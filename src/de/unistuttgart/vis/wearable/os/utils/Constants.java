@@ -24,4 +24,20 @@ public class Constants {
 	public static final int PERMISSION_TEMPERATURE = 0x00800800;	
 	
 	
+	//
+	// Constant IDS for internal sensors
+	//
+	public static final int INTERNAL_HEARTRATE_SENSOR = 0x00000001;
+	public static final int INTERNAL_ACCELEROMETER_SENSOR = 0x00000002;
+	public static final int INTERNAL_MAGNETIC_FIELD_SENSOR = 0x00000003;
+	public static final int INTERNAL_GYROSCOPE_SENSOR = 0x00000004;
+	public static final int INTERNAL_LIGHT_SENSOR = 0x00000005;
+	public static final int INTERNAL_PRESSURE_SENSOR = 0x00000006;
+	public static final int INTERNAL_PROXIMITY_SENSOR = 0x00000007;
+	public static final int INTERNAL_GRAVITY_SENSOR = 0x00000008;
+	public static final int INTERNAL_ROTATION_VECTOR_SENSOR = 0x00000009;
+	public static final int INTERNAL_RELATIVE_HUMIDITY_SENSOR = 0x0000000A;
+	public static final int INTERNAL_TEMPERATURE_SENSOR = 0x0000000B;
+	public static final int INTERNAL_GPS_SENSOR_SENSOR = 0x0000000C;
+	
 }
