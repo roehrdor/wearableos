@@ -184,7 +184,7 @@ public class MainActivity extends Activity {
 				}
 				while(true) {
 					try {
-						Thread.sleep(500);
+						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 					}
 					final long time = APIFunctions.getTime();
@@ -193,7 +193,7 @@ public class MainActivity extends Activity {
 						public void run() {
 							textView.setText(String.valueOf(time));	
 						}
-					});					
+					});				
 				}				
 			}
 		}).start();

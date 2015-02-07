@@ -2,6 +2,7 @@ package de.unistuttgart.vis.wearable.os.internalservice;
 
 import de.unistuttgart.vis.wearable.os.app.MainActivity;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
+import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 
 /**
  * This service shall be bound by the settings app only.
@@ -17,6 +18,7 @@ public class GarmentOSServiceInternal extends android.app.Service {
 	//
 	protected IGarmentInternalAPI.Stub APIInternalBinder = new APIInternalBinder();
 	
+	public static PUserApp pu = new PUserApp("blub", 1);
 	
 	
 	// =========================================================
@@ -59,5 +61,20 @@ public class GarmentOSServiceInternal extends android.app.Service {
 		super.onCreate();
 		if (context == null)
 			context = getApplicationContext();
+		
+		Runnable r = new Runnable() {			
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
+					android.util.Log.d("orDEBUG", "Service: " + pu.getName());
+				}
+			}
+		};
+		
+		new Thread(r).start();
 	}
 }
