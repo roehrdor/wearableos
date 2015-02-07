@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.unistuttgart.vis.wearable.os"
+    android:versionCode="1"
+    android:versionName="1.0" >
+    
+    <!-- Set the permission flags we need to use -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+    
+    <uses-sdk
+        android:minSdkVersion="17"
+        android:targetSdkVersion="21" />
+
+    <application
+        android:name="de.unistuttgart.vis.wearable.os.handle.APIHandle"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="de.unistuttgart.vis.wearable.os.app.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <!-- The public service -->
+        <service 
+            android:name="de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="de.unistuttgart.vis.wearable.os.api.IGarmentAPI"/>
+                <action android:name="de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce"/>
+            </intent-filter>            
+        </service>
+        
+        <!-- The internal service -->
+        <service 
+            android:name="de.unistuttgart.vis.wearable.os.internalservice.GarmentOSServiceInternal"
+            android:process=":remote">
+            <intent-filter >
+                <action android:name="de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI"/>
+                <action android:name="de.unistuttgart.vis.wearable.os.internalservice.GarmentOSServiceInternal"/>
+            </intent-filter>            
+        </service>
+        
+        
+    </application>
+
+</manifest>
