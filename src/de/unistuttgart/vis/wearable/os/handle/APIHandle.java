@@ -19,15 +19,14 @@ public class APIHandle extends android.app.Application {
 	// static handles for the services and intents and booleans to determine
 	// whether the service has already been bound or not
 	//
-	public static IGarmentAPI garmentAPIHandle;
-	public static IGarmentInternalAPI garmentInternalAPIHandle;
+	private static IGarmentAPI garmentAPIHandle;
+	private static IGarmentInternalAPI garmentInternalAPIHandle;
 	
 	private static android.content.Intent garmentAPIIntent = new android.content.Intent(IGarmentAPI.class.getName());
 	private static android.content.Intent garmentInternalAPIIntent = new android.content.Intent(IGarmentInternalAPI.class.getName());
 	
-	public static boolean serviceBound = false;
-	public static boolean serviceInternalBound = false;	
-	
+	private static boolean serviceBound = false;
+	private static boolean serviceInternalBound = false;		
 	
 	
 	// =========================================================
@@ -70,8 +69,7 @@ public class APIHandle extends android.app.Application {
 			serviceInternalBound = false;
 		}	
 	};
-	
-	
+
 	
 	
 	
@@ -80,7 +78,43 @@ public class APIHandle extends android.app.Application {
 	//
 	// Functions
 	//
-	// =========================================================	
+	// =========================================================
+	/**
+	 * Get the garment API Handle to make API function calls
+	 * 
+	 * @return the garment API Handle
+	 */
+	public static IGarmentAPI getGarmentAPIHandle() {
+		return garmentAPIHandle;
+	}
+	
+	/**
+	 * Get the internal garment API Handle to make internal API function calls
+	 * 
+	 * @return the garment API Handle for internal function calls
+	 */
+	public static IGarmentInternalAPI getGarmentInternalAPIHandle() {
+		return garmentInternalAPIHandle;
+	}
+	
+	/**
+	 * Tests whether the service is bound.
+	 * 
+	 * @return true if the service is bound
+	 */
+	public static boolean isServiceBound() {
+		return serviceBound && garmentAPIHandle != null;
+	}
+	
+	/**
+	 * Test whether the internal service is bound.
+	 * 
+	 * @return true if the internal service is bound
+	 */
+	public static boolean isInternalServiceBound() {
+		return serviceInternalBound && garmentInternalAPIHandle != null;
+	}
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();

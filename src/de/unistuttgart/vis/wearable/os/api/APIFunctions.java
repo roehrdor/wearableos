@@ -8,15 +8,11 @@ import de.unistuttgart.vis.wearable.os.handle.APIHandle;
  * 
  * @author roehrdor
  */
-public class APIFunctions {
-	public static boolean assertConnection() {
-		return APIHandle.serviceBound && APIHandle.garmentAPIHandle != null;
-	}
-	
+public class APIFunctions {	
 	public static long getTime() {
-		if(assertConnection()) {
+		if(APIHandle.isServiceBound()) {
 			try {
-				return APIHandle. garmentAPIHandle.currentTime();
+				return APIHandle.getGarmentAPIHandle().currentTime();
 			} catch(android.os.RemoteException e) {}
 		}
 		return 0xFFFFFFFFFFl;
