@@ -7,9 +7,11 @@
  */
 package de.unistuttgart.vis.wearable.os.service;
 
+import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 
 /**
  * This class implements the function calls passed through by the
@@ -67,7 +69,10 @@ class APIBinder extends IGarmentAPI.Stub {
 		}
 	}
 
+	
+
 	//
 	// Functions will be here
 	//
+
 }

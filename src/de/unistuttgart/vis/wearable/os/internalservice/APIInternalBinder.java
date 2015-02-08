@@ -50,6 +50,11 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 		return PrivacyManager.instance.getApp(name).toParcelable();
 	}
 
+	// =====================================================================
+	// 
+	// Function calls forward to UserApp object  
+	//
+	// -------------------------------------------------------------
 	//
 	// Calls to UserApp, oid represents the unique ID of the object 
 	//
@@ -107,5 +112,160 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 		return PrivacyManager.instance.getApp(oid).activityRecognitionGranted();
 	}
 
+	
+	// =====================================================================
+	// 
+	// Function calls forward to Sensor object  
+	//
+	// -------------------------------------------------------------
+	//
+	// Calls to Sensor, sid represents the unique ID of the object 
+	//
+	@Override
+	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
+	@Override
+	public void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String SENSORS_SENSOR_getDisplayedSensorName(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setDisplayedSensorName(int sid,
+			String displayedSensorName) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getSampleRate(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setSampleRate(int sid, int sampleRate)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getSavePeriod(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public float SENSORS_SENSOR_getSmoothness(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setSmoothness(int sid, float smoothness)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getSensorType(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setSensorType(int sid, int sensorType)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getGraphType(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setGraphType(int sid, int graphType)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setRawDataMeasurementUnit(int sid,
+			int rawDataMeasurementUnit) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setRawDataMeasurementSystem(int sid,
+			int rawDataMeasurementSystem) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid,
+			int displayedMeasurementUnit) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid,
+			int displayedMeasurementSystem) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}	
 }
