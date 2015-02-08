@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
-import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
-import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 
 /**
@@ -20,7 +18,7 @@ public class Sensor implements Serializable {
     private Vector<SensorData> rawData = new Vector<SensorData>();
     private boolean isInternalSensor = false;
 
-    private boolean isEnabled = true;
+    private boolean isEnabled = false;
 
     private int sampleRate = 0;
     private int savePeriod = 0;
