@@ -20,6 +20,7 @@ public class SensorDataDeSerializer implements Runnable {
 	private int sensorID = 0;
 	private java.util.List<SensorData> sensorData;
 	private int noDatasetsToRead = 0;
+	private android.content.Context context;
 	
 	private java.io.File file = null;
 	private java.io.RandomAccessFile raf = null;
@@ -40,13 +41,15 @@ public class SensorDataDeSerializer implements Runnable {
 	 *            will be thrown
 	 * @throws IllegalArgumentException if less than one element shall be read
 	 */
-	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead) {
+	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead, 
+									android.content.Context context) {
 		if(noDatasetsToRead < 1)
 			throw new IllegalArgumentException("Reading less than 1 element is not allowed");
 			
 		this.sensorData = sensorData;
 		this.sensorID = sensorID;
 		this.noDatasetsToRead = noDatasetsToRead;
+		this.context = context;
 	}
 
 	@Override
@@ -59,8 +62,9 @@ public class SensorDataDeSerializer implements Runnable {
 			//
 			// If the file does not exist we can not read anything 
 			//
-			file = new java.io.File(String.valueOf(sensorID));
+			file = new java.io.File(this.context.getFilesDir(), String.valueOf(sensorID));
 			if(!file.exists()) {
+				android.util.Log.d("orDEBUG", "File does not exist");
 				return;
 			}
 			
@@ -72,9 +76,10 @@ public class SensorDataDeSerializer implements Runnable {
 			//
 			// Based on the file size compute the number of entries in the file
 			//
-			currentFileLength = (int)file.length();
+			currentFileLength = (int)file.length();			
 			raf.seek(4);
 			dataDimension = raf.readInt();
+			android.util.Log.d("orDEBUG", "Open file, length " + currentFileLength + " " +dataDimension);
 			numberOfDataSetsInFile = (currentFileLength - 8) / ((dataDimension + 1) * 4); 
 			
 			//
@@ -112,7 +117,9 @@ public class SensorDataDeSerializer implements Runnable {
 			// Close the file
 			//
 			raf.close();
-		} catch (java.io.IOException ioe) {}
+		} catch (java.io.IOException ioe) {
+			android.util.Log.d("orDEBUG", ioe.getMessage());
+		}
 	}
 
 }

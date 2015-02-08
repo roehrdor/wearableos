@@ -21,6 +21,7 @@ public class SensorDataSerializer implements Runnable {
 	private java.util.List<SensorData> sensorData;
 	private java.io.File file = null;
 	private java.io.RandomAccessFile raf = null;
+	private android.content.Context context;
 	
 	/**
 	 * Create a new serializer
@@ -30,9 +31,10 @@ public class SensorDataSerializer implements Runnable {
 	 * @param sensorData
 	 *            the sensor data set to be serialized
 	 */
-	public SensorDataSerializer(int sensorID, java.util.List<SensorData> sensorData) {		
+	public SensorDataSerializer(int sensorID, java.util.List<SensorData> sensorData, android.content.Context context) {		
 		this.sensorData = sensorData;
 		this.sensorID = sensorID;							
+		this.context = context;
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class SensorDataSerializer implements Runnable {
 			// Create a new file object and test whether the file already
 			// exists. If the file does not already exist we need to create this file
 			//			
-			file = new java.io.File(String.valueOf(sensorID));
+			file = new java.io.File(this.context.getFilesDir(), String.valueOf(sensorID));
 			if(!file.exists()) {
 				//
 				// So we need to create a new file but also to insert the latest data 
