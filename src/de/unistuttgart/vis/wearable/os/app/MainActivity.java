@@ -12,12 +12,11 @@ import java.util.Vector;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctionsAsync;
 import de.unistuttgart.vis.wearable.os.api.AsyncResultObject;
+import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
-import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
-import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -199,25 +198,42 @@ public class MainActivity extends Activity {
 		new Thread(new Runnable() {			
 			@Override
 			public void run() {
+				
 				java.util.List<SensorData> sd = new Vector<SensorData>();
-				for(int i = 0; i != 0x10; ++i) {
-					sd.add(new SensorData(new float[]{i, i+0.5f}, Utils.getCurrentUnixTimeStamp() ));
+				
+				/*
+				for(int i = 0; i != 0x100; ++i) {
+					sd.add(new SensorData(new float[]{Utils.getCurrentUnixTimeStamp(), i+0.5f}, Utils.getCurrentUnixTimeStamp() ));
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
+				
 				new Thread(new SensorDataSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, getApplicationContext())).start();
+				runOnUiThread(new Runnable() {						
+					@Override
+					public void run() {
+						textView2.setText(":D:D");	
+					}
+				});	
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 				}
 				sd.clear();
-				new Thread(new SensorDataDeSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, 0x100, getApplicationContext())).start();
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-				}
+				*/
+				//long id = new SensorDataDeSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, 0x10, getApplicationContext()).work();
+				//long id = new SensorDataDeSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, 0x10, 1423404865).work();
+				//long id = new SensorDataDeSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, 1423404875, 1423405132, 0).work();
+				//while(!SensorDataDeSerializer.jobFinsihed(id));
+				/*
 				android.util.Log.d("orDEBUG", "size: " + sd.size());
 				for(final SensorData s : sd) {
 					try {
-						Thread.sleep(200);
+						Thread.sleep(20);
 					} catch (InterruptedException e) {
 					}
 					android.util.Log.d("orDEBUG", "" + s.getUnixDate() + " " + s.getData()[0]);					
@@ -226,11 +242,13 @@ public class MainActivity extends Activity {
 						public void run() {
 							textView2.setText(s.getUnixDate() + " " + s.getData()[0] + " " + s.getData()[1]);	
 						}
-					});	
+					});					
 				}
+				*/			
 				
 			}
 		}).start();
+		
 		
 		new Thread(new Runnable() {			
 			@Override
@@ -294,5 +312,9 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public static Context getContext() {
+		return context;
 	}
 }

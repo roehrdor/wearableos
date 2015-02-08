@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.privacy;
 
+import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
@@ -187,5 +188,14 @@ public class UserApp {
 	 */
 	public boolean activityRecognitionGranted() {
 		return this.activityRecognitionGranted;
-	}	
+	}
+
+	/**
+	 * Create a parcel able user application object from this one
+	 * 
+	 * @return the parcel able user application object
+	 */
+	public PUserApp toParcelable() {
+		return new PUserApp(this.name, this.ID, this.prohibitedSensors);
+	}
 }

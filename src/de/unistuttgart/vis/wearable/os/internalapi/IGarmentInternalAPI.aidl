@@ -14,11 +14,12 @@ interface IGarmentInternalAPI {
 	// Internal API Function calls
 	//
 	String[] 	API_getRegisteredApplications();
+	PUserApp[] 	API_getRegisteredUserApplications();
+	PUserApp 	API_getRegisteredUserAppByName(String name);
 	
 	// 
 	// Function calls forward to UserApp object  
 	//
-	int[] 		PRIVACY_USERAPP_getProhibitedSensors(int oid);
 	boolean 	PRIVACY_USERAPP_sensorProhibited(int oid, int id);
 	boolean 	PRIVACY_USERAPP_grantPermission(int oid, int id);
 	boolean 	PRIVACY_USERAPP_revokePermission(int oid, int id);

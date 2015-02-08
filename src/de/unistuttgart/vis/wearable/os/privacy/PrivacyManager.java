@@ -16,21 +16,19 @@ public class PrivacyManager {
 	// A map that maps the application names to the user application objects and
 	// a lock to allow concurrent processing
 	//
-	private final java.util.Map<String, UserApp> apps = new java.util.HashMap<String, UserApp>();
+	private java.util.Map<String, UserApp> apps = null;	
+	private android.util.SparseArray<UserApp> spapps = new android.util.SparseArray<UserApp>();
 
 	/**
 	 * Create a new Privacy manager object, since this is a singleton based
 	 * class the constructor needs to be private
 	 */
 	private PrivacyManager() {
-		this.init();
-	}
-
-	/**
-	 * Initialize the privacy manager and read the saved file
-	 */
-	private void init() {
-		
+		this.apps = SettingsStorage.readApps();
+		if(this.apps == null)
+			 this.apps = new java.util.HashMap<String, UserApp>();
+		for(UserApp ua : this.apps.values())
+			this.spapps.put(ua.getID(), ua);
 	}
 
 	/**
@@ -40,8 +38,11 @@ public class PrivacyManager {
 	 *            the name of the new app
 	 */
 	public void registerNewApp(String name) {
-		if (!this.apps.containsKey(name))
-			this.apps.put(name, new UserApp(name, name.hashCode()));
+		if (!this.apps.containsKey(name)) {
+			UserApp ua = new UserApp(name, name.hashCode());
+			this.apps.put(name, ua);
+			this.spapps.put(name.hashCode(), ua);
+		}
 		this.save();
 	}
 
@@ -62,6 +63,17 @@ public class PrivacyManager {
 	public UserApp getApp(String name) {
 		return this.apps.get(name);
 	}
+	
+	/**
+	 * Get the application by the id, returns null if application unknown
+	 * 
+	 * @param name
+	 *            the id of the application
+	 * @return the application object or null if not known
+	 */
+	public UserApp getApp(int id) {
+		return this.spapps.get(id);
+	}
 
 	/**
 	 * Return all the applications names
@@ -69,7 +81,9 @@ public class PrivacyManager {
 	 * @return all the applications names as array
 	 */
 	public String[] getAllAppNames() {
-		return (String[]) this.apps.keySet().toArray();
+		String[] s = new String[this.apps.keySet().size()];
+		this.apps.keySet().toArray(s);
+		return s;
 	}
 
 	/**
@@ -78,7 +92,9 @@ public class PrivacyManager {
 	 * @return all the user applications
 	 */
 	public UserApp[] getAllApps() {
-		return (UserApp[]) this.apps.values().toArray();
+		UserApp[] ua = new UserApp[this.apps.keySet().size()];
+		this.apps.keySet().toArray(ua);
+		return ua;
 	}
 
 }

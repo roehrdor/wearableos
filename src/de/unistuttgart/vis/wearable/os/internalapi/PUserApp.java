@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
+import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
