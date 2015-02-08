@@ -50,7 +50,7 @@ public class APIFunctions {
 	// =============================================================================
 
 	public static String[] getRegisteredApplications() {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().API_getRegisteredApplications();
 			} catch (android.os.RemoteException e) {
@@ -60,7 +60,7 @@ public class APIFunctions {
 	}
 	
 	public static PUserApp[] API_getRegisteredUserApplications() {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().API_getRegisteredUserApplications();
 			} catch (android.os.RemoteException e) {
@@ -70,7 +70,7 @@ public class APIFunctions {
 	}
 	
 	public static PUserApp API_getRegisteredUserAppByName(String name) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().API_getRegisteredUserAppByName(name);
 			} catch (android.os.RemoteException e) {
@@ -87,7 +87,7 @@ public class APIFunctions {
 	//
 	// =====================================================================
 	public static boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_sensorProhibited(oid, id);
 			} catch (android.os.RemoteException e) {
@@ -97,7 +97,7 @@ public class APIFunctions {
 	}
 
 	public static boolean PRIVACY_USERAPP_grantPermission(int oid, int id) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_grantPermission(oid, id);
 			} catch (android.os.RemoteException e) {
@@ -107,7 +107,7 @@ public class APIFunctions {
 	}
 
 	public static boolean PRIVACY_USERAPP_revokePermission(int oid, int id) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_revokePermission(oid, id);
 			} catch (android.os.RemoteException e) {
@@ -117,7 +117,7 @@ public class APIFunctions {
 	}
 
 	public static boolean PRIVACY_USERAPP_denySensorType(int oid, int flag) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_denySensorType(oid, flag);
 			} catch (android.os.RemoteException e) {
@@ -127,7 +127,7 @@ public class APIFunctions {
 	}
 
 	public static boolean PRIVACY_USERAPP_allowSensorType(int oid, int flag) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_allowSensorType(oid, flag);
 			} catch (android.os.RemoteException e) {
@@ -137,7 +137,7 @@ public class APIFunctions {
 	}
 
 	public static boolean PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_sensorTypeGranted(oid, flag);
 			} catch (android.os.RemoteException e) {
@@ -147,7 +147,7 @@ public class APIFunctions {
 	}
 
 	public static void PRIVACY_USERAPP_grantActivityRecognition(int oid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_grantActivityRecognition(oid);
 				return;
@@ -158,7 +158,7 @@ public class APIFunctions {
 	}
 
 	public static void PRIVACY_USERAPP_denyActivityRecognition(int oid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_denyActivityRecognition(oid);
 				return;
@@ -169,7 +169,7 @@ public class APIFunctions {
 	}
 
 	public static boolean PRIVACY_USERAPP_activityRecognitionGranted(int oid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_activityRecognitionGranted(oid);
 			} catch (android.os.RemoteException e) {
@@ -185,7 +185,7 @@ public class APIFunctions {
 	//
 	// =====================================================================
 	public static boolean SENSORS_SENSOR_isEnabled(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_isEnabled(sid);
 			} catch (android.os.RemoteException e) {
@@ -195,7 +195,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setEnabled(sid, isEnabled);
 			} catch (android.os.RemoteException e) {
@@ -205,7 +205,7 @@ public class APIFunctions {
 	}
 
 	public static String SENSORS_SENSOR_getDisplayedSensorName(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedSensorName(sid);
 			} catch (android.os.RemoteException e) {
@@ -215,7 +215,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setDisplayedSensorName(int sid, String displayedSensorName) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setDisplayedSensorName(sid, displayedSensorName);
 			} catch (android.os.RemoteException e) {
@@ -225,7 +225,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getSampleRate(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSampleRate(sid);
 			} catch (android.os.RemoteException e) {
@@ -235,7 +235,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setSampleRate(int sid, int sampleRate) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setSampleRate(sid, sampleRate);
 			} catch (android.os.RemoteException e) {
@@ -245,7 +245,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getSavePeriod(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSavePeriod(sid);
 			} catch (android.os.RemoteException e) {
@@ -255,7 +255,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setSavePeriod(sid, savePeriod);
 			} catch (android.os.RemoteException e) {
@@ -265,7 +265,7 @@ public class APIFunctions {
 	}
 
 	public static float SENSORS_SENSOR_getSmoothness(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSmoothness(sid);
 			} catch (android.os.RemoteException e) {
@@ -275,7 +275,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setSmoothness(int sid, float smoothness) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setSmoothness(sid, smoothness);
 			} catch (android.os.RemoteException e) {
@@ -285,7 +285,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getSensorType(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSensorType(sid);
 			} catch (android.os.RemoteException e) {
@@ -295,7 +295,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setSensorType(int sid, int sensorType) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setSensorType(sid, sensorType);
 			} catch (android.os.RemoteException e) {
@@ -305,7 +305,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getGraphType(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getGraphType(sid);
 			} catch (android.os.RemoteException e) {
@@ -315,7 +315,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setGraphType(int sid, int graphType) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setGraphType(sid, graphType);
 			} catch (android.os.RemoteException e) {
@@ -325,7 +325,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementUnit(sid);
 			} catch (android.os.RemoteException e) {
@@ -335,7 +335,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setRawDataMeasurementUnit(int sid, int rawDataMeasurementUnit) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setRawDataMeasurementUnit(sid, rawDataMeasurementUnit);
 			} catch (android.os.RemoteException e) {
@@ -345,7 +345,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementSystem(sid);
 			} catch (android.os.RemoteException e) {
@@ -355,7 +355,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setRawDataMeasurementSystem(int sid, int rawDataMeasurementSystem) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setRawDataMeasurementSystem(sid, rawDataMeasurementSystem);
 			} catch (android.os.RemoteException e) {
@@ -365,7 +365,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedMeasurementUnit(sid);
 			} catch (android.os.RemoteException e) {
@@ -375,7 +375,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setDisplayedMeasurementUnit(sid, displayedMeasurementUnit);
 			} catch (android.os.RemoteException e) {
@@ -385,7 +385,7 @@ public class APIFunctions {
 	}
 
 	public static int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedMeasurementSystem(sid);
 			} catch (android.os.RemoteException e) {
@@ -395,7 +395,7 @@ public class APIFunctions {
 	}
 
 	public static void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem) {
-		if (APIHandle.isServiceBound()) {
+		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setDisplayedMeasurementSystem(sid, displayedMeasurementSystem);
 			} catch (android.os.RemoteException e) {

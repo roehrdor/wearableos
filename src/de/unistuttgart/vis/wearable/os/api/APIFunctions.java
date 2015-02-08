@@ -10,24 +10,141 @@ package de.unistuttgart.vis.wearable.os.api;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 
 /**
- * This class provides of all the available function that can be called
- * from any application that has bound its connection to the service.
+ * This class provides of all the available function that can be called from any
+ * application that has bound its connection to the service.
  * 
  * @author roehrdor
  */
-public class APIFunctions {	
+public class APIFunctions {
 	public static long getTime() {
-		if(APIHandle.isServiceBound()) {
+		if (APIHandle.isServiceBound()) {
 			try {
 				return APIHandle.getGarmentAPIHandle().currentTime();
-			} catch(android.os.RemoteException e) {}
+			} catch (android.os.RemoteException e) {
+			}
 		}
 		return 0xFFFFFFFFFFl;
 	}
-	
+
 	// =============================================================================
 	//
 	// Public SDK Functions
 	//
 	// =============================================================================
+
+	// =====================================================================
+	//
+	// Function calls forward to Sensor object
+	//
+	// =====================================================================
+	public static boolean SENSORS_SENSOR_isEnabled(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_isEnabled(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static String SENSORS_SENSOR_getDisplayedSensorName(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedSensorName(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getSampleRate(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSampleRate(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getSavePeriod(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSavePeriod(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static float SENSORS_SENSOR_getSmoothness(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSmoothness(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getSensorType(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSensorType(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getGraphType(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getGraphType(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementUnit(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementSystem(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedMeasurementUnit(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
+	public static int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid) {
+		if (APIHandle.isServiceBound()) {
+			try {
+				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedMeasurementSystem(sid);
+			} catch (android.os.RemoteException e) {
+			}
+		}
+		throw new RuntimeException("Connection failed");
+	}
+
 }

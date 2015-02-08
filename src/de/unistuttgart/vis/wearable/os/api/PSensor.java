@@ -5,7 +5,7 @@
  * 
  * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
  */
-package de.unistuttgart.vis.wearable.os.internalapi;
+package de.unistuttgart.vis.wearable.os.api;
 
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
@@ -46,8 +46,7 @@ public class PSensor implements android.os.Parcelable {
 	// The gained sensor data
 	//
 	private java.util.List<SensorData> rawData = new java.util.Vector<SensorData>();
-	
-	
+		
 	
 	// =============================================================
 	//
@@ -171,7 +170,7 @@ public class PSensor implements android.os.Parcelable {
 	
 	// =====================================================================
 	//
-	// Getter and Setter functions	
+	// Getter functions	
 	// 
 	// =====================================================================
 	/**
@@ -183,27 +182,11 @@ public class PSensor implements android.os.Parcelable {
 	}
 
 	/**
-	 * @param isEnabled the isEnabled to set
-	 */
-	public void setEnabled(boolean isEnabled) {		
-		this.isEnabled = isEnabled;
-		APIFunctions.SENSORS_SENSOR_setEnabled(this.ID, isEnabled);
-	}
-
-	/**
 	 * @return the displayedSensorName
 	 */
 	public String getDisplayedSensorName() {
 		this.displayedSensorName = APIFunctions.SENSORS_SENSOR_getDisplayedSensorName(this.ID);
 		return this.displayedSensorName;
-	}
-
-	/**
-	 * @param displayedSensorName the displayedSensorName to set
-	 */
-	public void setDisplayedSensorName(String displayedSensorName) {
-		this.displayedSensorName = displayedSensorName;
-		APIFunctions.SENSORS_SENSOR_setDisplayedSensorName(this.ID, displayedSensorName);
 	}
 
 	/**
@@ -213,29 +196,13 @@ public class PSensor implements android.os.Parcelable {
 		this.sampleRate = APIFunctions.SENSORS_SENSOR_getSampleRate(this.ID);
 		return this.sampleRate;
 	}
-
-	/**
-	 * @param sampleRate the sampleRate to set
-	 */
-	public void setSampleRate(int sampleRate) {
-		this.sampleRate = sampleRate;
-		APIFunctions.SENSORS_SENSOR_setSampleRate(this.ID, sampleRate);
-	}
-
+	
 	/**
 	 * @return the savePeriod
 	 */
 	public int getSavePeriod() {
 		this.savePeriod = APIFunctions.SENSORS_SENSOR_getSavePeriod(this.ID);
 		return savePeriod;
-	}
-
-	/**
-	 * @param savePeriod the savePeriod to set
-	 */
-	public void setSavePeriod(int savePeriod) {
-		this.savePeriod = savePeriod;
-		APIFunctions.SENSORS_SENSOR_setSavePeriod(this.ID, savePeriod);
 	}
 
 	/**
@@ -247,14 +214,6 @@ public class PSensor implements android.os.Parcelable {
 	}
 
 	/**
-	 * @param smoothness the smoothness to set
-	 */
-	public void setSmoothness(float smoothness) {		
-		this.smoothness = smoothness;
-		APIFunctions.SENSORS_SENSOR_setSmoothness(this.ID, smoothness);
-	}	
-	
-	/**
 	 * @return the sensorType
 	 */
 	public SensorType getSensorType() {
@@ -264,15 +223,6 @@ public class PSensor implements android.os.Parcelable {
 		else
 			this.sensorType = SensorType.values()[ordinal];
 		return sensorType;
-	}
-
-	/**
-	 * @param sensorType the sensorType to set
-	 */
-	public void setSensorType(SensorType sensorType) {
-		this.sensorType = sensorType;
-		int ordinal = sensorType != null ? sensorType.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setSensorType(this.ID, ordinal);
 	}
 
 	/**
@@ -288,15 +238,6 @@ public class PSensor implements android.os.Parcelable {
 	}
 
 	/**
-	 * @param graphType the graphType to set
-	 */
-	public void setGraphType(GraphType graphType) {
-		this.graphType = graphType;
-		int ordinal = graphType != null ? graphType.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setGraphType(this.ID, ordinal);
-	}
-
-	/**
 	 * @return the rawDataMeasurementUnit
 	 */
 	public MeasurementUnits getRawDataMeasurementUnit() {
@@ -306,15 +247,6 @@ public class PSensor implements android.os.Parcelable {
 		else
 			this.rawDataMeasurementUnit = MeasurementUnits.values()[ordinal];
 		return rawDataMeasurementUnit;
-	}
-
-	/**
-	 * @param rawDataMeasurementUnit the rawDataMeasurementUnit to set
-	 */
-	public void setRawDataMeasurementUnit(MeasurementUnits rawDataMeasurementUnit) {
-		this.rawDataMeasurementUnit = rawDataMeasurementUnit;
-		int ordinal = rawDataMeasurementUnit != null ? rawDataMeasurementUnit.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setRawDataMeasurementUnit(this.ID, ordinal);
 	}
 
 	/**
@@ -330,15 +262,6 @@ public class PSensor implements android.os.Parcelable {
 	}
 
 	/**
-	 * @param rawDataMeasurementSystem the rawDataMeasurementSystem to set
-	 */
-	public void setRawDataMeasurementSystem(MeasurementSystems rawDataMeasurementSystem) {
-		this.rawDataMeasurementSystem = rawDataMeasurementSystem;
-		int ordinal = rawDataMeasurementSystem != null ? rawDataMeasurementSystem.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setRawDataMeasurementSystem(this.ID, ordinal);
-	}
-
-	/**
 	 * @return the displayedMeasurementUnit
 	 */
 	public MeasurementUnits getDisplayedMeasurementUnit() {
@@ -351,15 +274,6 @@ public class PSensor implements android.os.Parcelable {
 	}
 
 	/**
-	 * @param displayedMeasurementUnit the displayedMeasurementUnit to set
-	 */
-	public void setDisplayedMeasurementUnit(MeasurementUnits displayedMeasurementUnit) {
-		this.displayedMeasurementUnit = displayedMeasurementUnit;
-		int ordinal = displayedMeasurementUnit != null ? displayedMeasurementUnit.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setDisplayedMeasurementUnit(this.ID, ordinal);
-	}
-
-	/**
 	 * @return the displayedMeasurementSystem
 	 */
 	public MeasurementSystems getDisplayedMeasurementSystem() {
@@ -369,15 +283,6 @@ public class PSensor implements android.os.Parcelable {
 		else
 			this.displayedMeasurementSystem = MeasurementSystems.values()[ordinal];
 		return displayedMeasurementSystem;
-	}
-
-	/**
-	 * @param displayedMeasurementSystem the displayedMeasurementSystem to set
-	 */
-	public void setDisplayedMeasurementSystem(MeasurementSystems displayedMeasurementSystem) {
-		this.displayedMeasurementSystem = displayedMeasurementSystem;
-		int ordinal = displayedMeasurementSystem != null ? displayedMeasurementSystem.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setDisplayedMeasurementSystem(this.ID, ordinal);
 	}
 
 

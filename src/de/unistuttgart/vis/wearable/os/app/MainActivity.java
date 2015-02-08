@@ -7,13 +7,9 @@
  */
 package de.unistuttgart.vis.wearable.os.app;
 
-import java.util.Vector;
-
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctionsAsync;
 import de.unistuttgart.vis.wearable.os.api.AsyncResultObject;
-import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.app.Activity;
 import android.content.Context;
@@ -192,22 +188,20 @@ public class MainActivity extends Activity {
 		}	
 		
 		final TextView textView = (TextView) findViewById(R.id.textView1);
-		final TextView textView2 = (TextView) findViewById(R.id.textView2);
+		//final TextView textView2 = (TextView) findViewById(R.id.textView2);
 		final AsyncResultObject aro = new AsyncResultObject();
 		
 		new Thread(new Runnable() {			
 			@Override
 			public void run() {
-				
+				/*
 				java.util.List<SensorData> sd = new Vector<SensorData>();
 				
-				/*
 				for(int i = 0; i != 0x100; ++i) {
 					sd.add(new SensorData(new float[]{Utils.getCurrentUnixTimeStamp(), i+0.5f}, Utils.getCurrentUnixTimeStamp() ));
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

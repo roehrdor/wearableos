@@ -11,7 +11,6 @@ import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
-import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 
 /**
  * This class implements the function calls passed through by the
@@ -74,5 +73,74 @@ class APIBinder extends IGarmentAPI.Stub {
 	//
 	// Functions will be here
 	//
+	@Override
+	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
+	@Override
+	public String SENSORS_SENSOR_getDisplayedSensorName(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getSampleRate(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getSavePeriod(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float SENSORS_SENSOR_getSmoothness(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getSensorType(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getGraphType(int sid) throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
