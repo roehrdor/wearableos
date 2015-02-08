@@ -45,6 +45,8 @@ public class SensorDataSerializer implements Runnable {
 	 *            the id of the sensor where from this data sets are coming
 	 * @param sensorData
 	 *            the sensor data set to be serialized
+	 * @param context
+	 *            the context of the application to save the file as
 	 */
 	public SensorDataSerializer(int sensorID, java.util.List<SensorData> sensorData, android.content.Context context) {		
 		this.sensorData = sensorData;
