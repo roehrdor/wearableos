@@ -13,8 +13,31 @@ package de.unistuttgart.vis.wearable.os.utils;
  * @author roehrdor
  */
 public class Utils {
-	private Utils() {}
-	
+	private Utils() {
+	}
+
+	/**
+	 * Create the unix time stamp from the given {@link java.util.Date} object
+	 * 
+	 * @param date
+	 *            the date object
+	 * @return the unix time stamp for the date object
+	 */
+	public static int dateToUnix(java.util.Date date) {
+		return (int) (date.getTime() / 1000L);
+	}
+
+	/**
+	 * Create a new {@link java.util.Date} object from the given unix time stamp
+	 * 
+	 * @param unixTime
+	 *            the unix time stamp to create a date object for
+	 * @return the date object for the time stamp
+	 */
+	public static java.util.Date unixToDate(int unixTime) {
+		return new java.util.Date(1000L * unixTime);
+	}
+
 	/**
 	 * Return the current unix time stamp as integer value.
 	 * 
