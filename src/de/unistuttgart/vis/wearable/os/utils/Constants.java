@@ -1,5 +1,17 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ */
 package de.unistuttgart.vis.wearable.os.utils;
 
+/**
+ * This file defines constants used in the Garment OS system
+ *  
+ * @author roehrdor
+ */
 public class Constants {
 	private Constants(){}
 	
@@ -40,5 +52,5 @@ public class Constants {
 	public static final int INTERNAL_RELATIVE_HUMIDITY_SENSOR = 0x0000000A;
 	public static final int INTERNAL_TEMPERATURE_SENSOR = 0x0000000B;
 	public static final int INTERNAL_GPS_SENSOR_SENSOR = 0x0000000C;
-	
+
 }

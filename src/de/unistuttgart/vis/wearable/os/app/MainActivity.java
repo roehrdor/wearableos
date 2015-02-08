@@ -1,7 +1,16 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ */
 package de.unistuttgart.vis.wearable.os.app;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
+import de.unistuttgart.vis.wearable.os.api.APIFunctionsAsync;
+import de.unistuttgart.vis.wearable.os.api.AsyncResultObject;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,6 +18,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+/**
+ * Main Activity of the garment os settings app
+ * 
+ * @author roehrdor
+ */
 public class MainActivity extends Activity {
 	
 	//
@@ -174,7 +188,7 @@ public class MainActivity extends Activity {
 		}	
 		
 		final TextView textView = (TextView) findViewById(R.id.textView1);
-		
+		final AsyncResultObject aro = new AsyncResultObject();
 		new Thread(new Runnable() {			
 			@Override
 			public void run() {
@@ -187,11 +201,20 @@ public class MainActivity extends Activity {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 					}
-					final long time = APIFunctions.getTime();
+					long time = 0;
+					APIFunctionsAsync.getTime(aro);
+					time = APIFunctions.getTime();
+					if(aro.getObject() == null) {
+						time = 0;
+					}						
+					else {
+						time = (Long)aro.getObject();
+					}
+					final long t = time;
 					runOnUiThread(new Runnable() {						
 						@Override
 						public void run() {
-							textView.setText(String.valueOf(time));	
+							textView.setText(String.valueOf(t));	
 						}
 					});				
 				}				

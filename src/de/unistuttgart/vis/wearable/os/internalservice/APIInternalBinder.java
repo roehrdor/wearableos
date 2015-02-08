@@ -1,8 +1,28 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ */
 package de.unistuttgart.vis.wearable.os.internalservice;
 
 import android.os.RemoteException;
+import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
 
+/**
+ * <p>
+ * This class implements the functions provided by the internal SDK. These
+ * functions will be called from the corresponding handle created in
+ * {@link APIHandle}.
+ * </p>
+ * <p>
+ * Note these functions will be executed in the service
+ * </p> 
+ * 
+ * @author roehrdor
+ */
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 
 	//

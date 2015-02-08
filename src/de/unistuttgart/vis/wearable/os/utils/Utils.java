@@ -1,11 +1,20 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ */
 package de.unistuttgart.vis.wearable.os.utils;
 
 /**
+ * This class provides some basic utilities that can be used everywhere.
  * 
  * @author roehrdor
  */
 public class Utils {
-
+	private Utils() {}
+	
 	/**
 	 * Return the current unix time stamp as integer value.
 	 * 
