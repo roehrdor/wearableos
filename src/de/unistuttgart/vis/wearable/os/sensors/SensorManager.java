@@ -1,8 +1,11 @@
 package de.unistuttgart.vis.wearable.os.sensors;
 
+import android.annotation.SuppressLint;
+
 /**
  * @author pfaehlfd
  */
+@SuppressLint("UseSparseArrays")
 public final class SensorManager {
 	// roehrdor modified
     private static java.util.Map<Integer, Sensor> allSensors = new java.util.HashMap<Integer, Sensor>();

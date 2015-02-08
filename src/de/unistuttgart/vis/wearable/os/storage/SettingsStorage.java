@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.storage;
 
+import android.annotation.SuppressLint;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
@@ -97,6 +98,7 @@ public class SettingsStorage {
 	 * @param privacy
 	 *            the privacy settings
 	 */
+	@SuppressLint("UseSparseArrays")
 	public static void saveSensorAndPrivacy(
 			java.util.Map<Integer, Sensor> sensors,
 			java.util.Map<String, UserApp> privacy) {
