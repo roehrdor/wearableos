@@ -133,6 +133,7 @@ public class APIHandle extends android.app.Application {
 			//
 			// Bind the public service
 			//
+			garmentAPIIntent.putExtra("AppProcess", getApplicationInfo().processName);
 			serviceBound = bindService(Utils.explicitFromImplicit(getApplicationContext(), garmentAPIIntent), 
 									serviceConnection, android.content.Context.BIND_AUTO_CREATE);			
 		}

@@ -64,7 +64,9 @@ public class UserApp {
 	 *         sensor
 	 */
 	public boolean sensorProhibited(int id) {
-		return prohibitedSensors.contains(id);
+		boolean ret = prohibitedSensors.contains(id);
+		PrivacyManager.instance.save();
+		return ret;
 	}
 
 	/**
@@ -81,7 +83,9 @@ public class UserApp {
 	 *         permission has been changed
 	 */
 	public boolean grantPermission(int id) {
-		return prohibitedSensors.remove(id);
+		boolean ret = prohibitedSensors.remove(id);
+		PrivacyManager.instance.save();
+		return ret;
 	}
 
 	/**
@@ -96,7 +100,9 @@ public class UserApp {
 	 * @return
 	 */
 	public boolean revokePermission(int id) {
-		return prohibitedSensors.add(id);
+		boolean ret = prohibitedSensors.add(id);
+		PrivacyManager.instance.save();
+		return ret;
 	}
 
 	/**
@@ -117,6 +123,7 @@ public class UserApp {
 		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
 			return false;
 		this.permissionFlags |= flag;
+		PrivacyManager.instance.save();
 		return true;
 	}
 
@@ -136,6 +143,7 @@ public class UserApp {
 		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
 			return false;
 		this.permissionFlags ^= (flag ^ Constants.BASE_PERMISSION);
+		PrivacyManager.instance.save();
 		return true;
 	}
 
@@ -158,6 +166,7 @@ public class UserApp {
 	 */
 	public void grantActivityRecognition() {
 		this.activityRecognitionGranted = true;
+		PrivacyManager.instance.save();
 	}
 
 	/**
@@ -166,6 +175,7 @@ public class UserApp {
 	 */
 	public void denyActivityRecognition() {
 		this.activityRecognitionGranted = false;
+		PrivacyManager.instance.save();
 	}
 
 	/**
@@ -177,5 +187,5 @@ public class UserApp {
 	 */
 	public boolean activityRecognitionGranted() {
 		return this.activityRecognitionGranted;
-	}
+	}	
 }

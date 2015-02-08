@@ -1,18 +1,17 @@
 package de.unistuttgart.vis.wearable.os.sensors;
 
-import java.util.Vector;
-
 /**
  * @author pfaehlfd
  */
 public final class SensorManager {
-    private static Vector<Sensor> allSensors = new Vector<Sensor>();
+	// roehrdor modified
+    private static java.util.Map<Integer, Sensor> allSensors = new java.util.HashMap<Integer, Sensor>();
 
     protected static void addNewSensor(Sensor sensor) {
-        allSensors.add(sensor);
+        allSensors.put(sensor.getSensorID(), sensor);
     }
 
-    public static Vector<Sensor> getAllSensors () {
-        return allSensors;
+    public static java.util.Collection<Sensor> getAllSensors () {
+        return allSensors.values();
     }
 }

@@ -11,6 +11,7 @@ import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
 import de.unistuttgart.vis.wearable.os.app.MainActivity;
+import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
@@ -80,18 +81,22 @@ public class GarmentOSSerivce extends android.app.Service {
 	
 	@Override
 	public android.os.IBinder onBind(android.content.Intent intent) {
-		if(IGarmentAPI.class.getName().equals(intent.getAction()))
+		if(IGarmentAPI.class.getName().equals(intent.getAction())) {
+			String appName = intent.getStringExtra("AppProcess");
+			PrivacyManager.instance.registerNewApp(appName);
 			return this.APIBinder;
+		}					
 		else
 			return null;
 	}
 	
 	@Override
 	public void onCreate() {
-		super.onCreate();
+		super.onCreate();		
 		mHandler.sendEmptyMessage(Constants.CALLBACK_DEBUG_VALUE);
 		if(context == null)
-			context = getApplicationContext();		
+			context = getApplicationContext();
+		
 	}
 	
 }
