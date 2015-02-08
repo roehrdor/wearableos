@@ -24,12 +24,14 @@ public class Sensor implements Serializable {
 
     private int sampleRate = 0;
     private int savePeriod = 0;
+
     private String displayedSensorName = "";
     private SensorType sensorType = null;
     private float smoothness = 0.0f;
     private GraphType graphType = null;
 
     private MeasurementUnits rawDataMeasurementUnit = null;
+
     private MeasurementSystems rawDataMeasurementSystem = null;
     private MeasurementUnits displayedMeasurementUnit = null;
     private MeasurementSystems displayedMeasurementSystem = null;
@@ -52,6 +54,48 @@ public class Sensor implements Serializable {
         }
         sensorID = id;
         SensorManager.addNewSensor(this);
+    }
+
+    /**
+     * Use only for internal Sensors
+     */
+    protected Sensor(android.hardware.Sensor sensor, int sampleRate, int savePeriod,
+                     float smoothness, String displayedSensorName, SensorType sensorType,
+                     MeasurementSystems rawDataMeasurementSystem,
+                     MeasurementUnits rawDataMeasurementUnit) {
+        this.isInternalSensor = true;
+        this.sensorID = sensor.getType();
+        this.sampleRate = sampleRate;
+        this.savePeriod = savePeriod;
+        this.smoothness = smoothness;
+        this.displayedSensorName = displayedSensorName;
+        this.sensorType = sensorType;
+        this.rawDataMeasurementSystem = rawDataMeasurementSystem;
+        this.displayedMeasurementSystem = rawDataMeasurementSystem;
+        this.rawDataMeasurementUnit = rawDataMeasurementUnit;
+        this.displayedMeasurementUnit = rawDataMeasurementUnit;
+        this.graphType = GraphType.LINE;
+    }
+
+    /**
+     * Use only for internal GPS Sensors
+     */
+    protected Sensor(int gpsSensorID, int sampleRate, int savePeriod,
+                     float smoothness, String displayedSensorName, SensorType sensorType,
+                     MeasurementSystems rawDataMeasurementSystem,
+                     MeasurementUnits rawDataMeasurementUnit) {
+        this.isInternalSensor = true;
+        this.sensorID = gpsSensorID;
+        this.sampleRate = sampleRate;
+        this.savePeriod = savePeriod;
+        this.smoothness = smoothness;
+        this. displayedSensorName = displayedSensorName;
+        this.sensorType = sensorType;
+        this.rawDataMeasurementSystem = rawDataMeasurementSystem;
+        this.displayedMeasurementSystem = rawDataMeasurementSystem;
+        this.rawDataMeasurementUnit = rawDataMeasurementUnit;
+        this.displayedMeasurementUnit = rawDataMeasurementUnit;
+        this.graphType = GraphType.LINE;
     }
 
     public boolean isInternalSensor() {
@@ -109,6 +153,7 @@ public class Sensor implements Serializable {
         return rawData;
     }
 
+    @SuppressWarnings("deprecation")
     public Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
         if (!plusMinusOneSecond) {
             return getRawData(time, time);
@@ -178,5 +223,61 @@ public class Sensor implements Serializable {
 
     public int getSensorID() {
         return sensorID;
+    }
+
+    public SensorType getSensorType() {
+        return sensorType;
+    }
+
+    public void setSensorType(SensorType sensorType) {
+        this.sensorType = sensorType;
+    }
+
+    public String getDisplayedSensorName() {
+        return displayedSensorName;
+    }
+
+    public void setDisplayedSensorName(String displayedSensorName) {
+        this.displayedSensorName = displayedSensorName;
+    }
+
+    public int getSampleRate() {
+        return sampleRate;
+    }
+
+    public void setSampleRate(int sampleRate) {
+        this.sampleRate = sampleRate;
+    }
+
+    public String getBluetoothID() {
+        return bluetoothID;
+    }
+
+    public void setBluetoothID(String bluetoothID) {
+        this.bluetoothID = bluetoothID;
+    }
+
+    public float getSmoothness() {
+        return smoothness;
+    }
+
+    public void setSmoothness(float smoothness) {
+        this.smoothness = smoothness;
+    }
+
+    public int getSavePeriod() {
+        return savePeriod;
+    }
+
+    public void setSavePeriod(int savePeriod) {
+        this.savePeriod = savePeriod;
+    }
+
+    public GraphType getGraphType() {
+        return graphType;
+    }
+
+    public void setGraphType(GraphType graphType) {
+        this.graphType = graphType;
     }
 }
