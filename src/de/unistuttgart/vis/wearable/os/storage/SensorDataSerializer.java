@@ -8,6 +8,7 @@
 package de.unistuttgart.vis.wearable.os.storage;
 
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
 
 /**
  * Serialize sensor Data and save them to a file. Note that no duplicates will
@@ -22,6 +23,20 @@ public class SensorDataSerializer implements Runnable {
 	private java.io.File file = null;
 	private java.io.RandomAccessFile raf = null;
 	private android.content.Context context;
+	
+	/**
+	 * Create a new serializer
+	 * 
+	 * @param sensorID
+	 *            the id of the sensor where from this data sets are coming
+	 * @param sensorData
+	 *            the sensor data set to be serialized
+	 */
+	public SensorDataSerializer(int sensorID, java.util.List<SensorData> sensorData) {		
+		this.sensorData = sensorData;
+		this.sensorID = sensorID;							
+		this.context = GarmentOSSerivce.getContext();
+	}
 	
 	/**
 	 * Create a new serializer
