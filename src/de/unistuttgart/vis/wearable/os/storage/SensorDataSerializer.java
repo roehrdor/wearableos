@@ -19,7 +19,7 @@ import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
  */
 public class SensorDataSerializer implements Runnable {
 	private int sensorID = 0;
-	private java.util.List<SensorData> sensorData;
+	private java.util.Vector<SensorData> sensorData;
 	private java.io.File file = null;
 	private java.io.RandomAccessFile raf = null;
 	private android.content.Context context;
@@ -32,8 +32,9 @@ public class SensorDataSerializer implements Runnable {
 	 * @param sensorData
 	 *            the sensor data set to be serialized
 	 */
-	public SensorDataSerializer(int sensorID, java.util.List<SensorData> sensorData) {		
-		this.sensorData = sensorData;
+	@SuppressWarnings("unchecked")
+	public SensorDataSerializer(int sensorID, java.util.Vector<SensorData> sensorData) {		
+		this.sensorData = (java.util.Vector<SensorData>) sensorData.clone();
 		this.sensorID = sensorID;							
 		this.context = GarmentOSSerivce.getContext();
 	}
@@ -48,8 +49,9 @@ public class SensorDataSerializer implements Runnable {
 	 * @param context
 	 *            the context of the application to save the file as
 	 */
-	public SensorDataSerializer(int sensorID, java.util.List<SensorData> sensorData, android.content.Context context) {		
-		this.sensorData = sensorData;
+	@SuppressWarnings("unchecked")
+	public SensorDataSerializer(int sensorID, java.util.Vector<SensorData> sensorData, android.content.Context context) {		
+		this.sensorData = (java.util.Vector<SensorData>)sensorData.clone();
 		this.sensorID = sensorID;							
 		this.context = context;
 	}
