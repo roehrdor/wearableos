@@ -7,10 +7,15 @@
  */
 package de.unistuttgart.vis.wearable.os.app;
 
+import java.util.Vector;
+
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 import de.unistuttgart.vis.wearable.os.api.APIFunctionsAsync;
 import de.unistuttgart.vis.wearable.os.api.AsyncResultObject;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
+import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
+import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.app.Activity;
 import android.os.Bundle;
@@ -188,7 +193,45 @@ public class MainActivity extends Activity {
 		}	
 		
 		final TextView textView = (TextView) findViewById(R.id.textView1);
+		final TextView textView2 = (TextView) findViewById(R.id.textView2);
 		final AsyncResultObject aro = new AsyncResultObject();
+		
+		new Thread(new Runnable() {			
+			@Override
+			public void run() {
+				java.util.List<SensorData> sd = new Vector<SensorData>();
+				for(int i = 0; i != 0x10; ++i) {
+					sd.add(new SensorData(new float[]{i, i+0.5f}, Utils.getCurrentUnixTimeStamp() ));
+				}
+				new Thread(new SensorDataSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, getApplicationContext())).start();
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+				sd.clear();
+				new Thread(new SensorDataDeSerializer(Constants.INTERNAL_GYROSCOPE_SENSOR, sd, 0x100, getApplicationContext())).start();
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+				android.util.Log.d("orDEBUG", "size: " + sd.size());
+				for(final SensorData s : sd) {
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+					}
+					android.util.Log.d("orDEBUG", "" + s.getUnixDate() + " " + s.getData()[0]);					
+					runOnUiThread(new Runnable() {						
+						@Override
+						public void run() {
+							textView2.setText(s.getUnixDate() + " " + s.getData()[0] + " " + s.getData()[1]);	
+						}
+					});	
+				}
+				
+			}
+		}).start();
+		
 		new Thread(new Runnable() {			
 			@Override
 			public void run() {
@@ -203,7 +246,6 @@ public class MainActivity extends Activity {
 					}
 					long time = 0;
 					APIFunctionsAsync.getTime(aro);
-					time = APIFunctions.getTime();
 					if(aro.getObject() == null) {
 						time = 0;
 					}						
@@ -221,8 +263,6 @@ public class MainActivity extends Activity {
 			}
 		}).start();
 	}
-
-	TextView textView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
