@@ -112,7 +112,7 @@ public class SensorsActivity extends Activity {
                 this.sensorNames[count] = sensor.getDisplayedSensorName();
                 this.smoothness[count] = sensor.getSmoothness();
                 this.imageId[count] = R.drawable.speed;
-                int powerOption = (int)(sensor.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FAKTOR);
+                int powerOption = (int)(sensor.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FACTOR);
                 powerOption = powerOption == 0 ? 1 : powerOption;
                 this.powerOption[count++] = powerOption;
             }
@@ -144,7 +144,7 @@ public class SensorsActivity extends Activity {
 
     public void openSensor(int position) {
         Intent intent = new Intent(this, SensorDetailActivity.class);
-        intent.putExtra("sensorName", sensorNames[position]);
+        intent.putExtra("sensorId", sensors[position].getID());
         intent.putExtra("newSensor", false);
         startActivity(intent);
     }

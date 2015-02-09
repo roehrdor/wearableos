@@ -21,15 +21,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
-import de.unistuttgart.vis.wearable.os.sensors.Sensor;
-import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
+import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
 public class SensorDetailActivity extends Activity {
 
-    private Sensor sensor;
+    private PSensor sensor;
     private SeekBar seekBarSmoothness;
     private SeekBar seekBarPowerOptions;
     private Spinner spinner;
@@ -44,9 +44,9 @@ public class SensorDetailActivity extends Activity {
     private int powerOption = 0;
     private MeasurementSystems measurementSystem = MeasurementSystems.TEMPERATURE;
     private SensorType sensorType = SensorType.TEMPERATURE;
-    private String sensorName = "sensorName";
-    public static final int SAVE_PERIOD_FAKTOR = 125;
-    public static final double SAMPLE_RATE_FAKTOR = 1.2;
+    private int sensorId;
+    public static final int SAVE_PERIOD_FACTOR = 125;
+    public static final double SAMPLE_RATE_FACTOR = 1.2;
     private boolean enabled;
 
 
@@ -63,37 +63,36 @@ public class SensorDetailActivity extends Activity {
 
     public void showGraph(View view) {
         Intent intent = new Intent(getBaseContext(), GraphActivity.class);
-        intent.putExtra("sensorName", getIntent().getStringExtra("sensorName"));
+        intent.putExtra("sensorId", getIntent().getIntExtra("sensorId", -1));
         startActivity(intent);
     }
 
     private void buildSensorProperties() {
-//        Intent intent = getIntent();
-//
-//        sensorName = intent.getStringExtra("sensorName");
-//        sensor = APIFunctions.getSensorByName(sensorName);
-//        Log.d("gosDEBUG",
-//                "SensorDetailActivity:buildSensorProperties() - sensor "
-//                        + sensor);
-//        if (sensor != null) {
-//            smoothness = sensor.sensorProperties.getSmoothness();
-//            powerOption = (int) (sensor.sensorProperties.getSampleRate() / SAMPLE_RATE_FAKTOR);
-//            enabled = APIFunctions.checkIfSensorIsEnabled(sensorName);
-//            mySwitch.setChecked(enabled);
-//            mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                    enabled = isChecked;
-//
-//                }
-//            });
-//            if (powerOption == 0) {
-//                powerOption = 1; // min value
-//            }
-//            measurementSystem = sensor.sensorProperties
-//                    .getDisplayedMeasurementSystem();
-//            sensorType = sensor.sensorProperties.getSensorType();
-//        }
+        Intent intent = getIntent();
+
+        sensorId = intent.getIntExtra("sensorId", -1);
+        sensor = APIFunctions.API_getSensorById(sensorId);
+        Log.d("gosDEBUG",
+                "SensorDetailActivity:buildSensorProperties() - sensor "
+                        + sensor);
+        if (sensor != null) {
+            smoothness = sensor.getSmoothness();
+            powerOption = (int) (sensor.getSampleRate() / SAMPLE_RATE_FACTOR);
+            enabled = sensor.isEnabled();
+            mySwitch.setChecked(enabled);
+            mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    enabled = isChecked;
+
+                }
+            });
+            if (powerOption == 0) {
+                powerOption = 1; // min value
+            }
+            measurementSystem = sensor.getDisplayedMeasurementSystem();
+            sensorType = sensor.getSensorType();
+        }
 
     }
 
@@ -151,7 +150,7 @@ public class SensorDetailActivity extends Activity {
     private void setViews() {
 
         textView = (TextView) findViewById(R.id.sensorDetail_textView_title);
-        textView.setText(sensorName);
+        textView.setText(sensor.getDisplayedSensorName());
 
         seekBarSmoothness.setProgress((int) (smoothness * 100 - 1));
         seekBarPowerOptions.setProgress(powerOption - 1);
@@ -222,38 +221,20 @@ public class SensorDetailActivity extends Activity {
     @Override
     public void onBackPressed() {
 
-//        for (String sensorName : APIFunctions.getSensors()) {
-//            if (sensorName.equals(textView.getText().toString()) && !sensorName.equals(textView.getText().toString())) {
-//                Toast.makeText(getBaseContext(),
-//                        "The SensorName already exits, please choose another one.", Toast.LENGTH_SHORT)
-//                        .show();
-//                return;
-//            }
-//
-//        }
-//
-//        if (!(smoothness > 0) || !(powerOption > 0)) {
-//            Toast.makeText(getBaseContext(),
-//                    "Please check your SensorProperties. No null values allowed.", Toast.LENGTH_SHORT)
-//                    .show();
-//            return;
-//        }
+        if (!(smoothness > 0) || !(powerOption > 0)) {
+            Toast.makeText(getBaseContext(),
+                    "Please check your SensorProperties. No null values allowed.", Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
 
-//        APIFunctions.setSensorEnabled(sensorName, enabled);
-//
-//
-//        APIFunctions.updateSensorProperties(sensorName,
-//                measurementSystems[spinner2.getSelectedItemPosition()],
-//                (int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption
-//                        * SAVE_PERIOD_FAKTOR, textView.getText().toString(),
-//                sensorTypes[spinner.getSelectedItemPosition()], smoothness);
-//
-//
-//        StorageModule.getInstance().updateSensorPropertiesInDB(APIFunctions.getSensorByName(textView.getText().toString()).getSensorID(), new SensorProperties(measurementSystems[spinner2.getSelectedItemPosition()],
-//                (int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption
-//                * SAVE_PERIOD_FAKTOR, textView.getText().toString(),
-//                sensorTypes[spinner.getSelectedItemPosition()], smoothness));
-
+        sensor.setEnabled(enabled);
+        sensor.setSavePeriod(powerOption * SAVE_PERIOD_FACTOR);
+        sensor.setSampleRate((int) (powerOption * SAMPLE_RATE_FACTOR));
+        sensor.setSmoothness(smoothness);
+        sensor.setDisplayedMeasurementSystem(measurementSystems[spinner2.getSelectedItemPosition()]);
+        sensor.setSensorType(sensorTypes[spinner.getSelectedItemPosition()]);
+        sensor.setDisplayedSensorName(textView.getText().toString());
 
         this.finish();
     }

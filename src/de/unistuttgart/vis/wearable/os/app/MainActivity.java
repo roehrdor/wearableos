@@ -36,7 +36,6 @@ public class MainActivity extends Activity {
 
     public void openSensorsActivity(View view) {
         Intent intent = new Intent(this, SensorsActivity.class);
-
         startActivity(intent);
     }
 

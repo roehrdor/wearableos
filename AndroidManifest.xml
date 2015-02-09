@@ -34,6 +34,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         
         <!-- The public service -->
@@ -55,6 +56,39 @@
                 <action android:name="de.unistuttgart.vis.wearable.os.internalservice.GarmentOSServiceInternal"/>
             </intent-filter>            
         </service>
+
+        <activity
+            android:name=".app.PrivacyActivity"
+            android:label="@string/title_activity_privacy" >
+        </activity>
+        <activity
+            android:name=".app.SensorsActivity"
+            android:label="@string/title_activity_sensors" >
+        </activity>
+        <activity
+            android:name=".app.AboutActivity"
+            android:label="@string/title_activity_about" >
+        </activity>
+        <activity
+            android:name=".app.StorageActivity"
+            android:label="@string/title_activity_storage" >
+        </activity>
+        <activity
+            android:name=".app.SensorDetailActivity"
+            android:label="@string/title_activity_sensor_detail" >
+        </activity>
+        <activity
+            android:name=".app.AddSensorActivity"
+            android:label="@string/title_activity_sensor_add" >
+        </activity>
+        <activity
+            android:name=".app.ExportDbActivity"
+            android:label="@string/title_activity_export_db" >
+        </activity>
+        <activity
+            android:name=".app.GraphActivity"
+            android:label="@string/title_activity_graph" >
+        </activity>
         
         
     </application>
