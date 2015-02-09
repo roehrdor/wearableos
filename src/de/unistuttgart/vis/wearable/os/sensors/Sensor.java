@@ -114,6 +114,8 @@ public class Sensor implements Serializable {
     }
 
     /**
+     * Creates a new GPS Sensor, assigns the given values
+     * and adds the Sensor to the SensorManagers sensor list.
      * Use only for internal GPS Sensors
      */
     protected Sensor(int gpsSensorID, int sampleRate, int savePeriod,
@@ -137,14 +139,24 @@ public class Sensor implements Serializable {
         SensorManager.addNewSensor(this);
     }
 
+    /**
+     * returns if the sensor is an internal Sensor.
+     */
     public boolean isInternalSensor() {
         return isInternalSensor;
     }
 
+    /**
+     * returns if the sensor is enabled.
+     */
     public boolean isEnabled() {
         return isEnabled;
     }
 
+    /**
+     * sets the enabled status to the given value.
+     * => enables or disables the sensor
+     */
     public void setEnabled(boolean newValue) {
         this.isEnabled = newValue;
         if (newValue) {
@@ -173,6 +185,9 @@ public class Sensor implements Serializable {
                 .getTime() + 1000 / (sampleRate - 1))) {
             return;
         }
+
+        rawData.add(sensorData);
+        
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
             new Thread(serializer).start();
