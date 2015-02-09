@@ -12,6 +12,7 @@ import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
 import de.unistuttgart.vis.wearable.os.app.MainActivity;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
+import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
@@ -96,6 +97,7 @@ public class GarmentOSSerivce extends android.app.Service {
 		mHandler.sendEmptyMessage(Constants.CALLBACK_DEBUG_VALUE);
 		if(context == null)
 			context = getApplicationContext();
+        new InternalSensors(context);
     }
 	
 }
