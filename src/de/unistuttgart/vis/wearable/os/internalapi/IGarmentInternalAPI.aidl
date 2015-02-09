@@ -8,6 +8,7 @@
 package de.unistuttgart.vis.wearable.os.internalapi;
 
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 
 interface IGarmentInternalAPI {
 
@@ -58,4 +59,7 @@ interface IGarmentInternalAPI {
 	void 		SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit);
 	int 		SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem);
+	PSensorData SENSORS_SENSOR_getRawData(int sid);
+	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond);
+	PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end);
 }

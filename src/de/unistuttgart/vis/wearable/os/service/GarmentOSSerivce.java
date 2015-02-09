@@ -61,7 +61,7 @@ public class GarmentOSSerivce extends android.app.Service {
 	// =========================================================
 	/**
 	 * <p>This functions returns the context of the </p>
-	 * @return 
+	 * @return the context
 	 */
 	public static android.content.Context getContext() {
 		if(context == null)
@@ -96,7 +96,6 @@ public class GarmentOSSerivce extends android.app.Service {
 		mHandler.sendEmptyMessage(Constants.CALLBACK_DEBUG_VALUE);
 		if(context == null)
 			context = getApplicationContext();
-		
-	}
+    }
 	
 }

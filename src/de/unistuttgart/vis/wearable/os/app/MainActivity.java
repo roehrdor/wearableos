@@ -194,6 +194,13 @@ public class MainActivity extends Activity {
 		new Thread(new Runnable() {			
 			@Override
 			public void run() {
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
 				/*
 				java.util.List<SensorData> sd = new Vector<SensorData>();
 				

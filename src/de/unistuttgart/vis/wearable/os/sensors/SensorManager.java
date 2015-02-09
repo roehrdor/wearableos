@@ -14,6 +14,10 @@ public final class SensorManager {
         allSensors.put(sensor.getSensorID(), sensor);
     }
 
+    public static Sensor getSensorByID(int id) {
+        return allSensors.get(id);
+    }
+
     public static java.util.Collection<Sensor> getAllSensors () {
         return allSensors.values();
     }

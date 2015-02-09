@@ -10,9 +10,13 @@ package de.unistuttgart.vis.wearable.os.internalservice;
 import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
+import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * <p>
@@ -266,6 +270,32 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid,
 			int displayedMeasurementSystem) throws RemoteException {
 		// TODO Auto-generated method stub
-		
-	}	
+	}
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawData(int sid) {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData(sensor.getRawData());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData(sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond));
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData(sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)));
+    }
 }
