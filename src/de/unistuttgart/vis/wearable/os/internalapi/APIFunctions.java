@@ -78,8 +78,36 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");
 	}
-	
 
+    public static String[] API_getSensorNames() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().API_getSensorNames();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor[] API_getAllSensors() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().API_getAllSensors();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor API_getSensorById(int id) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().API_getSensorById(id);
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 	
 	// =====================================================================
 	// 

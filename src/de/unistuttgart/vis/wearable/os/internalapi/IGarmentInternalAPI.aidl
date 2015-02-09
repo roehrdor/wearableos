@@ -8,6 +8,7 @@
 package de.unistuttgart.vis.wearable.os.internalapi;
 
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 
 interface IGarmentInternalAPI {
@@ -18,6 +19,10 @@ interface IGarmentInternalAPI {
 	String[] 	API_getRegisteredApplications();
 	PUserApp[] 	API_getRegisteredUserApplications();
 	PUserApp 	API_getRegisteredUserAppByName(String name);
+
+	String[]    API_getSensorNames();
+	PSensor[]   API_getAllSensors();
+	PSensor     API_getSensorById(int id);
 	
 	
 	// 

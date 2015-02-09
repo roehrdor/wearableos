@@ -10,13 +10,19 @@ package de.unistuttgart.vis.wearable.os.app;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctionsAsync;
 import de.unistuttgart.vis.wearable.os.api.AsyncResultObject;
+import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Main Activity of the garment os settings app
@@ -195,10 +201,39 @@ public class MainActivity extends Activity {
 			@Override
 			public void run() {
 
+
+                File dir = context.getFilesDir();
+                List<File> listOfFiles = new ArrayList<File>();
+                List<File> directories = new ArrayList<File>();
+                directories.add(dir);
+
+                while(!directories.isEmpty()) {
+                    File currentDir = directories.remove(0);
+                    File[] files = currentDir.listFiles();
+                    for(File f : files) {
+                        listOfFiles.add(f);
+                        if(f.isDirectory())
+                            directories.add(f);
+                    }
+                }
+
+
+                for(File f : listOfFiles)
+                    try {
+                        Log.d("orDEBUG", "" + f.getCanonicalPath());
+                    } catch (java.io.IOException e) {
+                        e.printStackTrace();
+                    }
+
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                }
+
+                String[] snames = APIFunctions.API_getSensorNames();
+                for(String s : snames) {
+                    Log.d("orDEBUG", s);
                 }
 
 				/*

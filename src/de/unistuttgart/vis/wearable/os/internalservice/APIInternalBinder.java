@@ -10,6 +10,7 @@ package de.unistuttgart.vis.wearable.os.internalservice;
 import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
@@ -54,7 +55,27 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 		return PrivacyManager.instance.getApp(name).toParcelable();
 	}
 
-	// =====================================================================
+    @Override
+    public String[] API_getSensorNames() throws RemoteException {
+        return SensorManager.getSensorNames();
+    }
+
+    @Override
+    public PSensor[] API_getAllSensors() throws RemoteException {
+        java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
+        PSensor[] psensors = new PSensor[sensors.size()];
+        int i = -1;
+        for(Sensor s : sensors)
+            psensors[++i] = s.toParcelable();
+        return psensors;
+    }
+
+    @Override
+    public PSensor API_getSensorById(int id) throws RemoteException {
+        return SensorManager.getSensorByID(id).toParcelable();
+    }
+
+    // =====================================================================
 	// 
 	// Function calls forward to UserApp object  
 	//

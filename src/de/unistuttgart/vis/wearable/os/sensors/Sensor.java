@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 
 /**
@@ -277,5 +278,17 @@ public class Sensor implements Serializable {
 
     public void setGraphType(GraphType graphType) {
         this.graphType = graphType;
+    }
+
+    /**
+     * Create a parcelable Sensor object from the given Sensor
+     *
+     * @return the parcelable object
+     */
+    public PSensor toParcelable() {
+        return new PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
+                            this.savePeriod, this.smoothness, this.sensorType, this.graphType,
+                            this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
+                            this.displayedMeasurementUnit, this.displayedMeasurementSystem);
     }
 }
