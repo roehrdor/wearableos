@@ -26,7 +26,7 @@ public enum SensorType {
 	PRESSURE(1, new MeasurementSystems[]{MeasurementSystems.PASCAL}),
 	PROXIMITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}),
 	GRAVITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}),
-	ROTATION_VECTOR(4, new MeasurementSystems[]{MeasurementSystems.RADIAN}),
+	ROTATION_VECTOR(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}),
 	RELATIVE_HUMIDITY(1, new MeasurementSystems[]{MeasurementSystems.PERCENT}),
 	TEMPERATURE(1, new MeasurementSystems[]{MeasurementSystems.TEMPERATURE}),
 	GPS_SENSOR(4, new MeasurementSystems[]{MeasurementSystems.GPS});
