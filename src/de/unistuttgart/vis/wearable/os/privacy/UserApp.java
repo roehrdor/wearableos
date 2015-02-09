@@ -17,7 +17,7 @@ import de.unistuttgart.vis.wearable.os.utils.Constants;
  * 
  * @author roehrdor
  */
-public class UserApp {
+public class UserApp implements java.io.Serializable  {
 	private static final int BASE_PERMISSION_CHECK_FLAG = 0xFF800000;
 
 	private final int ID;
