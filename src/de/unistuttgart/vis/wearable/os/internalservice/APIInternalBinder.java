@@ -18,6 +18,7 @@ import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
@@ -348,7 +349,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData(sensor.getRawData());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData().clone());
     }
 
     @Override
@@ -357,7 +358,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData(sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond));
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond).clone());
     }
 
     @Override
@@ -366,6 +367,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData(sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)));
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
     }
 }
