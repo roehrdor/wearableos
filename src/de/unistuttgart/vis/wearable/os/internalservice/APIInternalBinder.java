@@ -8,11 +8,20 @@
 package de.unistuttgart.vis.wearable.os.internalservice;
 
 import android.os.RemoteException;
+
+import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
+import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * <p>
@@ -50,7 +59,27 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 		return PrivacyManager.instance.getApp(name).toParcelable();
 	}
 
-	// =====================================================================
+    @Override
+    public String[] API_getSensorNames() throws RemoteException {
+        return SensorManager.getSensorNames();
+    }
+
+    @Override
+    public PSensor[] API_getAllSensors() throws RemoteException {
+        java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
+        PSensor[] psensors = new PSensor[sensors.size()];
+        int i = -1;
+        for(Sensor s : sensors)
+            psensors[++i] = s.toParcelable();
+        return psensors;
+    }
+
+    @Override
+    public PSensor API_getSensorById(int id) throws RemoteException {
+        return SensorManager.getSensorByID(id).toParcelable();
+    }
+
+    // =====================================================================
 	// 
 	// Function calls forward to UserApp object  
 	//
@@ -123,94 +152,140 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	//
 	@Override
 	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return false;
+        return sensor.isEnabled();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setEnabled(isEnabled);
 	}
 
 	@Override
 	public String SENSORS_SENSOR_getDisplayedSensorName(int sid)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return sensor.getDisplayedSensorName();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setDisplayedSensorName(int sid,
 			String displayedSensorName) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setDisplayedSensorName(displayedSensorName);
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getSampleRate(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        return sensor.getSampleRate();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setSampleRate(int sid, int sampleRate)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setSampleRate(sampleRate);
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getSavePeriod(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        return sensor.getSavePeriod();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setSavePeriod(savePeriod);
 	}
 
 	@Override
 	public float SENSORS_SENSOR_getSmoothness(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        return sensor.getSmoothness();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setSmoothness(int sid, float smoothness)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setSmoothness(smoothness);
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getSensorType(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getSensorType() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getSensorType().ordinal();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setSensorType(int sid, int sensorType)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setSensorType(SensorType.values()[sensorType]);
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getGraphType(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getGraphType() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getGraphType().ordinal();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setGraphType(int sid, int graphType)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setGraphType(GraphType.values()[graphType]);
 	}
 
 	@Override
@@ -224,7 +299,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public void SENSORS_SENSOR_setRawDataMeasurementUnit(int sid,
 			int rawDataMeasurementUnit) throws RemoteException {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -266,6 +340,32 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid,
 			int displayedMeasurementSystem) throws RemoteException {
 		// TODO Auto-generated method stub
-		
-	}	
+	}
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawData(int sid) {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData(sensor.getRawData());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData(sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond));
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData(sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)));
+    }
 }

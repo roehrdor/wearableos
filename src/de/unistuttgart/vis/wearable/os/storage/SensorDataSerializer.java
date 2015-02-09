@@ -56,6 +56,13 @@ public class SensorDataSerializer implements Runnable {
 		this.context = context;
 	}
 
+    /**
+     * Start a new thread and execute the work asynchronously
+     */
+    public void work() {
+        new Thread(this).start();
+    }
+
 	@Override
 	public void run() {		
 		try {			

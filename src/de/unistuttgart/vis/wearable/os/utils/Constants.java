@@ -19,6 +19,7 @@ public class Constants {
 	public static final int CALLBACK_DEBUG_VALUE = 0x80000001;
 	
 	public static final int ENUMERATION_NULL = 0x01000001;
+    public static final int ILLEGAL_VALUE = 0x10000000;
 	
 	
 	//

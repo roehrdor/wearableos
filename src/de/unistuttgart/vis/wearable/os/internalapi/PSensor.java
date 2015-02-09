@@ -13,6 +13,7 @@ import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * Sensor object that can be used on the client side
@@ -45,7 +46,7 @@ public class PSensor implements android.os.Parcelable {
 	//
 	// The gained sensor data
 	//
-	private java.util.List<SensorData> rawData = new java.util.Vector<SensorData>();
+	private java.util.Vector<SensorData> rawData = new java.util.Vector<SensorData>();
 	
 	
 	
@@ -161,13 +162,68 @@ public class PSensor implements android.os.Parcelable {
 	 */
 	public String getBluetoothID() {
 		return this.bluetoothID;
-	}	
-	
-	
-	//TODO Sensor Data Functions
-	
-	
-		
+	}
+
+    /**
+     * Get the last requested raw data again. This function works without refreshing anything and
+     * shall be used it the user wants to access the same data twice
+     *
+     * @return the cached list of sensor data
+     */
+    public java.util.Vector<SensorData> getLastRawData() {
+        return this.rawData;
+    }
+
+    /**
+     * Get the current available raw data from this Sensor
+     *
+     * @return the current available rawData
+     */
+    public java.util.Vector<SensorData> getRawData() {
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawData(this.ID);
+        if(pd != null) {
+            this.rawData = pd.toSensorDataList();
+            return this.rawData;
+        } else
+            return null;
+    }
+
+    /**
+     * Get raw data fro the given time stamp. If data one second before and after the given time
+     * shall be included as well the plusMinusOneSecond flag shall be set. Note to easily convert
+     * between a unix time stamp and the {@link java.util.Date} object one can use the provided
+     * {@link de.unistuttgart.vis.wearable.os.utils.Utils#unixToDate(int)} function.
+     *
+     * @param time               the time to search raw data for
+     * @param plusMinusOneSecond in case this flag is set the data recorded one second earlier and
+     *                           later will be included as well
+     * @return a vector containing the data sets that meet the requirements
+     */
+    public java.util.Vector<SensorData> getRawData(java.util.Date time, boolean plusMinusOneSecond) {
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataIB(this.ID, Utils.dateToUnix(time), plusMinusOneSecond);
+        if(pd != null) {
+            this.rawData = pd.toSensorDataList();
+            return this.rawData;
+        } else
+            return null;
+    }
+
+    /**
+     * Get all data that has been recorded from the begin time stamp on but before the end time stamp
+     *
+     * @param begin the begin time stamp
+     * @param end   the end time stamp
+     * @return a vector containing the data sets that meet the requirements
+     */
+    public java.util.Vector<SensorData> getRawData(java.util.Date begin, java.util.Date end) {
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataII(this.ID, Utils.dateToUnix(begin), Utils.dateToUnix(end));
+        if(pd != null) {
+            this.rawData = pd.toSensorDataList();
+            return this.rawData;
+        } else
+            return null;
+    }
+
 	
 	// =====================================================================
 	//
