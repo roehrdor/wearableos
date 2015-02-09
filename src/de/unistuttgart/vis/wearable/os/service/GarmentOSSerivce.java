@@ -65,8 +65,6 @@ public class GarmentOSSerivce extends android.app.Service {
 	 * @return the context
 	 */
 	public static android.content.Context getContext() {
-		if(context == null)
-			context = MainActivity.getMainActivityContext();
 		return context;
 	}
 	

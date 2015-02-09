@@ -1,0 +1,77 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#c0d6e4">
+
+    <LinearLayout
+
+        android:id="@+id/LinearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c0d6e4"
+        android:orientation="vertical"
+        tools:context="${relativePackage}.${activityClass}" >
+
+        <Button
+            android:id="@+id/Button01"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#606060"
+            android:drawableLeft="@drawable/dropbox"
+            android:onClick="changeToDropBox"
+            android:text="@string/btn_dropbox"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/Button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#606060"
+            android:drawableLeft="@drawable/skydrive"
+            android:onClick="changeToOneDrive"
+            android:text="@string/btn_onedrive"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/Button3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#606060"
+            android:drawableLeft="@drawable/googledrive"
+            android:onClick="changeToGoogleDrive"
+            android:text="@string/btn_gooledrive"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/Button02"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#606060"
+            android:drawableLeft="@drawable/export_db"
+            android:onClick="exportDB"
+            android:text="@string/btn_exportDB"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/Button05"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#606060"
+            android:drawableLeft="@drawable/db_settings"
+            android:onClick="changeToDBSettingsMenu"
+            android:text="@string/btn_DbSettings"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+    </LinearLayout>
+</ScrollView>
