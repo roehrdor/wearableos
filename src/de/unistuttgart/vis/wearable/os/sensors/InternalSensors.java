@@ -32,7 +32,7 @@ public class InternalSensors implements SensorEventListener {
     private android.hardware.Sensor androidMagneticFieldSensor;
     private android.hardware.Sensor androidGyroscopeSensor;
     private android.hardware.Sensor androidLightSensor;
-    private android.hardware.Sensor androidPreassureSensor;
+    private android.hardware.Sensor androidPressureSensor;
     private android.hardware.Sensor androidProximitySensor;
     private android.hardware.Sensor androidGravitySensor;
     private android.hardware.Sensor androidRotationVectorSensor;
@@ -43,7 +43,7 @@ public class InternalSensors implements SensorEventListener {
     private Sensor magneticFieldSensor;
     private Sensor gyroscopeSensor;
     private Sensor lightSensor;
-    private Sensor preassureSensor;
+    private Sensor pressureSensor;
     private Sensor proximitySensor;
     private Sensor gravitySensor;
     private Sensor rotationVectorSensor;
@@ -72,6 +72,12 @@ public class InternalSensors implements SensorEventListener {
         public void onProviderDisabled(String provider) {}
     };
 
+    /**
+     * Creates and saves the instance of InternalSensors.
+     * Loads the internal sensors from the storage,
+     * creates the new supported internal sensors
+     * and saves them to the SensorManagers sensor list.
+     */
     public InternalSensors(Context context) {
         InternalSensors.instance = this;
         sensorManager = (android.hardware.SensorManager) context
@@ -90,11 +96,17 @@ public class InternalSensors implements SensorEventListener {
         getInternalSensorsFromStorage(internalSensorsFromStorage);
         createNewInternalSensors();
 
+        // TODO delete - just for test
         for (Sensor sensor : SensorManager.getAllSensors()) {
             sensor.setEnabled(true);
         }
     }
 
+    /**
+     * returns the instance of InternalSensors.
+     * The constructor must be called one time before getInstance.
+     * Otherwise this method will throw a UnsupportedOperationException.
+     */
     public static InternalSensors getInstance() {
         if (InternalSensors.instance == null) {
             throw new UnsupportedOperationException();
@@ -102,6 +114,9 @@ public class InternalSensors implements SensorEventListener {
         return InternalSensors.instance;
     }
 
+    /**
+     * Saves the android Sensors to this class.
+     */
     private void getAndroidSensors() {
         androidAccelerometerSensor = sensorManager
                 .getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER);
@@ -111,7 +126,7 @@ public class InternalSensors implements SensorEventListener {
                 .getDefaultSensor(android.hardware.Sensor.TYPE_GYROSCOPE);
         androidLightSensor = sensorManager
                 .getDefaultSensor(android.hardware.Sensor.TYPE_LIGHT);
-        androidPreassureSensor = sensorManager
+        androidPressureSensor = sensorManager
                 .getDefaultSensor(android.hardware.Sensor.TYPE_PRESSURE);
         androidProximitySensor = sensorManager
                 .getDefaultSensor(android.hardware.Sensor.TYPE_PROXIMITY);
@@ -125,6 +140,10 @@ public class InternalSensors implements SensorEventListener {
                 .getDefaultSensor(android.hardware.Sensor.TYPE_AMBIENT_TEMPERATURE);
     }
 
+    /**
+     * Saves the given senors (from the storage) to the Sensor objects in this calss,
+     * depending on the SensorType of  each sensor
+     */
     private void getInternalSensorsFromStorage(Vector<Sensor> internalSensorsFromDB) {
         for (Sensor sensor : internalSensorsFromDB) {
             if (sensor != null) {
@@ -137,7 +156,7 @@ public class InternalSensors implements SensorEventListener {
                 } else if (sensor.getSensorType() == SensorType.LIGHT) {
                     lightSensor = sensor;
                 } else if (sensor.getSensorType() == SensorType.PRESSURE) {
-                    preassureSensor = sensor;
+                    pressureSensor = sensor;
                 } else if (sensor.getSensorType() == SensorType.PROXIMITY) {
                     proximitySensor = sensor;
                 } else if (sensor.getSensorType() == SensorType.GRAVITY) {
@@ -160,6 +179,14 @@ public class InternalSensors implements SensorEventListener {
         }
     }
 
+    /**
+     * creates the sensors supported by the device,
+     * which are not yet in the storage.
+     * The sensorID of each sensor will be the same
+     * as in Android.
+     * (see android.hardware.Sensor
+     * http://developer.android.com/reference/android/hardware/Sensor.html)
+     */
     private void createNewInternalSensors() {
         int numberOfCreatedSensors = 0;
         if (accelerometerSensor == null &&
@@ -194,9 +221,9 @@ public class InternalSensors implements SensorEventListener {
                     MeasurementUnits.NONE);
             numberOfCreatedSensors++;
         }
-        if (preassureSensor == null &&
+        if (pressureSensor == null &&
                 sensorManager.getSensorList(android.hardware.Sensor.TYPE_PRESSURE).size() > 0) {
-            preassureSensor = new Sensor(androidPreassureSensor, DEFAULT_SAMPLERATE,
+            pressureSensor = new Sensor(androidPressureSensor, DEFAULT_SAMPLERATE,
                     DEFAULT_SAVEPERIOD, DEFAULT_SMOOTHNESS, "internal_pressure_sensor",
                     SensorType.PRESSURE, MeasurementSystems.PASCAL,
                     MeasurementUnits.HECTO);
@@ -253,6 +280,10 @@ public class InternalSensors implements SensorEventListener {
         Log.d("fpDEBUG", "Created " + numberOfCreatedSensors + " Sensors");
     }
 
+    /**
+     * Enables the given internal sensor.
+     * => sets enabled true and registers the according listener.
+     */
     protected void enableInternalSensor(Sensor sensor) {
         if (!sensor.isInternalSensor()) {
             throw new UnsupportedOperationException();
@@ -285,6 +316,10 @@ public class InternalSensors implements SensorEventListener {
         Log.d("fpDEBUG", "Enabled " + sensor.getDisplayedSensorName());
     }
 
+    /**
+     * Disables the given internal sensor.
+     * => sets enabled false and unregisters the according listener.
+     */
     public void disableInternalSensor(Sensor sensor) {
         if (!sensor.isInternalSensor()) {
             throw new UnsupportedOperationException();
@@ -299,6 +334,9 @@ public class InternalSensors implements SensorEventListener {
         Log.d("fpDEBUG", "Disabled " + sensor.getDisplayedSensorName());
     }
 
+    /**
+     * returns the android sensor according to the given sensor object.
+     */
     private android.hardware.Sensor getAndroidSensorBySensor(Sensor sensor) {
         switch (sensor.getSensorType()) {
             case ACCELEROMETER:
@@ -312,7 +350,7 @@ public class InternalSensors implements SensorEventListener {
             case MAGNETIC_FIELD:
                 return androidMagneticFieldSensor;
             case PRESSURE:
-                return androidPreassureSensor;
+                return androidPressureSensor;
             case PROXIMITY:
                 return androidProximitySensor;
             case RELATIVE_HUMIDITY:
@@ -327,6 +365,9 @@ public class InternalSensors implements SensorEventListener {
         return null;
     }
 
+    /**
+     * returns the sensor object according to the given android sensor.
+     */
     private Sensor getSensorByAndroidSensor(android.hardware.Sensor sensor) {
         switch (sensor.getType()) {
             case android.hardware.Sensor.TYPE_ACCELEROMETER:
@@ -340,7 +381,7 @@ public class InternalSensors implements SensorEventListener {
             case android.hardware.Sensor.TYPE_MAGNETIC_FIELD:
                 return magneticFieldSensor;
             case android.hardware.Sensor.TYPE_PRESSURE:
-                return preassureSensor;
+                return pressureSensor;
             case android.hardware.Sensor.TYPE_PROXIMITY:
                 return proximitySensor;
             case android.hardware.Sensor.TYPE_RELATIVE_HUMIDITY:
@@ -355,6 +396,9 @@ public class InternalSensors implements SensorEventListener {
         return null;
     }
 
+    /**
+     * saves the incoming sensor values to the according sensor object.
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         android.hardware.Sensor androidSensor = sensorEvent.sensor;
@@ -366,9 +410,7 @@ public class InternalSensors implements SensorEventListener {
 
         if (sensor.isEnabled()) {
             float[] data = new float[dimensions];
-            for (int i = 0; i < dimensions; i++) {
-                data[i] = sensorEvent.values[i];
-            }
+            System.arraycopy(sensorEvent.values, 0, data, 0, dimensions);
             sensor.addRawData(new SensorData(Utils.getCurrentUnixTimeStamp(),
                     sensor.getSensorType().getDimension(), data));
         }
@@ -377,7 +419,9 @@ public class InternalSensors implements SensorEventListener {
     @Override
     public void onAccuracyChanged(android.hardware.Sensor sensor, int i) {}
 
-
+    /**
+     * saves the incoming gps sensor value to the gps sensor object.
+     */
     private void gpsChanged(Location location) {
         try {
             float[] data = {(float) location.getLatitude(), (float) location.getLongitude(),

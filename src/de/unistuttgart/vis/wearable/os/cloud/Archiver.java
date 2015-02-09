@@ -7,14 +7,22 @@
  */
 package de.unistuttgart.vis.wearable.os.cloud;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
@@ -80,12 +88,77 @@ public class Archiver {
     }
 
     /**
+     * Return all files in the given directory and in sub directory
+     *
+     * @param dir the root directory where to start searching
+     * @return a list of files contained in the directory or sub directory
+     */
+    protected static List<File> getFilesInDirectory(File dir) {
+        List<File> files = new ArrayList<File>();
+        List<File> queue = new ArrayList<File>();
+        queue.add(dir);
+        while(!queue.isEmpty()) {
+            File current = queue.remove(0);
+            if(current.isDirectory())
+                queue.add(current);
+            files.add(current);
+        }
+        return files;
+    }
+
+    /**
      * Create a compressed archive file containing all sensor data and the storage file containing
      * the privacy information and sensor settings.
 
      * @param outputFile the output file to store the files in
      */
-    public static void createArchiveFile(File outputFile) {}
+    public static void createArchiveFile(File outputFile) {
+        try {
+            // Get all files in the directory and in its sub directories
+            List<File> files = getFilesInDirectory(Properties.storageDirectory);
+            byte[] bytes = new byte[1024];
+            int length;
+
+            // Create a new file output stream and zip output stream to save the files to a zip file
+            FileOutputStream fos = new FileOutputStream(Properties.storageDirectory.getName() + ".sf");
+            FileInputStream fis;
+            ZipOutputStream zos = new ZipOutputStream(fos);
+
+            // For each file we got in the file list
+            for (File f : files) {
+
+                // Check whether the file is a directory
+                if (!f.isDirectory()) {
+                    // and only if not add the file to the zip file
+                    // Therefore open the file
+                    fis = new FileInputStream(f);
+
+                    // Make the path to the file relative
+                    String zippedName = f.getCanonicalPath().substring(Properties.storageDirectory.getCanonicalPath().length() + 1, f.getCanonicalPath().length());
+
+                    // Create a new zip entry with the relative name
+                    ZipEntry zipEntry = new ZipEntry(zippedName);
+
+                    // and put it as next entry to the zip file
+                    zos.putNextEntry(zipEntry);
+
+                    // copy the file to the zip output stream
+                    while((length = fis.read()) >= 0)
+                        zos.write(bytes, 0, length);
+
+                    // close the current entry and the now added file
+                    zos.closeEntry();
+                    fis.close();
+                }
+            }
+
+            // In the end close the zip file and the according output stream
+            zos.close();
+            fos.close();
+        } catch (IOException ioe) {
+            Log.w("GarmentOS", "Could not create compressed archive");
+        }
+    }
 
 
     /**
