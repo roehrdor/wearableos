@@ -42,8 +42,6 @@ public class Sensor implements Serializable {
     // TODO: merge to this project
     // private SensorCommunication sensorCommunication;
 
-   // TODO: set MeasurementSystem and unit 2x
-
     /**
      * Creates a new Sensor, assigns the given values
      * and adds the Sensor to the SensorManagers sensor list.
@@ -174,20 +172,26 @@ public class Sensor implements Serializable {
         }
     }
 
+    /**
+     * adds tje given sensorData to rawData.
+     * If rawData > savePeriod the data will be saved to the Storage
+     * and rawData will be cleared.
+     */
     public void addRawData (SensorData sensorData) {
         if (!isEnabled) {
             return;
         }
-        if (isInternalSensor
-                && rawData.size() > 0
-                && sensorData.getDate().getTime() < (rawData
-                .get(rawData.size() - 1).getDate()
-                .getTime() + 1000 / (sampleRate - 1))) {
-            return;
-        }
+        // TODO needed?
+//        if (isInternalSensor
+//                && rawData.size() > 0
+//                && sensorData.getDate().getTime() < (rawData
+//                .get(rawData.size() - 1).getDate()
+//                .getTime() + 1000 / (sampleRate - 1))) {
+//            return;
+//        }
 
         rawData.add(sensorData);
-        
+
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
             new Thread(serializer).start();
@@ -195,10 +199,19 @@ public class Sensor implements Serializable {
         }
     }
 
+    /**
+     * returns the actual rawData of the Sensor,
+     * which is not saved to the storage yet.
+     */
     public Vector<SensorData> getRawData() {
         return rawData;
     }
 
+    /**
+     * returns the rawData from the given timestamp to the millisecond exact.
+     * Or, if plusMinusOneSecond = true the rawData from the given timestamp plus minus 1 second.
+     * @return
+     */
     @SuppressWarnings("deprecation")
     public Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
         if (!plusMinusOneSecond) {
@@ -212,6 +225,11 @@ public class Sensor implements Serializable {
         }
     }
 
+    /**
+     * returns the rawData between the two given timestamps including the given times themselves,
+     * either from the database or from the actual rawData or both.
+     * Depending of the given timestamps.
+     */
     public Vector<SensorData> getRawData(Date begin, Date end) {
         Date firstLocallyHoldDate;
         Vector<SensorData> data = new Vector<SensorData>();
