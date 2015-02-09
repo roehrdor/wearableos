@@ -7,6 +7,8 @@ import android.annotation.SuppressLint;
  */
 @SuppressLint("UseSparseArrays")
 public final class SensorManager {
+
+    public static final int MAXIMUM_INTERNAL_SENSOR_ID = 64;
 	// roehrdor modified
     private static java.util.Map<Integer, Sensor> allSensors = new java.util.HashMap<Integer, Sensor>();
 
