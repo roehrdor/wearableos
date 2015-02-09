@@ -17,22 +17,22 @@ import de.unistuttgart.vis.wearable.os.utils.Utils;
 public class Sensor implements Serializable {
 
     private static final long serialVersionUID = 8052438921578259544L;
-    private int sensorID = -1;
-    private String bluetoothID = "";
+
     private Vector<SensorData> rawData = new Vector<SensorData>();
+
     private boolean isInternalSensor = false;
+    SensorDriver sensorDriver = null;
 
     private boolean isEnabled = false;
 
+    private int sensorID = -1;
+    private String bluetoothID = "";
     private int sampleRate = 0;
+    private float smoothness = 0.0f;
     private int savePeriod = 0;
-
     private String displayedSensorName = "";
     private SensorType sensorType = null;
-    private float smoothness = 0.0f;
     private GraphType graphType = null;
-
-    SensorDriver sensorDriver = null;
 
     private MeasurementUnits rawDataMeasurementUnit = null;
     private MeasurementSystems rawDataMeasurementSystem = null;
@@ -42,9 +42,11 @@ public class Sensor implements Serializable {
     // TODO: merge to this project
     // private SensorCommunication sensorCommunication;
 
-   // TODO: set MeasurementSystem and unit 2x
-
     /**
+     * Creates a new Sensor, assigns the given values
+     * and adds the Sensor to the SensorManagers sensor list.
+     * The new Sensor will have the lowest external sensorID,
+     * which is not forgiven yet.
      * Use only for external Sensors
      */
     public Sensor(SensorDriver sensorDriver, int sampleRate, int savePeriod, int smoothness,
@@ -53,6 +55,7 @@ public class Sensor implements Serializable {
                   MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
         isInternalSensor = false;
 
+        // compute the lowest external sensorID which is not forgiven yet
         int id = 100;
         for (Sensor sensor : SensorManager.getAllSensors()) {
             if (id <= sensor.getSensorID()) {
@@ -75,10 +78,16 @@ public class Sensor implements Serializable {
         this.displayedMeasurementUnit = displayedMeasurementUnit;
         this.graphType = GraphType.LINE;
         this.isEnabled = true;
+
         SensorManager.addNewSensor(this);
     }
 
     /**
+     * Creates a new Sensor, assigns the given values
+     * and adds the Sensor to the SensorManagers sensor list.
+     * The new Sensor will have the same sensorID as in Android.
+     * (see android.hardware.Sensor
+     * http://developer.android.com/reference/android/hardware/Sensor.html)
      * Use only for internal Sensors
      */
     protected Sensor(android.hardware.Sensor sensor, int sampleRate, int savePeriod,
@@ -86,6 +95,7 @@ public class Sensor implements Serializable {
                      MeasurementSystems rawDataMeasurementSystem,
                      MeasurementUnits rawDataMeasurementUnit) {
         this.isInternalSensor = true;
+
         this.sensorID = sensor.getType();
         this.sampleRate = sampleRate;
         this.savePeriod = savePeriod;
@@ -97,10 +107,13 @@ public class Sensor implements Serializable {
         this.rawDataMeasurementUnit = rawDataMeasurementUnit;
         this.displayedMeasurementUnit = rawDataMeasurementUnit;
         this.graphType = GraphType.LINE;
+
         SensorManager.addNewSensor(this);
     }
 
     /**
+     * Creates a new GPS Sensor, assigns the given values
+     * and adds the Sensor to the SensorManagers sensor list.
      * Use only for internal GPS Sensors
      */
     protected Sensor(int gpsSensorID, int sampleRate, int savePeriod,
@@ -108,6 +121,7 @@ public class Sensor implements Serializable {
                      MeasurementSystems rawDataMeasurementSystem,
                      MeasurementUnits rawDataMeasurementUnit) {
         this.isInternalSensor = true;
+
         this.sensorID = gpsSensorID;
         this.sampleRate = sampleRate;
         this.savePeriod = savePeriod;
@@ -119,17 +133,28 @@ public class Sensor implements Serializable {
         this.rawDataMeasurementUnit = rawDataMeasurementUnit;
         this.displayedMeasurementUnit = rawDataMeasurementUnit;
         this.graphType = GraphType.LINE;
+
         SensorManager.addNewSensor(this);
     }
 
+    /**
+     * returns if the sensor is an internal Sensor.
+     */
     public boolean isInternalSensor() {
         return isInternalSensor;
     }
 
+    /**
+     * returns if the sensor is enabled.
+     */
     public boolean isEnabled() {
         return isEnabled;
     }
 
+    /**
+     * sets the enabled status to the given value.
+     * => enables or disables the sensor
+     */
     public void setEnabled(boolean newValue) {
         this.isEnabled = newValue;
         if (newValue) {
@@ -147,17 +172,26 @@ public class Sensor implements Serializable {
         }
     }
 
-    public void addRawData (SensorData sensorData) {
+    /**
+     * adds tje given sensorData to rawData.
+     * If rawData > savePeriod the data will be saved to the Storage
+     * and rawData will be cleared.
+     */
+    public synchronized void addRawData (SensorData sensorData) {
         if (!isEnabled) {
             return;
         }
-        if (isInternalSensor
-                && rawData.size() > 0
-                && sensorData.getDate().getTime() < (rawData
-                .get(rawData.size() - 1).getDate()
-                .getTime() + 1000 / (sampleRate - 1))) {
-            return;
-        }
+        // TODO needed?
+//        if (isInternalSensor
+//                && rawData.size() > 0
+//                && sensorData.getDate().getTime() < (rawData
+//                .get(rawData.size() - 1).getDate()
+//                .getTime() + 1000 / (sampleRate - 1))) {
+//            return;
+//        }
+
+        rawData.add(sensorData);
+
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
             new Thread(serializer).start();
@@ -165,12 +199,21 @@ public class Sensor implements Serializable {
         }
     }
 
-    public Vector<SensorData> getRawData() {
+    /**
+     * returns the actual rawData of the Sensor,
+     * which is not saved to the storage yet.
+     */
+    public synchronized Vector<SensorData> getRawData() {
         return rawData;
     }
 
+    /**
+     * returns the rawData from the given timestamp to the millisecond exact.
+     * Or, if plusMinusOneSecond = true the rawData from the given timestamp plus minus 1 second.
+     * @return
+     */
     @SuppressWarnings("deprecation")
-    public Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
+    public synchronized Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
         if (!plusMinusOneSecond) {
             return getRawData(time, time);
         } else {
@@ -182,7 +225,12 @@ public class Sensor implements Serializable {
         }
     }
 
-    public Vector<SensorData> getRawData(Date begin, Date end) {
+    /**
+     * returns the rawData between the two given timestamps including the given times themselves,
+     * either from the database or from the actual rawData or both.
+     * Depending of the given timestamps.
+     */
+    public synchronized Vector<SensorData> getRawData(Date begin, Date end) {
         Date firstLocallyHoldDate;
         Vector<SensorData> data = new Vector<SensorData>();
         if (rawData.size() == 0) {
@@ -204,7 +252,10 @@ public class Sensor implements Serializable {
         return data;
     }
 
-    private void getRawData (Date begin, Date end, Vector<SensorData> data) {
+    /**
+     * only an internal helper method to prevent multiple code.
+     */
+    private synchronized void getRawData (Date begin, Date end, Vector<SensorData> data) {
         for (SensorData sensorData : rawData) {
             if ((sensorData.getDate().before(end) || sensorData.getDate()
                     .equals(end))
@@ -215,6 +266,18 @@ public class Sensor implements Serializable {
         }
     }
 
+    /**
+     * sets the rawDataMeasurementSystem [e.g. METRICAL] and the
+     * rawDataMeasurementUnit [e.g. KILO] of the Sensor
+     *
+     * The rawDataMeasurementUnit has to fit to the rawDataMeasurementSystem! so
+     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
+     *
+     * @param rawDataMeasurementSystem
+     *            a MeasurementSystems element
+     * @param rawDataMeasurementUnit
+     *            a MeasurementUnits element
+     */
     public void setRawDataMeasurementSystemAndUnit(
             MeasurementSystems rawDataMeasurementSystem,
             MeasurementUnits rawDataMeasurementUnit) {
@@ -226,6 +289,18 @@ public class Sensor implements Serializable {
         this.rawDataMeasurementUnit = rawDataMeasurementUnit;
     }
 
+    /**
+     * sets the displayedMeasurementSystem [e.g. METRICAL] and the
+     * displayedMeasurementUnit [e.g. KILO] of the Sensor
+     *
+     * The displayedMeasurementUnit has to fit to the displayedMeasurementSystem! so
+     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
+     *
+     * @param displayedMeasurementSystem
+     *            a MeasurementSystems element
+     * @param displayedMeasurementUnit
+     *            a MeasurementUnits element
+     */
     public void setDisplayedMeasurementSystemAndUnit(
             MeasurementSystems displayedMeasurementSystem,
             MeasurementUnits displayedMeasurementUnit) {
@@ -237,6 +312,21 @@ public class Sensor implements Serializable {
         this.displayedMeasurementUnit = displayedMeasurementUnit;
     }
 
+    /**
+     * Create a parcelable Sensor object from the given Sensor
+     *
+     * @return the parcelable object
+     */
+    public PSensor toParcelable() {
+        return new PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
+                this.savePeriod, this.smoothness, this.sensorType, this.graphType,
+                this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
+                this.displayedMeasurementUnit, this.displayedMeasurementSystem);
+    }
+
+      /////////////////////////////////////////////////////////
+     ////////////////// GETTERS AND SETTERS //////////////////
+    /////////////////////////////////////////////////////////
     public int getSensorID() {
         return sensorID;
     }
@@ -297,61 +387,5 @@ public class Sensor implements Serializable {
         this.graphType = graphType;
     }
 
-    /**
-     * sets the rawDataMeasurementSystem [e.g. METRICAL] and the
-     * rawDataMeasurementUnit [e.g. KILO] of the Sensor
-     *
-     * The rawDataMeasurementUnit has to fit to the rawDataMeasurementSystem! so
-     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
-     *
-     * @param rawDataMeasurementSystem
-     *            a MeasurementSystems element
-     * @param rawDataMeasurementUnit
-     *            a MeasurementUnits element
-     */
-    public void setRawDataSensorMeasurementSystemAndUnit(
-            MeasurementSystems rawDataMeasurementSystem,
-            MeasurementUnits rawDataMeasurementUnit) {
-        if (!rawDataMeasurementUnit
-                .containsMeasurementSystem(rawDataMeasurementSystem)) {
-            throw new IllegalArgumentException();
-        }
-        this.rawDataMeasurementSystem = rawDataMeasurementSystem;
-        this.rawDataMeasurementUnit = rawDataMeasurementUnit;
-    }
 
-    /**
-     * sets the displayedMeasurementSystem [e.g. METRICAL] and the
-     * displayedMeasurementUnit [e.g. KILO] of the Sensor
-     *
-     * The displayedMeasurementUnit has to fit to the displayedMeasurementSystem! so
-     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
-     *
-     * @param displayedMeasurementSystem
-     *            a MeasurementSystems element
-     * @param displayedMeasurementUnit
-     *            a MeasurementUnits element
-     */
-    public void setDisplayedSensorMeasurementSystemAndUnit(
-            MeasurementSystems displayedMeasurementSystem,
-            MeasurementUnits displayedMeasurementUnit) {
-        if (!displayedMeasurementUnit
-                .containsMeasurementSystem(displayedMeasurementSystem)) {
-            throw new IllegalArgumentException();
-        }
-        this.displayedMeasurementSystem = displayedMeasurementSystem;
-        this.displayedMeasurementUnit = displayedMeasurementUnit;
-    }
-
-    /**
-     * Create a parcelable Sensor object from the given Sensor
-     *
-     * @return the parcelable object
-     */
-    public PSensor toParcelable() {
-        return new PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
-                this.savePeriod, this.smoothness, this.sensorType, this.graphType,
-                this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
-                this.displayedMeasurementUnit, this.displayedMeasurementSystem);
-    }
 }

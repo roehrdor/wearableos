@@ -5,7 +5,7 @@
  *
  * (c) 2014-2015 Garment OS
  */
-package de.unistuttgart.vis.wearable.os.de.unistuttgart.vis.wearable.os.cloud;
+package de.unistuttgart.vis.wearable.os.cloud;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,8 +91,8 @@ public class Archiver {
     /**
      * Create a compressed and encrypted archive file containing all sensor data and the storage
      * file containing the privacy information and sensor settings. This function call is actually
-     * the same as first calling {@link de.unistuttgart.vis.wearable.os.de.unistuttgart.vis.wearable.os.cloud.Archiver#createArchiveFile(java.io.File)}
-     * and afterwards calling the {@link de.unistuttgart.vis.wearable.os.de.unistuttgart.vis.wearable.os.cloud.Archiver#encryptFile(String, java.io.File, java.io.File)}
+     * the same as first calling {@link de.unistuttgart.vis.wearable.os.cloud.Archiver#createArchiveFile(java.io.File)}
+     * and afterwards calling the {@link de.unistuttgart.vis.wearable.os.cloud.Archiver#encryptFile(String, java.io.File, java.io.File)}
      * method.
      *
      * @param key        the key to encrypt the file with
