@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 
 public class SensorsActivity extends Activity {
 
@@ -61,17 +62,17 @@ public class SensorsActivity extends Activity {
 
             mySwitch = (Switch) sensorsLayout.findViewById(R.id.switch3);
 
-//            mySwitch.setChecked(APIFunctions
-//                    .checkIfSensorIsEnabled(sensorNames[position]));
+            if(sensors != null) {
+                mySwitch.setChecked(sensors[position].isEnabled());
+                mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView,
+                                                 boolean isChecked) {
+                        sensors[position].setEnabled(isChecked);
+                    }
+                });
+            }
 
-//            mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton buttonView,
-//                                             boolean isChecked) {
-//                    APIFunctions.setSensorEnabled(sensorNames[position],
-//                            isChecked);
-//                }
-//            });
             if (position < imageId.length)
                 imageView.setImageResource(imageId[position]);
 
@@ -83,6 +84,7 @@ public class SensorsActivity extends Activity {
         }
     }
 
+    PSensor[] sensors;
     private String[] sensorNames;
     private Float[] smoothness;
     private Integer[] powerOption;
@@ -91,38 +93,32 @@ public class SensorsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_sensorlist);
-//
-//        ListView listView = (ListView) findViewById(R.id.listView1);
-//
-//        String[] getSensors = APIFunctions.getSensors();
-//
-//        if (getSensors != null) {
-//            sensorNames = new String[getSensors.length];
-//            smoothness = new Float[getSensors.length];
-//            powerOption = new Integer[getSensors.length];
-//            imageId = new Integer[getSensors.length];
-//
-//            int count = 0;
-//            for (String sensor : getSensors) {
-//
-//                SensorProperties sensorProperties = APIFunctions
-//                        .getSensorByName(sensor).sensorProperties;
-//                sensorNames[count] = sensorProperties.getSensorName();
-//                smoothness[count] = sensorProperties.getSmoothness();
-//                imageId[count] = R.drawable.speed;
-//
-//                int powerOption = (int) (sensorProperties.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FAKTOR);
-//                if (powerOption == 0) {
-//                    powerOption = 1; // min value
-//                }
-//                this.powerOption[count++] = powerOption;
-//
-//            }
-//
-//            listViewOptions(listView);
-//        }
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sensorlist);
+
+        ListView listView = (ListView)findViewById(R.id.listView1);
+        sensors = APIFunctions.API_getAllSensors();
+        int numberOfSensors = sensors.length;
+
+        if(sensors != null) {
+
+            this.sensorNames = new String[numberOfSensors];
+            this.smoothness = new Float[numberOfSensors];
+            this.powerOption = new Integer[numberOfSensors];
+            this.imageId = new Integer[numberOfSensors];
+
+            int count = 0;
+            for(PSensor sensor : sensors) {
+                this.sensorNames[count] = sensor.getDisplayedSensorName();
+                this.smoothness[count] = sensor.getSmoothness();
+                this.imageId[count] = R.drawable.speed;
+                int powerOption = (int)(sensor.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FAKTOR);
+                powerOption = powerOption == 0 ? 1 : powerOption;
+                this.powerOption[count++] = powerOption;
+            }
+        }
+
+        listViewOptions(listView);
     }
 
     @Override
