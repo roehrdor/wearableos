@@ -17,6 +17,9 @@ public class PSensorData implements android.os.Parcelable {
      * @param sensorData the sensor data list to be converted
      */
     public PSensorData(java.util.List<SensorData> sensorData) {
+        if(sensorData == null || sensorData.size() < 1)
+            return;
+
         this.dimension = sensorData.get(0).getData().length;
         this.time = new int[sensorData.size()];
         this.data = new float[this.dimension * this.time.length];
@@ -42,7 +45,10 @@ public class PSensorData implements android.os.Parcelable {
      * @return A list containing sensor data objects
      */
     public java.util.Vector<SensorData> toSensorDataList() {
-        java.util.Vector<SensorData> ret = new java.util.Vector<SensorData>();
+        java.util.Vector<SensorData> ret;
+        if(this.time == null)
+            return null;
+        ret = new java.util.Vector<SensorData>();
         int length = this.time.length;
         for(int i = 0; i != length; ++i) {
             float[] data = new float[this.dimension];
@@ -61,11 +67,14 @@ public class PSensorData implements android.os.Parcelable {
         @Override
         public PSensorData createFromParcel(android.os.Parcel source) {
             PSensorData ret = new PSensorData();
-            ret.time = new int[source.readInt()];
-            ret.dimension = source.readInt();
-            ret.data = new float[ret.dimension * ret.time.length];
-            source.readIntArray(ret.time);
-            source.readFloatArray(ret.data);
+            int size = source.readInt();
+            if(size > 0) {
+                ret.time = new int[size];
+                ret.dimension = source.readInt();
+                ret.data = new float[ret.dimension * ret.time.length];
+                source.readIntArray(ret.time);
+                source.readFloatArray(ret.data);
+            }
             return ret;
         }
 
@@ -82,10 +91,14 @@ public class PSensorData implements android.os.Parcelable {
 
     @Override
     public void writeToParcel(android.os.Parcel dest, int flags) {
-        dest.writeInt(this.time.length);
-        dest.writeInt(this.dimension);
-        dest.writeIntArray(this.time);
-        dest.writeFloatArray(this.data);
+        if(this.time == null || this.time.length == 0)
+            dest.writeInt(0);
+        else {
+            dest.writeInt(this.time.length);
+            dest.writeInt(this.dimension);
+            dest.writeIntArray(this.time);
+            dest.writeFloatArray(this.data);
+        }
     }
 
 }
