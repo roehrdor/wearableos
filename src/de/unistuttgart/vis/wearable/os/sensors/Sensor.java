@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Vector;
 
-import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
-import de.unistuttgart.vis.wearable.os.utils.Utils;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
+import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
+import de.unistuttgart.vis.wearable.os.sensorDriver.SensorDriver;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
@@ -32,8 +32,9 @@ public class Sensor implements Serializable {
     private float smoothness = 0.0f;
     private GraphType graphType = null;
 
-    private MeasurementUnits rawDataMeasurementUnit = null;
+    SensorDriver sensorDriver = null;
 
+    private MeasurementUnits rawDataMeasurementUnit = null;
     private MeasurementSystems rawDataMeasurementSystem = null;
     private MeasurementUnits displayedMeasurementUnit = null;
     private MeasurementSystems displayedMeasurementSystem = null;
@@ -46,14 +47,34 @@ public class Sensor implements Serializable {
     /**
      * Use only for external Sensors
      */
-    public Sensor() {
+    public Sensor(SensorDriver sensorDriver, int sampleRate, int savePeriod, int smoothness,
+                  String displayedSensorName, SensorType sensorType, String bluetoothID,
+                  MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
+                  MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
+        isInternalSensor = false;
+
         int id = 100;
         for (Sensor sensor : SensorManager.getAllSensors()) {
             if (id <= sensor.getSensorID()) {
                 id = sensor.getSensorID() + 1;
             }
         }
+
         sensorID = id;
+
+        this.sensorDriver = sensorDriver;
+        this.sampleRate = sampleRate;
+        this.savePeriod = savePeriod;
+        this.smoothness = smoothness;
+        this.displayedSensorName = displayedSensorName;
+        this.sensorType = sensorType;
+        this.bluetoothID = bluetoothID;
+        this.rawDataMeasurementSystem = rawDataMeasurementSystem;
+        this.rawDataMeasurementUnit = rawDataMeasurementUnit;
+        this.displayedMeasurementSystem = displayedMeasurementSystem;
+        this.displayedMeasurementUnit = displayedMeasurementUnit;
+        this.graphType = GraphType.LINE;
+        this.isEnabled = true;
         SensorManager.addNewSensor(this);
     }
 
@@ -274,6 +295,52 @@ public class Sensor implements Serializable {
 
     public void setGraphType(GraphType graphType) {
         this.graphType = graphType;
+    }
+
+    /**
+     * sets the rawDataMeasurementSystem [e.g. METRICAL] and the
+     * rawDataMeasurementUnit [e.g. KILO] of the Sensor
+     *
+     * The rawDataMeasurementUnit has to fit to the rawDataMeasurementSystem! so
+     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
+     *
+     * @param rawDataMeasurementSystem
+     *            a MeasurementSystems element
+     * @param rawDataMeasurementUnit
+     *            a MeasurementUnits element
+     */
+    public void setRawDataSensorMeasurementSystemAndUnit(
+            MeasurementSystems rawDataMeasurementSystem,
+            MeasurementUnits rawDataMeasurementUnit) {
+        if (!rawDataMeasurementUnit
+                .containsMeasurementSystem(rawDataMeasurementSystem)) {
+            throw new IllegalArgumentException();
+        }
+        this.rawDataMeasurementSystem = rawDataMeasurementSystem;
+        this.rawDataMeasurementUnit = rawDataMeasurementUnit;
+    }
+
+    /**
+     * sets the displayedMeasurementSystem [e.g. METRICAL] and the
+     * displayedMeasurementUnit [e.g. KILO] of the Sensor
+     *
+     * The displayedMeasurementUnit has to fit to the displayedMeasurementSystem! so
+     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
+     *
+     * @param displayedMeasurementSystem
+     *            a MeasurementSystems element
+     * @param displayedMeasurementUnit
+     *            a MeasurementUnits element
+     */
+    public void setDisplayedSensorMeasurementSystemAndUnit(
+            MeasurementSystems displayedMeasurementSystem,
+            MeasurementUnits displayedMeasurementUnit) {
+        if (!displayedMeasurementUnit
+                .containsMeasurementSystem(displayedMeasurementSystem)) {
+            throw new IllegalArgumentException();
+        }
+        this.displayedMeasurementSystem = displayedMeasurementSystem;
+        this.displayedMeasurementUnit = displayedMeasurementUnit;
     }
 
     /**
