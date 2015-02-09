@@ -1,28 +1,117 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.unistuttgart.vis.wearable.os.app.MainActivity" >
+    android:background="#c0d6e4"
+    tools:context="com.settingsApp.MainActivity"
+    tools:ignore="MergeRootFrame" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="18dp"
-        android:text="TextView" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#c0d6e4"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:text="TextView" />
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="#606060"
+            android:drawableRight="@android:drawable/ic_menu_manage"
+            android:gravity="left|center_vertical|center_horizontal"
+            android:onClick="openSensorsActivity"
+            android:padding="20dp"
+            android:text="@string/sensors"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="normal" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#606060"
+            android:drawableRight="@android:drawable/ic_menu_manage"
+            android:gravity="left|center_vertical|center_horizontal"
+            android:onClick="openHARActivity"
+            android:padding="20dp"
+            android:text="@string/har"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="normal" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#606060"
+            android:drawableRight="@android:drawable/ic_dialog_alert"
+            android:gravity="left|center_vertical|center_horizontal"
+            android:onClick="openPrivacyActivity"
+            android:padding="20dp"
+            android:text="@string/privacy"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#606060"
+            android:drawableRight="@android:drawable/ic_menu_save"
+            android:gravity="left|center_vertical|center_horizontal"
+            android:padding="20dp"
+            android:text="@string/storage"
+            android:onClick="openStorageActivity"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#606060"
+            android:drawableRight="@android:drawable/stat_sys_data_bluetooth"
+            android:gravity="left|center_vertical|center_horizontal"
+            android:onClick="openBluetoothActivity"
+            android:padding="20dp"
+            android:text="@string/bluetooth"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#606060"
+            android:drawableRight="@android:drawable/ic_menu_info_details"
+            android:gravity="left|center_vertical|center_horizontal"
+            android:padding="20dp"
+            android:text="@string/about"
+            android:onClick="openAboutActivity"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp" />
+
+    </LinearLayout>
+
+</ScrollView>
