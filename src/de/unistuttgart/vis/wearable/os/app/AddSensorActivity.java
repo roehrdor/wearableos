@@ -227,7 +227,7 @@ public class AddSensorActivity extends Activity {
 //                    "Please check your sensor properties!", Toast.LENGTH_SHORT)
 //                    .show();
 //        }
-
+        this.finish();
     }
 
     public void goBack(View view) {
