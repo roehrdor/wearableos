@@ -210,18 +210,12 @@ public class Sensor implements Serializable {
     /**
      * returns the rawData from the given timestamp to the millisecond exact.
      * Or, if plusMinusOneSecond = true the rawData from the given timestamp plus minus 1 second.
-     * @return
      */
-    @SuppressWarnings("deprecation")
     public synchronized Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
         if (!plusMinusOneSecond) {
             return getRawData(time, time);
         } else {
-            Date begin = time;
-            begin.setSeconds(time.getSeconds() - 1);
-            Date end = time;
-            end.setSeconds(time.getSeconds() + 1);
-            return getRawData(begin, end);
+            return getRawData(new Date(time.getTime() - 1000), new Date(time.getTime() + 1000));
         }
     }
 
