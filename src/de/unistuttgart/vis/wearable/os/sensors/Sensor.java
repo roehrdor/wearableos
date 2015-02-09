@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.Vector;
 
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
+import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * @author pfaehlfd
@@ -37,8 +39,7 @@ public class Sensor implements Serializable {
     // TODO: merge to this project
     // private SensorCommunication sensorCommunication;
 
-    // TODO: merge to this class
-    // public SensorProperties sensorProperties = new SensorProperties();
+   // TODO: set MeasurementSystem and unit 2x
 
     /**
      * Use only for external Sensors
@@ -73,6 +74,7 @@ public class Sensor implements Serializable {
         this.rawDataMeasurementUnit = rawDataMeasurementUnit;
         this.displayedMeasurementUnit = rawDataMeasurementUnit;
         this.graphType = GraphType.LINE;
+        SensorManager.addNewSensor(this);
     }
 
     /**
@@ -94,6 +96,7 @@ public class Sensor implements Serializable {
         this.rawDataMeasurementUnit = rawDataMeasurementUnit;
         this.displayedMeasurementUnit = rawDataMeasurementUnit;
         this.graphType = GraphType.LINE;
+        SensorManager.addNewSensor(this);
     }
 
     public boolean isInternalSensor() {
@@ -108,21 +111,13 @@ public class Sensor implements Serializable {
         this.isEnabled = newValue;
         if (newValue) {
             if (isInternalSensor) {
-                //TODO
-                /////InternalSensors.getInstance().enableInternalSensor(this);
-
-                /////APIFunctions.updateSensor(this);
-
+                InternalSensors.getInstance().enableInternalSensor(this);
             } else {
                 // TODO: enable external sensors
             }
         } else {
             if (isInternalSensor) {
-                //TODO
-                /////InternalSensors.getInstance().disableInternalSensor(this);
-
-                ///// APIFunctions.updateSensor(this);
-
+                InternalSensors.getInstance().disableInternalSensor(this);
             } else {
                 // TODO: disable external sensors
             }
@@ -175,10 +170,10 @@ public class Sensor implements Serializable {
         if (begin.after(firstLocallyHoldDate) || begin.equals(firstLocallyHoldDate)) {
             getRawData(begin, end, data);
         } else {
-            //TODO
-            /////SensorDataDeSerializer deSerializer =
-            /////        new SensorDataDeSerializer(sensorID, data, begin, end, null);
-            /////deSerializer.work();
+            SensorDataDeSerializer deSerializer =
+                    new SensorDataDeSerializer(sensorID, data,
+                            Utils.dateToUnix(begin), Utils.dateToUnix(end), 0);
+            deSerializer.work();
             if (!end.before(firstLocallyHoldDate)) {
                 getRawData(begin, end, data);
             }

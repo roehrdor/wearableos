@@ -150,7 +150,7 @@ public class InternalSensors implements SensorEventListener {
                     gpsSensor = sensor;
                 }
                 SensorManager.addNewSensor(sensor);
-                Log.d("fpDEBUG", "LOADED SENSOR FROM STORAGE " + sensor.getDisplayedSensorName());
+                Log.d("fpDEBUG", "Loaded Sensor from storage " + sensor.getDisplayedSensorName());
                 if (sensor.isEnabled()) {
                     enableInternalSensor(sensor);
                 }
