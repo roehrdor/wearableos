@@ -177,7 +177,7 @@ public class Sensor implements Serializable {
      * If rawData > savePeriod the data will be saved to the Storage
      * and rawData will be cleared.
      */
-    public void addRawData (SensorData sensorData) {
+    public synchronized void addRawData (SensorData sensorData) {
         if (!isEnabled) {
             return;
         }
@@ -203,7 +203,7 @@ public class Sensor implements Serializable {
      * returns the actual rawData of the Sensor,
      * which is not saved to the storage yet.
      */
-    public Vector<SensorData> getRawData() {
+    public synchronized Vector<SensorData> getRawData() {
         return rawData;
     }
 
@@ -213,7 +213,7 @@ public class Sensor implements Serializable {
      * @return
      */
     @SuppressWarnings("deprecation")
-    public Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
+    public synchronized Vector<SensorData> getRawData(Date time, boolean plusMinusOneSecond) {
         if (!plusMinusOneSecond) {
             return getRawData(time, time);
         } else {
@@ -230,7 +230,7 @@ public class Sensor implements Serializable {
      * either from the database or from the actual rawData or both.
      * Depending of the given timestamps.
      */
-    public Vector<SensorData> getRawData(Date begin, Date end) {
+    public synchronized Vector<SensorData> getRawData(Date begin, Date end) {
         Date firstLocallyHoldDate;
         Vector<SensorData> data = new Vector<SensorData>();
         if (rawData.size() == 0) {
@@ -252,7 +252,10 @@ public class Sensor implements Serializable {
         return data;
     }
 
-    private void getRawData (Date begin, Date end, Vector<SensorData> data) {
+    /**
+     * only an internal helper method to prevent multiple code.
+     */
+    private synchronized void getRawData (Date begin, Date end, Vector<SensorData> data) {
         for (SensorData sensorData : rawData) {
             if ((sensorData.getDate().before(end) || sensorData.getDate()
                     .equals(end))
