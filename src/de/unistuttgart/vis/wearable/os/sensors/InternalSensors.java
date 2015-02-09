@@ -13,7 +13,6 @@ import android.util.Log;
 
 import java.util.Vector;
 
-import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
@@ -81,9 +80,8 @@ public class InternalSensors implements SensorEventListener {
 
         getAndroidSensors();
 
-        java.util.HashMap<Integer, Sensor> allSensors = SettingsStorage.readSensors();
         Vector<Sensor> internalSensorsFromStorage = new Vector<Sensor>();
-        for(Sensor sensor : allSensors.values()) {
+        for(Sensor sensor : SensorManager.getAllSensors()) {
             if (sensor.getSensorID() <= SensorManager.MAXIMUM_INTERNAL_SENSOR_ID) {
                 internalSensorsFromStorage.add(sensor);
             }
@@ -91,6 +89,10 @@ public class InternalSensors implements SensorEventListener {
 
         getInternalSensorsFromStorage(internalSensorsFromStorage);
         createNewInternalSensors();
+
+        for (Sensor sensor : SensorManager.getAllSensors()) {
+            sensor.setEnabled(true);
+        }
     }
 
     public static InternalSensors getInstance() {
@@ -343,7 +345,7 @@ public class InternalSensors implements SensorEventListener {
                 return proximitySensor;
             case android.hardware.Sensor.TYPE_RELATIVE_HUMIDITY:
                 return relativeHumiditySensor;
-            case android.hardware.Sensor.TYPE_GAME_ROTATION_VECTOR:
+            case android.hardware.Sensor.TYPE_ROTATION_VECTOR:
                 return rotationVectorSensor;
             case android.hardware.Sensor.TYPE_AMBIENT_TEMPERATURE:
                 return ambientTemperatureSensor;
@@ -357,6 +359,9 @@ public class InternalSensors implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         android.hardware.Sensor androidSensor = sensorEvent.sensor;
         Sensor sensor = getSensorByAndroidSensor(androidSensor);
+        if (sensor == null) {
+            return;
+        }
         int dimensions = sensor.getSensorType().getDimension();
 
         if (sensor.isEnabled()) {
