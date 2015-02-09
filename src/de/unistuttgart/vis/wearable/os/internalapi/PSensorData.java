@@ -17,9 +17,11 @@ public class PSensorData implements android.os.Parcelable {
      * @param sensorData the sensor data list to be converted
      */
     public PSensorData(java.util.List<SensorData> sensorData) {
+        // In case we have no data we can skip constructing anything
         if(sensorData == null || sensorData.size() < 1)
             return;
 
+        // Otherwise construct the parcelable object
         this.dimension = sensorData.get(0).getData().length;
         this.time = new int[sensorData.size()];
         this.data = new float[this.dimension * this.time.length];
@@ -41,14 +43,19 @@ public class PSensorData implements android.os.Parcelable {
 
     /**
      * Convert the PSensorData object back to a list of Sensor Data objects
+     * This function will return an empty vector if there is no data to be converted
      *
      * @return A list containing sensor data objects
      */
     public java.util.Vector<SensorData> toSensorDataList() {
-        java.util.Vector<SensorData> ret;
+        java.util.Vector<SensorData> ret = new java.util.Vector<SensorData>();
+
+        // Check whether we have constructed anything, if not we have no data available
+        // In this case return the empty vector
         if(this.time == null)
-            return null;
-        ret = new java.util.Vector<SensorData>();
+            return ret;
+
+        // Otherwise fill the vector with the data
         int length = this.time.length;
         for(int i = 0; i != length; ++i) {
             float[] data = new float[this.dimension];
@@ -67,6 +74,7 @@ public class PSensorData implements android.os.Parcelable {
         @Override
         public PSensorData createFromParcel(android.os.Parcel source) {
             PSensorData ret = new PSensorData();
+            // Read the number of data sets, in case this is set to 0 there is no data to be read
             int size = source.readInt();
             if(size > 0) {
                 ret.time = new int[size];
@@ -91,9 +99,11 @@ public class PSensorData implements android.os.Parcelable {
 
     @Override
     public void writeToParcel(android.os.Parcel dest, int flags) {
+        // If we don't have any data write a 0
         if(this.time == null || this.time.length == 0)
             dest.writeInt(0);
         else {
+            // otherwise write the data
             dest.writeInt(this.time.length);
             dest.writeInt(this.dimension);
             dest.writeIntArray(this.time);
