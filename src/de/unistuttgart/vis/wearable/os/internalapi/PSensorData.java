@@ -3,7 +3,21 @@ package de.unistuttgart.vis.wearable.os.internalapi;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 
 /**
- * Parcelable Sensor Data object
+ * Parcelable Sensor Data object. This class represents a list of
+ * {@link de.unistuttgart.vis.wearable.os.sensors.SensorData} objects but optimizes them
+ * considering their data layout to be sent through the parcel.
+ *
+ * The typical use of this class will be to create a new
+ * {@link de.unistuttgart.vis.wearable.os.internalapi.PSensorData} object from a
+ * {@link java.util.List} of {@link de.unistuttgart.vis.wearable.os.sensors.SensorData} objects
+ * and after this object has been sent to the client call the
+ * {@link PSensorData#toSensorDataList()} method to create the initial List of
+ * {@link de.unistuttgart.vis.wearable.os.sensors.SensorData} objects.
+ *
+ * Note that this class should only be used in the
+ * {@link de.unistuttgart.vis.wearable.os.internalservice.APIInternalBinder} class as well as in
+ * the {@link de.unistuttgart.vis.wearable.os.internalapi.APIFunctions} class.
+ *
  * @author roehrdor
  */
 public class PSensorData implements android.os.Parcelable {
