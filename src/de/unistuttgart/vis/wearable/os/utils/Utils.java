@@ -16,6 +16,55 @@ public class Utils {
 	private Utils() {
 	}
 
+    /**
+     * Convert the given float value to the given byte array
+     *
+     * @param b the byte destination array to store the byte representation fot the float value into
+     * @param f the float value to be stored as byte representation in the byte array
+     */
+    public static void getByteFromFloat(byte[] b, float f) {
+        if(b.length < 4)
+            return;
+        getByteFromInt(b, Float.floatToIntBits(f));
+    }
+
+    /**
+     * Convert the given byte array to a float number
+     *
+     * @param b the byte array to convert
+     * @return the float number
+     */
+    public static float getFloatFromByte(byte[] b) {
+        return Float.intBitsToFloat(getIntFromByte(b));
+    }
+
+    /**
+     * Store the byte wise representation of thg given integer value i in the given byte array
+     *
+     * @param b the byte array to store the byte representation into
+     * @param i the integer value to store as byte representation
+     */
+    public static void getByteFromInt(byte[] b, int i) {
+        if(b.length < 4)
+            return;
+        b[3] = (byte)(i & 0xFF);
+        b[2] = (byte)((i >> 0x8) & 0xFF);
+        b[1] = (byte)((i >> 0x10) & 0xFF);
+        b[0] = (byte)((i >> 0x18) & 0xFF);
+    }
+
+    /**
+     * Return the integer value to the byte representation in the given array
+     *
+     * @param b the byte representation of an integer
+     * @return the integer
+     */
+    public static int getIntFromByte(byte[] b) {
+        if (b.length < 4)
+            return 0;
+        return (b[3]) | ((b[2] & 0xFF) << 0x8) | ((b[1] & 0xFF) << 0x10) | ((b[0] & 0xFF) << 0x18);
+    }
+
 	/**
 	 * Create the unix time stamp from the given {@link java.util.Date} object
 	 * 
