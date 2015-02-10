@@ -95,11 +95,6 @@ public class InternalSensors implements SensorEventListener {
 
         getInternalSensorsFromStorage(internalSensorsFromStorage);
         createNewInternalSensors();
-
-        // TODO delete - just for test
-        for (Sensor sensor : SensorManager.getAllSensors()) {
-            sensor.setEnabled(true);
-        }
     }
 
     /**
