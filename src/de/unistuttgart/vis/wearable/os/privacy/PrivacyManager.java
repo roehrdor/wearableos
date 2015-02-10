@@ -67,7 +67,7 @@ public class PrivacyManager {
 	/**
 	 * Get the application by the id, returns null if application unknown
 	 * 
-	 * @param name
+	 * @param id
 	 *            the id of the application
 	 * @return the application object or null if not known
 	 */

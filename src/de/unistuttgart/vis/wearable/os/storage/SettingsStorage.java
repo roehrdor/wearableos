@@ -8,8 +8,16 @@
 package de.unistuttgart.vis.wearable.os.storage;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
 
 /**
@@ -18,76 +26,135 @@ import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
  * @author roehrdor
  */
 public class SettingsStorage {
-	private static final String FILE_NAME = "storage";
+	private static final String FILE_NAME_SENSOR = "storageS";
+    private static final String FILE_NAME_APPS = "storageA";
 
-	/**
-	 * Read the sensor settings. This function will return null if they have not
-	 * yet been saved
-	 * 
-	 * @return the sensor settings
-	 */
-	@SuppressWarnings({ "unchecked" })
-	public static java.util.HashMap<Integer, Sensor> readSensors() {
-		android.content.Context context = GarmentOSSerivce.getContext();
-		java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME);
-		java.io.ObjectInputStream ois = null;
-		java.io.FileInputStream fis = null;
-		Object ret = null;
+    //
+    // Auto update Thread save changes automatically every few seconds
+    //
+    private static Runnable updater = new Runnable() {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ie) {
+                }
+                SensorManager.save();
+            }
+        }
+    };
 
-		try {
-			//
-			// If the file does exist we read the file, otherwise not
-			//
-			if (file.exists()) {
-				//
-				// Read the contents of the file and save the
-				//
-				fis = new java.io.FileInputStream(file);
-				ois = new java.io.ObjectInputStream(fis);
-				ret = ois.readObject();
-				ois.close();
-				fis.close();
-			}
-		} catch (java.io.IOException ioe) {
-		} catch (java.lang.ClassNotFoundException cnfe) {
-		}
-		return (java.util.HashMap<Integer, Sensor>) ret;
-	}
+    static {
+        new Thread(updater).start();
+    }
 
-	/**
-	 * Read the Application settings from the file. This function will return
-	 * null if they have not yet been saved.
-	 * 
-	 * @return the application settings
-	 */
-	@SuppressWarnings("unchecked")
-	public static java.util.HashMap<String, UserApp> readApps() {
-		android.content.Context context = GarmentOSSerivce.getContext();
-		java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME);
-		java.io.ObjectInputStream ois = null;
-		java.io.FileInputStream fis = null;
-		Object ret = null;
+    /**
+     * Read the sensor settings. This function will return null if they have not
+     * yet been saved
+     *
+     * @return the sensor settings
+     */
+    public static java.util.HashMap<Integer, Sensor> readSensors() {
+        android.content.Context context = GarmentOSSerivce.getContext();
+        java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME_SENSOR);
+        java.io.ObjectInputStream ois = null;
+        java.io.FileInputStream fis = null;
+        HashMap<Integer, Sensor> ret = null;
 
-		try {
-			//
-			// If the file does exist we read the file, otherwise not
-			//
-			if (file.exists()) {
-				//
-				// Read the contents of the file and save the
-				//
-				fis = new java.io.FileInputStream(file);
-				ois = new java.io.ObjectInputStream(fis);
-				ois.readObject();
-				ret = ois.readObject();
-				ois.close();
-				fis.close();
-			}
-		} catch (java.io.IOException ioe) {
-		} catch (java.lang.ClassNotFoundException cnfe) {
-		}
-		return (java.util.HashMap<String, UserApp>) ret;
-	}
+        try {
+            if (file.exists()) {
+                fis = new java.io.FileInputStream(file);
+                ois = new java.io.ObjectInputStream(fis);
+                ret = (HashMap<Integer, Sensor>)ois.readObject();
+            }
+        } catch (java.io.IOException ioe) {
+        } catch (java.lang.ClassNotFoundException cnfe) {
+        } finally {
+            try {
+                if(ois != null) ois.close();
+                if(fis != null) fis.close();
+            } catch(IOException ioe) {}
+        }
+        return ret;
+    }
+
+    /**
+     * Save the given Map to file for later use
+     *
+     * @param sensors the map to save
+     * @param context the context of the application to choose the right folder
+     */
+    private static void saveSensors(java.util.Map<Integer, Sensor> sensors, Context context) {
+        java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME_SENSOR);
+        java.io.ObjectOutputStream oos = null;
+        java.io.FileOutputStream fos = null;
+        try {
+            fos = new java.io.FileOutputStream(file);
+            oos = new java.io.ObjectOutputStream(fos);
+            oos.writeObject(sensors);
+
+            oos.close();
+            fos.close();
+
+        } catch (IOException io) {}
+    }
+
+
+    /**
+     * Read the Application settings from the file. This function will return
+     * null if they have not yet been saved.
+     *
+     * @return the application settings
+     */
+    public static java.util.HashMap<String, UserApp> readApps() {
+        android.content.Context context = GarmentOSSerivce.getContext();
+        java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME_APPS);
+        java.io.ObjectInputStream ois = null;
+        java.io.FileInputStream fis = null;
+        HashMap<String, UserApp> ret = null;
+
+        try {
+            if (file.exists()) {
+                fis = new FileInputStream(file);
+                ois = new ObjectInputStream(fis);
+
+               ret = (HashMap<String, UserApp>) ois.readObject();
+            }
+        } catch (java.io.IOException ioe) {
+        } catch (java.lang.ClassNotFoundException cnfe) {
+        } finally {
+            try {
+                if(ois != null) ois.close();
+                if(fis != null) fis.close();
+            } catch(IOException ioe) {}
+        }
+        return ret;
+    }
+
+
+    /**
+     * Save the given Map to file for later use
+     *
+     * @param app     the map to save
+     * @param context the context of the application to choose the right folder
+     */
+    private static void saveApps(java.util.Map<String, UserApp> app, Context context) {
+        java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME_APPS);
+        java.io.ObjectOutputStream oos = null;
+        java.io.FileOutputStream fos = null;
+        try {
+            fos = new java.io.FileOutputStream(file);
+            oos = new java.io.ObjectOutputStream(fos);
+
+            oos.writeObject(app);
+
+            oos.close();
+            fos.close();
+
+        } catch (IOException io) {}
+    }
+
 
 	/**
 	 * Save the sensor and the privacy settings to file. If any of the
@@ -103,90 +170,11 @@ public class SettingsStorage {
 			java.util.Map<Integer, Sensor> sensors,
 			java.util.Map<String, UserApp> privacy) {
 		android.content.Context context = GarmentOSSerivce.getContext();
-		java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME);
-		java.io.ObjectOutputStream oos = null;
-		java.io.ObjectInputStream ois = null;
-		java.io.FileInputStream fis = null;
-		java.io.FileOutputStream fos = null;
-
-		try {
-			//
-			// If the file does already exist
-			//
-			if (file.exists()) {
-				//
-				// we must make sure to keep all the contents
-				// Therefore we start by reading all the content from the file
-				//
-				fis = new java.io.FileInputStream(file);
-				ois = new java.io.ObjectInputStream(fis);
-				Object sensorsRead = ois.readObject();
-				Object privacyRead = ois.readObject();
-				ois.close();
-				fis.close();
-
-				//
-				// When we have read the content we can create a new file and
-				// write the content again
-				//
-				fos = new java.io.FileOutputStream(file);
-				oos = new java.io.ObjectOutputStream(fos);
-
-				//
-				// If sensors is null we want to write the read value to keep
-				// our settings
-				//
-				if (sensors == null)
-					oos.writeObject(sensorsRead);
-				else
-					oos.writeObject(sensors);
-
-				//
-				// If privacy is null we want to write the read value to keep
-				// our settings
-				//
-				if (privacy == null)
-					oos.writeObject(privacyRead);
-				else
-					oos.writeObject(privacy);
-
-				fos.close();
-				oos.close();
-			}
-
-			else {
-				//
-				// In case this is a new file we can start writing without
-				// reading anything
-				//
-				fos = new java.io.FileOutputStream(file);
-				oos = new java.io.ObjectOutputStream(fos);
-
-				//
-				// If valid sensors have not been passed insert a dummy one to
-				// maintain the file structure. Otherwise write the provided
-				// sensors settings
-				//
-				if (sensors == null)
-					oos.writeObject(new java.util.HashMap<Integer, Sensor>());
-				else
-					oos.writeObject(sensors);
-
-				//
-				// If valid privacy settings have not been passed insert a dummy
-				// one to maintain the file structure. Otherwise write the
-				// provided privacy settings
-				//
-				if (privacy == null)
-					oos.writeObject(new java.util.HashMap<String, UserApp>());
-				else
-					oos.writeObject(privacy);
-
-				fos.close();
-				oos.close();
-			}
-		} catch (java.io.IOException ioe) {
-		} catch (java.lang.ClassNotFoundException cnfe) {
-		}
+        if(sensors != null) {
+            saveSensors(sensors, context);
+        }
+        if(privacy != null) {
+            saveApps(privacy, context);
+        }
 	}
 }

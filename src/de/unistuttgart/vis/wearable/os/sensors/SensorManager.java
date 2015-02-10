@@ -43,6 +43,12 @@ public final class SensorManager {
      */
     protected static void addNewSensor(Sensor sensor) {
         allSensors.put(sensor.getSensorID(), sensor);
+    }
+
+    /**
+     * Save the current settings
+     */
+    public static void save() {
         SettingsStorage.saveSensorAndPrivacy(allSensors, null);
     }
 

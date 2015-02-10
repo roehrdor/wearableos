@@ -1,6 +1,9 @@
 package de.unistuttgart.vis.wearable.os.sensors;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Date;
 import java.util.Vector;
 
@@ -14,11 +17,11 @@ import de.unistuttgart.vis.wearable.os.utils.Utils;
 /**
  * @author pfaehlfd
  */
-public class Sensor implements Serializable {
+public class Sensor implements Externalizable {
 
     private static final long serialVersionUID = 8052438921578259544L;
 
-    private Vector<SensorData> rawData = new Vector<SensorData>();
+    private transient Vector<SensorData> rawData = new Vector<SensorData>();
 
     private boolean isInternalSensor = false;
     SensorDriver sensorDriver = null;
@@ -41,6 +44,15 @@ public class Sensor implements Serializable {
 
     // TODO: merge to this project
     // private SensorCommunication sensorCommunication;
+
+    /**
+     * Empty constructor needed for serialization
+     * This constructor shall never be called otherwise
+     */
+    public Sensor() {
+        if(this.rawData == null)
+            this.rawData = new Vector<SensorData>();
+    }
 
     /**
      * Creates a new Sensor, assigns the given values
@@ -318,8 +330,8 @@ public class Sensor implements Serializable {
                 this.displayedMeasurementUnit, this.displayedMeasurementSystem);
     }
 
-      /////////////////////////////////////////////////////////
-     ////////////////// GETTERS AND SETTERS //////////////////
+    /////////////////////////////////////////////////////////
+    ////////////////// GETTERS AND SETTERS //////////////////
     /////////////////////////////////////////////////////////
     public int getSensorID() {
         return sensorID;
@@ -382,4 +394,54 @@ public class Sensor implements Serializable {
     }
 
 
+    /**
+     * Reads the next object from the ObjectInput <code>input</code>.
+     *
+     * @param input the ObjectInput from which the next object is read.
+     * @throws java.io.IOException    if an error occurs attempting to read from {@code input}.
+     * @throws ClassNotFoundException if the class of the instance being loaded cannot be found.
+     */
+    @Override
+    public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
+        this.isInternalSensor = input.readBoolean();
+        this.isEnabled = input.readBoolean();
+        android.util.Log.d("orDEBUG", "READ IN SENSOR " + this.isEnabled());
+        this.sensorID = input.readInt();
+        this.bluetoothID = input.readUTF();
+        this.sampleRate = input.readInt();
+        this.smoothness = input.readFloat();
+        this.savePeriod = input.readInt();
+        this.displayedSensorName = input.readUTF();
+        this.sensorType = (SensorType)input.readObject();
+        this.graphType = (GraphType)input.readObject();
+        this.rawDataMeasurementUnit = (MeasurementUnits)input.readObject();
+        this.rawDataMeasurementSystem = (MeasurementSystems)input.readObject();
+        this.displayedMeasurementUnit = (MeasurementUnits)input.readObject();
+        this.displayedMeasurementSystem = (MeasurementSystems)input.readObject();
+        this.rawData = new Vector<SensorData>();
+    }
+
+    /**
+     * Writes the receiver to the ObjectOutput <code>output</code>.
+     *
+     * @param output the ObjectOutput to write the object to.
+     * @throws java.io.IOException if an error occurs attempting to write to {@code output}.
+     */
+    @Override
+    public void writeExternal(ObjectOutput output) throws IOException {
+        output.writeBoolean(this.isInternalSensor);
+        output.writeBoolean(this.isEnabled);
+        output.writeInt(this.sensorID);
+        output.writeUTF(this.bluetoothID);
+        output.writeInt(this.sampleRate);
+        output.writeFloat(this.smoothness);
+        output.writeInt(this.savePeriod);
+        output.writeUTF(this.displayedSensorName);
+        output.writeObject(this.sensorType);
+        output.writeObject(this.graphType);
+        output.writeObject(this.rawDataMeasurementUnit);
+        output.writeObject(this.rawDataMeasurementSystem);
+        output.writeObject(this.displayedMeasurementUnit);
+        output.writeObject(this.displayedMeasurementSystem);
+    }
 }
