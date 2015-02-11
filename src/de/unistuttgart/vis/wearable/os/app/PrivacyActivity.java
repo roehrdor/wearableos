@@ -15,7 +15,7 @@ public class PrivacyActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_privacy);
+        setContentView(R.layout.activity_niy);
 
 
 //    ListView lv = (ListView)findViewById(R.id.listView1);
