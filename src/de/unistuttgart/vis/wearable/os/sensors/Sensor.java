@@ -319,12 +319,24 @@ public class Sensor implements Externalizable {
     }
 
     /**
-     * Create a parcelable Sensor object from the given Sensor
+     * Create a parcelable Sensor object from the given Sensor for internal use
      *
      * @return the parcelable object
      */
     public PSensor toParcelable() {
         return new PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
+                this.savePeriod, this.smoothness, this.sensorType, this.graphType,
+                this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
+                this.displayedMeasurementUnit, this.displayedMeasurementSystem);
+    }
+
+    /**
+     * Create a parcelable Sensor object from the given Sensor
+     *
+     * @return the parcelable object
+     */
+    public de.unistuttgart.vis.wearable.os.api.PSensor toParcelableAPI() {
+        return new de.unistuttgart.vis.wearable.os.api.PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
                 this.savePeriod, this.smoothness, this.sensorType, this.graphType,
                 this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
                 this.displayedMeasurementUnit, this.displayedMeasurementSystem);
