@@ -8,9 +8,11 @@
 package de.unistuttgart.vis.wearable.os.service;
 
 import android.os.RemoteException;
-import de.unistuttgart.vis.wearable.os.api.APIFunctions;
-import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
-import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
+import de.unistuttgart.vis.wearable.os.api.*;
+import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
+import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * This class implements the function calls passed through by the
@@ -68,7 +70,20 @@ class APIBinder extends IGarmentAPI.Stub {
 		}
 	}
 
-	
+    @Override
+    public PSensor[] API_getAllSensors() throws RemoteException {
+        java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
+        PSensor[] psensors = new PSensor[sensors.size()];
+        int i = -1;
+        for(Sensor s : sensors)
+            psensors[++i] = s.toParcelableAPI();
+        return psensors;
+    }
+
+    @Override
+    public PSensor API_getSensorById(int id) throws RemoteException {
+        return SensorManager.getSensorByID(id).toParcelableAPI();
+    }
 
 	//
 	// Functions will be here
@@ -143,4 +158,31 @@ class APIBinder extends IGarmentAPI.Stub {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawData(int sid) {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData().clone());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond).clone());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+    }
 }
