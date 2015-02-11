@@ -32,6 +32,27 @@ public class APIFunctions {
 	//
 	// =============================================================================
 
+
+    public static PSensor[] API_getAllSensors() {
+        if (APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().API_getAllSensors();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor API_getSensorById(int id) {
+        if (APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().API_getSensorById(id);
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 	// =====================================================================
 	//
 	// Function calls forward to Sensor object
@@ -146,5 +167,36 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");
 	}
+
+
+    public static PSensorData SENSORS_SENSOR_getRawData(int sid) {
+        if (APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawData(sid);
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) {
+        if (APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawDataIB(sid, time, plusMinusOneSecond);
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) {
+        if (APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawDataII(sid, start, end);
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 
 }
