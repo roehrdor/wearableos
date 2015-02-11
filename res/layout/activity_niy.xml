@@ -4,11 +4,9 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
-    <TextView
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Dieser Teil ist noch eine Baustelle"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.27" />
+        android:layout_height="546dp"
+        android:id="@+id/imageView"
+        android:background="@drawable/workzone"/>
 </LinearLayout>
