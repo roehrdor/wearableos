@@ -16,7 +16,7 @@ public class StorageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_storage);
+        setContentView(R.layout.activity_niy);
     }
 
 //    public void changeToDropBox(View view) {
@@ -38,9 +38,8 @@ public class StorageActivity extends Activity {
 //        Intent intent = new Intent(getBaseContext(), DbSettingsActivity.class);
 //        startActivity(intent);
 //    }
-
-    public void exportDB(View view) {
-        Intent intent = new Intent(getBaseContext(), ExportDbActivity.class);
-        startActivity(intent);
-    }
+//    public void exportDB(View view) {
+//        Intent intent = new Intent(getBaseContext(), ExportDbActivity.class);
+//        startActivity(intent);
+//    }
 }

@@ -51,17 +51,17 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-//    public void openBluetoothActivity(View view) {
-//        Intent intent = new Intent(this, BluetoothActivity.class);
-//
-//        startActivity(intent);
-//    }
-//
-//    public void openHARActivity(View view) {
-//        Intent intent = new Intent(this, HARActivity.class);
-//
-//        startActivity(intent);
-//    }
+    public void openBluetoothActivity(View view) {
+        Intent intent = new Intent(this, BluetoothActivity.class);
+
+        startActivity(intent);
+    }
+
+    public void openHARActivity(View view) {
+        Intent intent = new Intent(this, HARActivity.class);
+
+        startActivity(intent);
+    }
 
     @Override
     protected void onStart() {

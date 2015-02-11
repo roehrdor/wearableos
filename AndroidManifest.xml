@@ -89,8 +89,10 @@
             android:name=".app.GraphActivity"
             android:label="@string/title_activity_graph" >
         </activity>
-        
-        
+        <activity android:name=".app.BluetoothActivity" />
+        <activity android:name=".app.HARActivity" />
+
+
     </application>
 
 </manifest>
