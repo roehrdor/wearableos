@@ -26,7 +26,7 @@
 
         <Spinner
             android:id="@+id/sensorAdd_spinner_SensorType"
-            android:layout_width="match_parent"
+            android:layout_width="264dp"
             android:layout_height="42dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
@@ -37,7 +37,7 @@
 
         <Spinner
             android:id="@+id/sensorAdd_spinner_MeasurmentSystem"
-            android:layout_width="match_parent"
+            android:layout_width="264dp"
             android:layout_height="42dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
@@ -52,7 +52,7 @@
 
             <Spinner
                 android:id="@+id/sensorAdd_spinner_Bluetooth"
-                android:layout_width="wrap_content"
+                android:layout_width="264dp"
                 android:layout_height="42dp"
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
@@ -63,7 +63,7 @@
 
             <Button
                 android:id="@+id/button1"
-                android:layout_width="wrap_content"
+                android:layout_width="52dp"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
                 android:layout_gravity="right|top"

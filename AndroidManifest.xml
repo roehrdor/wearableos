@@ -91,6 +91,7 @@
         </activity>
         <activity android:name=".app.BluetoothActivity" />
         <activity android:name=".app.HARActivity" />
+        <activity android:name=".app.NIYActivity" />
 
 
     </application>

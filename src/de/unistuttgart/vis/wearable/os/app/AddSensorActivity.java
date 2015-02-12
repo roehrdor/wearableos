@@ -5,6 +5,8 @@ package de.unistuttgart.vis.wearable.os.app;
  */
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,6 +16,10 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.bluetooth.BluetoothDevice;
+
+import java.lang.reflect.Array;
+import java.util.Set;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
@@ -28,9 +34,7 @@ public class AddSensorActivity extends Activity {
     private Spinner spinner3;
     SensorType[] sensorTypes;
     MeasurementSystems[] measurementSystems;
-    // ToDo from Manu Lorenz
-    // BluetoothDevice[] bluetoothDevices;
-    // BluetoothDevice[] bluetoothDevice
+    BluetoothDevice[] bluetoothDevices;
     TextView textView;
     private int seekBarSmoothnessMax = 98; // between 0 and 1
     private int seekBarPowerOptionsMax = 99; // bigger than 0
@@ -41,7 +45,8 @@ public class AddSensorActivity extends Activity {
     private String sensorName = "New Sensor";
     public static final int SAVE_PERIOD_FAKTOR = 125;
     public static final double SAMPLE_RATE_FAKTOR = 1.2;
-    Boolean newSensor = false;
+    private Boolean newSensor = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +110,7 @@ public class AddSensorActivity extends Activity {
 
     }
 
-    private void setViews(){
+    private void setViews() {
 
         textView = (TextView) findViewById(R.id.sensorAdd_textView_title);
         textView.setText(sensorName);
@@ -153,24 +158,25 @@ public class AddSensorActivity extends Activity {
         spinner2.setAdapter(adapter3);
         spinner2.setSelection(getPosition(measurementSystems, measurementSystem));
 
-        // ToDo fill Bluetooth spinner with all available Bluetooth Devices
-        // ToDo from Manu Lorenz
 
         spinner3 = (Spinner) findViewById(R.id.sensorAdd_spinner_Bluetooth);
-        // bluetoothDevices = ;
-        // ArrayAdapter adapter4 = new ArrayAdapter(this,
-        // android.R.layout.simple_spinner_item, measurementSystems);
-        // spinner3.setAdapter(adapter4);
+        BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (!myBluetoothAdapter.isEnabled()) {
+            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOnIntent, 1);
+        }
+
+        Set<BluetoothDevice> pairedDevices = myBluetoothAdapter.getBondedDevices();
+        ArrayAdapter<BluetoothDevice> BTArrayAdapter = new ArrayAdapter<BluetoothDevice>(this, android.R.layout.simple_spinner_item);
+        for (BluetoothDevice device : pairedDevices) {
+            BTArrayAdapter.add(device);
+        }
+        spinner3.setAdapter(BTArrayAdapter);
     }
 
     public void refreshBluetoothSpinner() {
-        // bluetoothDevice = spinner3.getSelectedItem();
-        // bluetoothDevices = ;
-        // ArrayAdapter adapter5 = new ArrayAdapter(this,
-        // android.R.layout.simple_spinner_item, measurementSystems);
-        // spinner3.setAdapter(adapter4);
-        // spinner3.setSelection(getPosition(bluetoothDevices,
-        // bluetoothDevice));
+
     }
 
     public int getPosition(SensorType[] sensorTypes, SensorType sensorType) {
@@ -196,17 +202,18 @@ public class AddSensorActivity extends Activity {
         return 0;
     }
 
-    // public int getPosition(bluetoothDevices[] bluetoothDevices,
-    // bluetoothDevice bluetoothDevice) {
-    // int i = 0;
-    // for (bluetoothDevices mS : bluetoothDevices) {
-    // if (mS == bluetoothDevice) {
-    // return i;
-    // }
-    // i++;
-    // }
-    // return 0;
-    // }
+    // Hier muss noch herausgefunden werden wie man zwei BluetoothDevices miteinander vergleicht
+
+//    public int getPosition(BluetoothDevice[] bluetoothDevices, BluetoothDevice bluetoothDevice) {
+//        int i = 0;
+//        for (bluetoothDevices bd : bluetoothDevices) {
+//            if (bd == bluetoothDevice) {
+//                return i;
+//            }
+//            i++;
+//        }
+//        return 0;
+//    }
 
     @Override
     public void onBackPressed() {
@@ -227,10 +234,13 @@ public class AddSensorActivity extends Activity {
 //                    "Please check your sensor properties!", Toast.LENGTH_SHORT)
 //                    .show();
 //        }
+
+
         this.finish();
     }
 
     public void goBack(View view) {
         this.finish();
     }
+
 }
