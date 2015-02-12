@@ -12,6 +12,7 @@ import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
@@ -90,59 +91,94 @@ class APIBinder extends IGarmentAPI.Stub {
 	//
 	@Override
 	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return false;
+        return sensor.isEnabled();
 	}
 
 	@Override
 	public String SENSORS_SENSOR_getDisplayedSensorName(int sid)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return sensor.getDisplayedSensorName();
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getSampleRate(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        return sensor.getSampleRate();
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getSavePeriod(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        return sensor.getSavePeriod();
 	}
 
 	@Override
 	public float SENSORS_SENSOR_getSmoothness(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        return sensor.getSmoothness();
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getSensorType(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getSensorType() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getSensorType().ordinal();
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getGraphType(int sid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getGraphType() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getGraphType().ordinal();
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getDisplayedMeasurementUnit() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getDisplayedMeasurementUnit().ordinal();
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getDisplayedMeasurementSystem() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getDisplayedMeasurementSystem().ordinal();
 	}
 
     @Override
