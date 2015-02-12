@@ -296,29 +296,6 @@ public class Sensor implements Externalizable {
     }
 
     /**
-     * sets the displayedMeasurementSystem [e.g. METRICAL] and the
-     * displayedMeasurementUnit [e.g. KILO] of the Sensor
-     *
-     * The displayedMeasurementUnit has to fit to the displayedMeasurementSystem! so
-     * KILO and METRICAL is legal! and KILO and ANGLOSAXON is illegal!
-     *
-     * @param displayedMeasurementSystem
-     *            a MeasurementSystems element
-     * @param displayedMeasurementUnit
-     *            a MeasurementUnits element
-     */
-    public void setDisplayedMeasurementSystemAndUnit(
-            MeasurementSystems displayedMeasurementSystem,
-            MeasurementUnits displayedMeasurementUnit) {
-        if (!displayedMeasurementUnit
-                .containsMeasurementSystem(displayedMeasurementSystem)) {
-            throw new IllegalArgumentException();
-        }
-        this.displayedMeasurementSystem = displayedMeasurementSystem;
-        this.displayedMeasurementUnit = displayedMeasurementUnit;
-    }
-
-    /**
      * Create a parcelable Sensor object from the given Sensor for internal use
      *
      * @return the parcelable object
@@ -403,6 +380,22 @@ public class Sensor implements Externalizable {
 
     public void setGraphType(GraphType graphType) {
         this.graphType = graphType;
+    }
+
+    public MeasurementUnits getDisplayedMeasurementUnit() {
+        return displayedMeasurementUnit;
+    }
+
+    public void setDisplayedMeasurementUnit(MeasurementUnits displayedMeasurementUnit) {
+        this.displayedMeasurementUnit = displayedMeasurementUnit;
+    }
+
+    public MeasurementSystems getDisplayedMeasurementSystem() {
+        return displayedMeasurementSystem;
+    }
+
+    public void setDisplayedMeasurementSystem(MeasurementSystems displayedMeasurementSystem) {
+        this.displayedMeasurementSystem = displayedMeasurementSystem;
     }
 
 

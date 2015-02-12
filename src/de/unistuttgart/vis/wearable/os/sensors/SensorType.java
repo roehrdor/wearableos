@@ -38,7 +38,8 @@ public enum SensorType {
 		this.dimension = dimension;
 		this.measurementSystems = measurementSystems;
 	}
-	
+
+    @Deprecated
 	public int getDimension() {
 		return dimension;
 	}
