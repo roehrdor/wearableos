@@ -66,38 +66,6 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ie) {}
-                PSensor[] sensors = APIFunctions.API_getAllSensors();
-                for(int i = 0; i != sensors.length; ++i) {
-                    android.util.Log.d("orDEBUG", sensors[i].getDisplayedSensorName() + " " + sensors[i].getID());
-                }
-                PSensor s = APIFunctions.API_getSensorById(1);
-
-                while(true) {
-                    try {
-                        Thread.sleep(4000);
-                    } catch (InterruptedException ie) {}
-
-                    android.util.Log.d("orDEBUG", "Getting API SENSORS");
-                    PSensor[] sensors2 = APIFunctions.API_getAllSensors();
-                    for(int i = 0; i != sensors.length; ++i) {
-                        android.util.Log.d("orDEBUG", sensors2[i].getDisplayedSensorName() + " " + sensors2[i].getID());
-                    }
-
-                    android.util.Log.d("orDEBUG", "Getting internal API SENSORS");
-                    de.unistuttgart.vis.wearable.os.internalapi.PSensor[] sensors3 = de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.API_getAllSensors();
-                    for(int i = 0; i != sensors.length; ++i) {
-                        android.util.Log.d("orDEBUG", sensors3[i].getDisplayedSensorName() + " " + sensors3[i].getID());
-                    }
-                }
-            }
-        }).start();
     }
 
     public static Context getContext() {
