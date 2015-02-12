@@ -128,26 +128,6 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");
 	}
 
-	public static int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid) {
-		if (APIHandle.isServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementUnit(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");
-	}
-
-	public static int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid) {
-		if (APIHandle.isServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementSystem(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");
-	}
-
 	public static int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid) {
 		if (APIHandle.isServiceBound()) {
 			try {

@@ -288,30 +288,6 @@ public class PSensor {
     }
 
     /**
-     * @return the rawDataMeasurementUnit
-     */
-    public MeasurementUnits getRawDataMeasurementUnit() {
-        int ordinal = APIFunctions.SENSORS_SENSOR_getRawDataMeasurementUnit(this.ID);
-        if(ordinal == Constants.ENUMERATION_NULL)
-            this.rawDataMeasurementUnit = null;
-        else
-            this.rawDataMeasurementUnit = MeasurementUnits.values()[ordinal];
-        return rawDataMeasurementUnit;
-    }
-
-    /**
-     * @return the rawDataMeasurementSystem
-     */
-    public MeasurementSystems getRawDataMeasurementSystem() {
-        int ordinal = APIFunctions.SENSORS_SENSOR_getRawDataMeasurementSystem(this.ID);
-        if(ordinal == Constants.ENUMERATION_NULL)
-            this.rawDataMeasurementSystem = null;
-        else
-            this.rawDataMeasurementSystem = MeasurementSystems.values()[ordinal];
-        return rawDataMeasurementSystem;
-    }
-
-    /**
      * @return the displayedMeasurementUnit
      */
     public MeasurementUnits getDisplayedMeasurementUnit() {

@@ -29,9 +29,7 @@ interface IGarmentAPI {
 	int 		SENSORS_SENSOR_getSavePeriod(int sid);
 	float 		SENSORS_SENSOR_getSmoothness(int sid);
 	int 		SENSORS_SENSOR_getSensorType(int sid);
-	int 		SENSORS_SENSOR_getGraphType(int sid);	
-	int 		SENSORS_SENSOR_getRawDataMeasurementUnit(int sid);
-	int 		SENSORS_SENSOR_getRawDataMeasurementSystem(int sid);
+	int 		SENSORS_SENSOR_getGraphType(int sid);
 	int 		SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid);
 	int 		SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid);
 	PSensorData SENSORS_SENSOR_getRawData(int sid);

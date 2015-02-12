@@ -17,10 +17,7 @@ import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
-import de.unistuttgart.vis.wearable.os.sensors.Sensor;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
-import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+import de.unistuttgart.vis.wearable.os.sensors.*;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
@@ -290,57 +287,47 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void SENSORS_SENSOR_setRawDataMeasurementUnit(int sid,
-			int rawDataMeasurementUnit) throws RemoteException {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void SENSORS_SENSOR_setRawDataMeasurementSystem(int sid,
-			int rawDataMeasurementSystem) throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getDisplayedMeasurementUnit() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getDisplayedMeasurementUnit().ordinal();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid,
 			int displayedMeasurementUnit) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setDisplayedMeasurementUnit(MeasurementUnits.values()[displayedMeasurementUnit]);
 	}
 
 	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return Constants.ILLEGAL_VALUE;
+        if(sensor.getDisplayedMeasurementSystem() == null)
+            return Constants.ENUMERATION_NULL;
+        return sensor.getDisplayedMeasurementSystem().ordinal();
 	}
 
 	@Override
 	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid,
 			int displayedMeasurementSystem) throws RemoteException {
-		// TODO Auto-generated method stub
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.setDisplayedMeasurementSystem(MeasurementSystems.values()[displayedMeasurementSystem]);
 	}
 
     @Override

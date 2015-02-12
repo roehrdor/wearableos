@@ -55,15 +55,11 @@ interface IGarmentInternalAPI {
 	int 		SENSORS_SENSOR_getSensorType(int sid);
 	void 		SENSORS_SENSOR_setSensorType(int sid, int sensorType);
 	int 		SENSORS_SENSOR_getGraphType(int sid);
-	void 		SENSORS_SENSOR_setGraphType(int sid, int graphType);	
-	int 		SENSORS_SENSOR_getRawDataMeasurementUnit(int sid);
-	void 		SENSORS_SENSOR_setRawDataMeasurementUnit(int sid, int rawDataMeasurementUnit);
-	int 		SENSORS_SENSOR_getRawDataMeasurementSystem(int sid);
-	void 		SENSORS_SENSOR_setRawDataMeasurementSystem(int sid, int rawDataMeasurementSystem);
+	void 		SENSORS_SENSOR_setGraphType(int sid, int graphType);
 	int 		SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid);
-	void 		SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit);
 	int 		SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem);
+	void 		SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit);
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
 	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond);
 	PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end);

@@ -132,20 +132,6 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
 			throws RemoteException {
 		// TODO Auto-generated method stub

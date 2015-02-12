@@ -359,48 +359,6 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");	
 	}
 
-	public static int SENSORS_SENSOR_getRawDataMeasurementUnit(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementUnit(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static void SENSORS_SENSOR_setRawDataMeasurementUnit(int sid, int rawDataMeasurementUnit) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setRawDataMeasurementUnit(sid, rawDataMeasurementUnit);
-                return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static int SENSORS_SENSOR_getRawDataMeasurementSystem(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataMeasurementSystem(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static void SENSORS_SENSOR_setRawDataMeasurementSystem(int sid, int rawDataMeasurementSystem) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setRawDataMeasurementSystem(sid, rawDataMeasurementSystem);
-                return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
 	public static int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid) {
 		if (APIHandle.isInternalServiceBound()) {
 			try {

@@ -146,24 +146,6 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
 	}
 
 	/**
-	 * @param rawDataMeasurementUnit the rawDataMeasurementUnit to set
-	 */
-	public void setRawDataMeasurementUnit(MeasurementUnits rawDataMeasurementUnit) {
-		this.rawDataMeasurementUnit = rawDataMeasurementUnit;
-		int ordinal = rawDataMeasurementUnit != null ? rawDataMeasurementUnit.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setRawDataMeasurementUnit(this.ID, ordinal);
-	}
-
-	/**
-	 * @param rawDataMeasurementSystem the rawDataMeasurementSystem to set
-	 */
-	public void setRawDataMeasurementSystem(MeasurementSystems rawDataMeasurementSystem) {
-		this.rawDataMeasurementSystem = rawDataMeasurementSystem;
-		int ordinal = rawDataMeasurementSystem != null ? rawDataMeasurementSystem.ordinal() : Constants.ENUMERATION_NULL;
-		APIFunctions.SENSORS_SENSOR_setRawDataMeasurementSystem(this.ID, ordinal);
-	}
-
-	/**
 	 * @param displayedMeasurementUnit the displayedMeasurementUnit to set
 	 */
 	public void setDisplayedMeasurementUnit(MeasurementUnits displayedMeasurementUnit) {
