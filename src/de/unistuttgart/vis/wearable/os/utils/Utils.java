@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 Garment OS
  */
 package de.unistuttgart.vis.wearable.os.utils;
 
@@ -15,6 +15,45 @@ package de.unistuttgart.vis.wearable.os.utils;
 public class Utils {
 	private Utils() {
 	}
+
+    /**
+     * <p>
+     * Convert the given int value into a float value. Note that this function does not cast the
+     * value but rather reinterprets the byte representation of the given number and returns the
+     * result as floating point value.
+     * </p>
+     * <p>
+     * Note that this function is equivalent to the C / C++ code:
+     * float r = *(float*)&v;
+     * </p>
+     * @param v the integer that is to be reinterpreted
+     * @return the float value for the byte representation of the integer value
+     */
+    public static float getFloatFromIntByte(int v) {
+        byte[] b = new byte[4];
+        getByteFromInt(b, v);
+        return getFloatFromByte(b);
+    }
+
+    /**
+     * <p>
+     * Convert the given float value into a int value. Note that this function does not cast the
+     * value but rather reinterprets the byte representation of the given float number and returns
+     * the result as integer value
+     * </p>
+     * <p>
+     * Note that this function is equivalent to the C / C++ code:
+     * int r = *(int*)&f;
+     * </p>
+     *
+     * @param f the float value that is to be reinterpreted
+     * @return the int value for the byte representation of the float value
+     */
+    public static int getIntFromFloatByte(float f) {
+        byte[] b = new byte[4];
+        getByteFromFloat(b, f);
+        return getIntFromByte(b);
+    }
 
     /**
      * Convert the given float value to the given byte array
