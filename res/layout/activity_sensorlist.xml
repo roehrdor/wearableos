@@ -5,15 +5,17 @@
     android:background="#c0d6e4"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <GridLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:columnCount="2">
 
         <TextView
             android:id="@+id/sensorAdd_textView_title"
-            android:layout_width="305dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="60dp"
+            android:layout_gravity="left"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:text="@string/sensorSettings"
@@ -21,13 +23,14 @@
 
         <ImageButton
             android:id="@+id/imageButton1"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:background="@null"
+            android:layout_gravity="right|center"
             android:onClick="addSensor"
             android:scaleType="fitCenter"
             android:src="@android:drawable/ic_menu_add" />
-    </LinearLayout>
+    </GridLayout>
 
     <ListView
         android:id="@+id/listView1"
