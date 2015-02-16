@@ -11,7 +11,6 @@ public class DigitalViewModule extends PopupModule2 {
 		super(context, attrs);
 
 		content = new TextView(context);
-		super.createLayout(context, content, R.drawable.graph,
-				"Digital View");
+		super.createLayout(context, content, R.drawable.graph, "Digital View");
 	}
 }

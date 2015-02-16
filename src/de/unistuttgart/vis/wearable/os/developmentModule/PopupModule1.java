@@ -12,7 +12,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-public  abstract class  PopupModule1 extends BasisModule {
+public abstract class PopupModule1 extends BasisModule {
 	public PopupModule1(Context context) {
 		super(context);
 	}
@@ -38,21 +38,21 @@ public  abstract class  PopupModule1 extends BasisModule {
 		LinearLayout upperLayout = new RadioGroup(context);
 		upperLayout.setOrientation(VERTICAL);
 		upperLayout.setGravity(Gravity.TOP);
-		
+
 		TextView textview = new TextView(context);
 		textview.setText("Set Time Span:");
 		textview.setPadding(0, 0, 0, 20);
-		
+
 		textview.setTextColor(Color.WHITE);
 		textview.setTextSize(22);
 
 		layout.addView(upperLayout);
 		layout.addView(downLayout);
-		
+
 		upperLayout.addView(textview);
-		
+
 		RadioButton radioButtonToday = new RadioButton(context);
-		
+
 		radioButtonToday.setText("Today");
 
 		radioButtonToday.setTextColor(Color.WHITE);
@@ -62,19 +62,19 @@ public  abstract class  PopupModule1 extends BasisModule {
 		RadioButton radioButtonWeek = new RadioButton(context);
 
 		radioButtonWeek.setText("Last Week");
-		
+
 		radioButtonWeek.setTextColor(Color.WHITE);
 
 		upperLayout.addView(radioButtonWeek);
 
 		RadioButton radioButtonMonth = new RadioButton(context);
-		
+
 		radioButtonMonth.setText("LastMonth");
 
 		radioButtonMonth.setTextColor(Color.WHITE);
 
 		upperLayout.addView(radioButtonMonth);
-		
+
 		upperLayout.setPadding(0, 0, 0, 25);
 
 		Button cancelButton = new Button(context);

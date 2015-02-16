@@ -1,4 +1,5 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
+
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -25,14 +26,16 @@ public abstract class BasisModule extends GridLayout {
 	private static final int TITLE_TEXT_SIZE = 20;
 
 	protected String sensorName;
-	//protected SensorType sensorType;
+	// protected SensorType sensorType;
 	protected Boolean raw;
-	//protected SettingsModule settingsModule = com.garmentos.garmentOSLib.SettingsModule.getInstance();
+	// protected SettingsModule settingsModule =
+	// com.garmentos.garmentOSLib.SettingsModule.getInstance();
 	protected int numberOfValues;
 	protected String beginTime;
 	protected String endTime;
 	protected TextView content;
-	//protected VirtualSensor virtualSensor;
+
+	// protected VirtualSensor virtualSensor;
 
 	public BasisModule(Context context) {
 		super(context);
@@ -69,7 +72,7 @@ public abstract class BasisModule extends GridLayout {
 		titleLinearLayout.addView(titleTextView);
 		titleTextView.setTextSize(TITLE_TEXT_SIZE);
 		titleTextView.setText(title);
-		
+
 		titleLinearLayout.setBackgroundColor(Color.parseColor("#c0d6e4"));
 
 		this.addView(titleLinearLayout);
@@ -82,9 +85,8 @@ public abstract class BasisModule extends GridLayout {
 		params.columnSpec = spec(2);
 		params.rowSpec = spec(0, 2);
 
-		
 		rightLinearLayout.setLayoutParams(params);
-		
+
 		rightLinearLayout.setBackgroundColor(Color.parseColor("#c0d6e4"));
 
 		this.addView(rightLinearLayout);
@@ -98,44 +100,42 @@ public abstract class BasisModule extends GridLayout {
 		firstButton.setBackgroundColor(Color.parseColor("#606060"));
 		firstButton.setImageResource(android.R.drawable.ic_menu_more);
 		rightLinearLayout.addView(firstButton);
-		
 
 		firstButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(final View view) {
 
-						System.out.println("clicked");
-						final PopupWindow pwindow = new PopupWindow(view.getContext());
-						
-						pwindow.setHeight(BasisModule.this.getHeight() * 2);
-						pwindow.setWidth((int)(BasisModule.this.getWidth()* 1.1));
-						
-//						pwindow.setContentView(BasisModule.this.getPopupContent(item.getItemId(), view.getContext()));
-						
-//						pwindow.update();
-						
-					//	pwindow.setBackgroundDrawable(null);
-					
-						pwindow.setFocusable(true);
-						
-						pwindow.setAnimationStyle(-1);
-						
-						pwindow.setContentView(getPopupContent(view.getContext(), pwindow));
-						
-						
-						
-						pwindow.showAsDropDown(firstButton);
-						
-//						return true;
+				System.out.println("clicked");
+				final PopupWindow pwindow = new PopupWindow(view.getContext());
 
-					}
-				});
-//
-//				popup.show(); // showing popup menu
-//			}
-////		});
+				pwindow.setHeight(BasisModule.this.getHeight() * 2);
+				pwindow.setWidth((int) (BasisModule.this.getWidth() * 1.1));
 
+				// pwindow.setContentView(BasisModule.this.getPopupContent(item.getItemId(),
+				// view.getContext()));
+
+				// pwindow.update();
+
+				// pwindow.setBackgroundDrawable(null);
+
+				pwindow.setFocusable(true);
+
+				pwindow.setAnimationStyle(-1);
+
+				pwindow.setContentView(getPopupContent(view.getContext(),
+						pwindow));
+
+				pwindow.showAsDropDown(firstButton);
+
+				// return true;
+
+			}
+		});
+		//
+		// popup.show(); // showing popup menu
+		// }
+		// // });
 
 		secondButton = new ImageButton(context);
 		secondButton.setMinimumWidth(BUTTON_SIZE);
@@ -175,7 +175,7 @@ public abstract class BasisModule extends GridLayout {
 		imageView.setLayoutParams(params);
 
 		this.addView(imageView);
-		
+
 		this.setBackgroundColor(Color.parseColor("#c0d6e4"));
 
 		params = new LayoutParams(spec(1), spec(1));
@@ -184,8 +184,8 @@ public abstract class BasisModule extends GridLayout {
 
 		this.addView(content);
 	}
-	
-	protected abstract View getPopupContent(final Context context, final PopupWindow pWindow);
 
+	protected abstract View getPopupContent(final Context context,
+			final PopupWindow pWindow);
 
 }
