@@ -11,6 +11,16 @@ public class PSensorData {
     protected int dimension;
 
     /**
+     * Get the dimension of the sensor data object
+     *
+     * @return the dimension
+     */
+    public int getDimension() {
+        return this.dimension;
+    }
+
+
+    /**
      * Create a new PSensorData object from the given List of Sensor Data
      *
      * @param sensorData the sensor data list to be converted
