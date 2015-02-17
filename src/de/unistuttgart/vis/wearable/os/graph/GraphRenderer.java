@@ -27,21 +27,21 @@ public class GraphRenderer {
 	private interface GraphDataGenerator {
 		public GraphData[] getData();
 	}
-	
+
 	public static class ChartThreadTuple {
 		private Thread thread;
 		private View chart;
-		
+
 		public ChartThreadTuple(Thread thread, View chart) {
-			
+
 			this.thread = thread;
 			this.chart = chart;
 		}
-		
+
 		public View getChart() {
 			return chart;
 		}
-		
+
 		public Thread getThread() {
 			return thread;
 		}
@@ -126,12 +126,12 @@ public class GraphRenderer {
 			public void run() {
 
 				while (!isInterrupted()) {
-					
+
 					try {
 						Thread.sleep(UPDATE_INTERVAL);
 					} catch (InterruptedException e) {
 					}
-					
+
 					Iterator<TimeSeries> iterator = series.iterator();
 					for (GraphData d : generator.getData()) {
 						TimeSeries currentTimeSeries = iterator.next();
@@ -145,10 +145,9 @@ public class GraphRenderer {
 							currentTimeSeries.add(x[i], y[i]);
 						}
 					}
-					
+
 					view.repaint();
 
-					
 				}
 			};
 		};
