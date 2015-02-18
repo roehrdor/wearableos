@@ -20,7 +20,7 @@
     <string name="sendDataToSensor">Send Data to Sensor</string>
     <string name="smoothness">Smoothness</string>
     <string name="powerOptions">Power Options</string>
-    <string name="copyright">Copyright 2014 - 2015</string>
+    <string name="copyright">Copyright 2014 &#8211; 2015</string>
     <string name="studienprojekt">Studienprojekt Garment OS</string>
     <string name="university">University of Stuttgart</string>
     <string name="title_activity_privacy">PrivacyActivity</string>
@@ -99,5 +99,6 @@
     <string name="textView_manager_numberOfTrainings">Numer of trainings:</string>
     <string name="textView_manager_numberOfSkippedTrainings">Numer of skipped trainings:</string>
     <string name="har_button_manager_delete">Delete neural network</string>
+    <string name="refresh">refresh</string>
 
 </resources>

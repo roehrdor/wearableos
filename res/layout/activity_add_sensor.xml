@@ -69,6 +69,7 @@
                 android:background="@null"
                 android:maxHeight="5dp"
                 android:maxWidth="4dp"
+                android:contentDescription="@string/refresh"
                 android:onClick="refreshBluetoothSpinner"
                 android:src="@android:drawable/ic_popup_sync" />
         </LinearLayout>

@@ -12,6 +12,6 @@ public class HARActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_niy);
+        setContentView(R.layout.activity_har);
     }
 }
