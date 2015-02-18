@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
         android:orientation="vertical" >
@@ -21,6 +21,7 @@
             android:paddingTop="10dp"
             android:text="@string/title"
             android:textColor="#606060"
+            android:inputType="text"
             android:textSize="35sp" >
         </EditText>
 
@@ -52,17 +53,9 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginTop="20dp"
+            android:padding="15dp"
             android:text="@string/OnOff"
             android:textSize="15sp" />
-
-        <SeekBar
-            android:id="@+id/sensorDetail_seekBar_Smoothness"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="30dp"
-            android:max="100" />
 
         <TextView
             android:id="@+id/textView2"
@@ -70,8 +63,32 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:padding="15dp"
             android:text="@string/smoothness"
             android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/sensorDetail_seekBar_Smoothness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:max="100" />
+
+   
+        
+        
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:padding="15dp"
+            android:text="@string/powerOptions"
+            android:textSize="20sp" />
+        
 
         <SeekBar
             android:id="@+id/sensorDetail_seekBar_PowerOptions"
@@ -79,26 +96,21 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="15dp"
             android:max="100" />
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:paddingBottom="10dp"
-            android:text="@string/powerOptions"
-            android:textSize="20sp" />
-
+        
         <Button
             android:id="@+id/sensorDetail_button_showGraph"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#606060"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:onClick="showGraph"
-            android:padding="5dp"
+            android:padding="15dp"
             android:text="@string/btn_showGraph"
             android:textColor="#FFFFFF" />
     </LinearLayout>
