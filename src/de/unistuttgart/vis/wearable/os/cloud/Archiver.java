@@ -99,9 +99,13 @@ public class Archiver {
         queue.add(dir);
         while(!queue.isEmpty()) {
             File current = queue.remove(0);
-            if(current.isDirectory())
-                queue.add(current);
-            files.add(current);
+            File[] filesInCurrent = current.listFiles();
+            for(File f : filesInCurrent) {
+                if(f.isDirectory())
+                    queue.add(f);
+                else
+                    files.add(f);
+            }
         }
         return files;
     }
@@ -116,11 +120,14 @@ public class Archiver {
         try {
             // Get all files in the directory and in its sub directories
             List<File> files = getFilesInDirectory(Properties.storageDirectory);
+
+            android.util.Log.d("orDEUB", "Saving to " + outputFile);
+
             byte[] bytes = new byte[1024];
             int length;
 
             // Create a new file output stream and zip output stream to save the files to a zip file
-            FileOutputStream fos = new FileOutputStream(Properties.storageDirectory.getName() + ".sf");
+            FileOutputStream fos = new FileOutputStream(outputFile);
             FileInputStream fis;
             ZipOutputStream zos = new ZipOutputStream(fos);
 
@@ -156,7 +163,7 @@ public class Archiver {
             zos.close();
             fos.close();
         } catch (IOException ioe) {
-            Log.w("GarmentOS", "Could not create compressed archive");
+            Log.e("GarmentOS", "Could not create compressed archive");
         }
     }
 
