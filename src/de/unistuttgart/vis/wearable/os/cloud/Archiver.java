@@ -24,6 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * This class is used to create an archive file containing selected sensor data files or
@@ -83,8 +84,7 @@ public class Archiver {
             fos.write(outputBytes);
             fos.close();
 
-        } catch(Exception e) {
-        }
+        } catch(Exception e) {}
     }
 
     /**
@@ -117,6 +117,16 @@ public class Archiver {
      * @param outputFile the output file to store the files in
      */
     public static void createArchiveFile(File outputFile) {
+        //
+        // Wait until no file in the directory is in use and lock these files
+        //
+        Properties.FILE_STATUS_FIELDS_LOCK.lock();
+        Properties.FILE_ARCHIVING.set(true);
+        while(Properties.FILES_IN_USE.get() != 0) {
+            Utils.sleepUninterrupted(200);
+        }
+        Properties.FILE_STATUS_FIELDS_LOCK.unlock();
+
         try {
             // Get all files in the directory and in its sub directories
             List<File> files = getFilesInDirectory(Properties.storageDirectory);
@@ -165,6 +175,11 @@ public class Archiver {
         } catch (IOException ioe) {
             Log.e("GarmentOS", "Could not create compressed archive");
         }
+
+        //
+        // Unlock the files in the directory again
+        //
+        Properties.FILE_ARCHIVING.set(false);
     }
 
 

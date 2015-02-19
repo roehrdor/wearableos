@@ -17,6 +17,30 @@ public class Utils {
 	}
 
     /**
+     * Sleep for the given amount of time without getting interrupted.
+     *
+     * @param timeInMSecs the time in mseconds to sleep
+     */
+    public static void sleepUninterrupted(int timeInMSecs) {
+        // compute the end time to stop sleeping at
+        long end = System.currentTimeMillis() + timeInMSecs;
+
+        // While we have not reached that time yet
+        while(System.currentTimeMillis() < end) {
+            try {
+                // go for sleep for the remaining time
+                long dur = end-System.currentTimeMillis();
+                dur = dur < 0 ? 0 : dur;
+                Thread.sleep(dur);
+            } catch(InterruptedException ie) {
+                // do nothing here, we just got woken up, check whether we have
+                // any time left to sleep. If so we want to sleep for the
+                // remaining time
+            }
+        }
+    }
+
+    /**
      * <p>
      * Convert the given int value into a float value. Note that this function does not cast the
      * value but rather reinterprets the byte representation of the given number and returns the

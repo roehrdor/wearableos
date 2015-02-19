@@ -7,6 +7,10 @@
  */
 package de.unistuttgart.vis.wearable.os.properties;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * This class is used to store the user properties such as the password for the encryption or the
  * path of the files.
@@ -16,6 +20,13 @@ package de.unistuttgart.vis.wearable.os.properties;
 public class Properties {
     // These are constant right now but could basically be changed dynamically
     public static java.io.File storageDirectory = new java.io.File("/data/data/de.unistuttgart.vis.wearable.os/files");
+
+    //
+    // This lock is used to synchronize concurrent access to the below data fields
+    //
+    public static final ReentrantLock FILE_STATUS_FIELDS_LOCK = new ReentrantLock(true);
+    public static final AtomicInteger FILES_IN_USE = new AtomicInteger(0);
+    public static final AtomicBoolean FILE_ARCHIVING = new AtomicBoolean(false);
 
     //
     // These constants are used to start the services
