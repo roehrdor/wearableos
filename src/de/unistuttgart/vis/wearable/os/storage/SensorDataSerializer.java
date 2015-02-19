@@ -15,6 +15,7 @@ import de.unistuttgart.vis.wearable.os.utils.Utils;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -36,112 +37,124 @@ public class SensorDataSerializer {
     protected static final Thread runner = new Thread() {
         @Override
         public void run() {
-            //
-            // Wait until the archiver process has terminated and then
-            // tell the files are being used
-            //
-            Properties.FILE_STATUS_FIELDS_LOCK.lock();
-            while(Properties.FILE_ARCHIVING.get()) {
-                Utils.sleepUninterrupted(200);
-            }
-            Properties.FILES_IN_USE.incrementAndGet();
-            Properties.FILE_STATUS_FIELDS_LOCK.unlock();
+            while (true) {
+                //
+                // Wait until the archiver process has terminated and then
+                // tell the files are being used
+                //
+                Properties.FILE_STATUS_FIELDS_LOCK.lock();
+                while (Properties.FILE_ARCHIVING.get()) {
+                    Utils.sleepUninterrupted(200);
+                }
+                Properties.FILES_IN_USE.incrementAndGet();
+                Properties.FILE_STATUS_FIELDS_LOCK.unlock();
 
-            RandomAccessFile raf;
-            File file;
-
-            //
-            // As long as we have jobs to be done
-            //
-            while(!jobIDS.isEmpty()) {
-                int id = jobIDS.remove(0);
-                Vector<SensorData> data = mSensorData.get(id);
+                RandomAccessFile raf;
+                File file;
 
                 //
-                // Synchronize the access to the object
+                // As long as we have jobs to be done
                 //
-                synchronized (mSensorData.get(id)) {
-                    try {
-                        long currentFileLength;
-                        int latestData = 0;
-                        int currentDate = 0;
+                while (!jobIDS.isEmpty()) {
+                    int id = jobIDS.remove(0);
+                    Vector<SensorData> data = mSensorData.get(id);
 
-                        //
-                        // Create a new file object and test whether the file already
-                        // exists. If the file does not already exist we need to create this file
-                        //
-                        file = new java.io.File(Properties.storageDirectory, String.valueOf(id));
-                        if(!file.exists()) {
+                    //
+                    // Synchronize the access to the object
+                    //
+                    synchronized (mSensorData.get(id)) {
+                        try {
+                            long currentFileLength;
+                            int latestData = 0;
+                            int currentDate = 0;
+
                             //
-                            // So we need to create a new file but also to insert the latest data
-                            // date as well as the dimension of the data fields to this file
+                            // Create a new file object and test whether the file already
+                            // exists. If the file does not already exist we need to create this file
                             //
-                            if(!file.createNewFile()) {
-                                Log.e("GarmentOS", "File does not exist, but creating it tells us it does already exist?");
+                            file = new java.io.File(Properties.storageDirectory, String.valueOf(id));
+                            if (!file.exists()) {
+                                //
+                                // So we need to create a new file but also to insert the latest data
+                                // date as well as the dimension of the data fields to this file
+                                //
+                                if (!file.createNewFile()) {
+                                    Log.e("GarmentOS", "File does not exist, but creating it tells us it does already exist?");
+                                }
+                                raf = new java.io.RandomAccessFile(file, "rw");
+                                raf.writeInt(0);
+                                raf.writeInt(data.get(0).getData().length);
+                            } else {
+                                raf = new java.io.RandomAccessFile(file, "rw");
                             }
-                            raf = new java.io.RandomAccessFile(file, "rw");
-                            raf.writeInt(0);
-                            raf.writeInt(data.get(0).getData().length);
-                        } else {
-                            raf = new java.io.RandomAccessFile(file, "rw");
-                        }
 
 
-                        //
-                        // Now we need to check whether any of our sensor data has already
-                        // been written to the file. Since we write the time stamp of the
-                        // latest inserted data to the beginning of the file this is quite
-                        // easy
-                        //
-                        currentFileLength = file.length();
-                        if(currentFileLength != 0L) {
-                            latestData = raf.readInt();
-                        }
+                            //
+                            // Now we need to check whether any of our sensor data has already
+                            // been written to the file. Since we write the time stamp of the
+                            // latest inserted data to the beginning of the file this is quite
+                            // easy
+                            //
+                            currentFileLength = file.length();
+                            if (currentFileLength != 0L) {
+                                latestData = raf.readInt();
+                            }
 
-                        //
-                        // Seek to the end of the file to insert new data
-                        //
-                        raf.seek(currentFileLength);
+                            //
+                            // Seek to the end of the file to insert new data
+                            //
+                            raf.seek(currentFileLength);
 
-                        //
-                        // Iterate over the sensor Data set and write the data fields
-                        //
-                        for(SensorData sd : data) {
-                            // The data has already been inserted so we can skip it
-                            if((currentDate = sd.getUnixDate()) < latestData)
-                                continue;
+                            //
+                            // Iterate over the sensor Data set and write the data fields
+                            //
+                            for (SensorData sd : data) {
+                                // The data has already been inserted so we can skip it
+                                if ((currentDate = sd.getUnixDate()) < latestData)
+                                    continue;
 
-                            // Otherwise the data has not yet been inserted, so
+                                // Otherwise the data has not yet been inserted, so
+                                raf.writeInt(currentDate);
+                                for (float fsd : sd.getData())
+                                    raf.writeFloat(fsd);
+                            }
+
+                            //
+                            // Write the latest date to the beginning of the file
+                            //
+                            raf.seek(0);
                             raf.writeInt(currentDate);
-                            for(float fsd : sd.getData())
-                                raf.writeFloat(fsd);
+
+                            //
+                            // Close the file
+                            //
+                            raf.close();
+                        } catch (java.io.IOException ioe) {
+                            Log.e("GarmentOS", "SensorDataSerializer - writing to file failed");
                         }
-
-                        //
-                        // Write the latest date to the beginning of the file
-                        //
-                        raf.seek(0);
-                        raf.writeInt(currentDate);
-
-                        //
-                        // Close the file
-                        //
-                        raf.close();
-                    } catch (java.io.IOException ioe) {
-                        Log.e("GarmentOS", "SensorDataSerializer - writing to file failed");
                     }
                 }
-            }
 
-            //
-            // Tell we finished processing this file, therefore
-            // decrement the count
-            //
-            Properties.FILES_IN_USE.decrementAndGet();
+                //
+                // Tell we finished processing this file, therefore
+                // decrement the count
+                //
+                Properties.FILES_IN_USE.decrementAndGet();
+
+                try {
+                    Thread.sleep(Long.MAX_VALUE);
+                } catch (InterruptedException ie) {
+                }
+            }
         }
     };
 
-	/**
+    static {
+        runner.start();
+    }
+
+
+    /**
 	 * Create a new serializer
 	 * 
 	 * @param sensorID
@@ -150,7 +163,7 @@ public class SensorDataSerializer {
 	 *            the sensor data set to be serialized
 	 */
 	@SuppressWarnings("unchecked")
-	public SensorDataSerializer(int sensorID, java.util.Vector<SensorData> sensorData) {
+	public SensorDataSerializer(int sensorID, List<SensorData> sensorData) {
         synchronized (mSensorData) {
             if(!mSensorData.containsKey(sensorID))
                 mSensorData.put(sensorID, new Vector<SensorData>());
@@ -159,8 +172,7 @@ public class SensorDataSerializer {
         }
         synchronized (runner) {
             jobIDS.add(sensorID);
-            if (!runner.isAlive())
-                runner.start();
+            runner.interrupt();
         }
 	}
 }
