@@ -206,7 +206,6 @@ public class Sensor implements Externalizable {
 
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
-            new Thread(serializer).start();
             rawData.clear();
         }
     }
