@@ -10,19 +10,20 @@ import android.os.Bundle;
 import android.view.View;
 
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.cloud.Dropbox;
 
 public class StorageActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_niy);
+        setContentView(R.layout.activity_storage);
     }
 
-//    public void changeToDropBox(View view) {
-//        Intent intent = new Intent(getBaseContext(), DropboxActivity.class);
-//        startActivity(intent);
-//    }
+    public void changeToDropBox(View view) {
+        Intent intent = new Intent(getBaseContext(), Dropbox.class);
+        startActivity(intent);
+    }
 //
 //    public void changeToOneDrive(View view) {
 //        Intent intent = new Intent(getBaseContext(), OneDriveActivity.class);

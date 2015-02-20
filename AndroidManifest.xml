@@ -60,6 +60,20 @@
         </service>
 
         <activity
+                android:name="com.dropbox.client2.android.AuthActivity"
+                android:configChanges="orientation|keyboard"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait" >
+            <intent-filter>
+                <data android:scheme="db-hfo4su0wieruugc" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".app.PrivacyActivity"
             android:label="@string/title_activity_privacy" >
         </activity>
@@ -96,6 +110,7 @@
         <activity android:name=".app.BluetoothActivity" />
         <activity android:name=".app.HARActivity" />
         <activity android:name=".app.NIYActivity" />
+        <activity android:name=".cloud.Dropbox"/>
 
 
     </application>

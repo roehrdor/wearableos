@@ -30,8 +30,8 @@
     <string name="title_activity_storage">StorageActivity</string>
     <string name="sensorSettings">Sensor Settings</string>
     <string name="title_activity_dropbox">DropboxActivity</string>
-    <string name="btn_uploadDropbox">Upload database</string>
-    <string name="btn_downloadDropbox">Download database</string>
+    <string name="btn_uploadDropbox">Upload SensorData</string>
+    <string name="btn_downloadDropbox">Download SensorData</string>
     <string name="title_activity_database_debug_menu">DatabaseDebugMenuActivity</string>
     <string name="buttonTextCreateEncryptedDatabase">Create encrypted database</string>
     <string name="buttonTextCreateUnencryptedDatabase">Create unencrypted database</string>
@@ -47,6 +47,7 @@
     <string name="on">Turn On</string>
     <string name="save">BT Save</string>
     <string name="off">Turn Off</string>
+    <string name="encrypt">Encrypt Data</string>
     <string name="List">List paired Devices</string>
     <string name="Find">Search new Devices / Cancel</string>
     <string name="bluetooth">Bluetooth</string>
