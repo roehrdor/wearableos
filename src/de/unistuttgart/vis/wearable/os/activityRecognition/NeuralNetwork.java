@@ -60,7 +60,7 @@ public class NeuralNetwork {
 
 	// Statically load the library
 	static {
-		System.loadLibrary("neuralNetwork");
+		System.loadLibrary("neuralnetwork");
 	}
 	
 	/**
@@ -128,7 +128,7 @@ public class NeuralNetwork {
 	 */
 	public void input(double[] input) {
 		if(input.length != this.numberOfInputNeurons)
-//			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
+			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network - found " + this.numberOfInputNeurons + " but need " + input.length);
 		this.j_neural_net_feed_forward(input, input.length);
 	}
 
@@ -143,10 +143,10 @@ public class NeuralNetwork {
 	 * @param the target result
 	 */
 	public void train(double[] input, double[] target) {
-//		if(input.length != this.numberOfInputNeurons)
-//			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
-//		if(target.length != this.numberOfOutputNeurons)
-//			throw new IllegalArgumentException("The number of target neurons must equal the output numbers of the neural network");
+		if(input.length != this.numberOfInputNeurons)
+			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
+		if(target.length != this.numberOfOutputNeurons)
+			throw new IllegalArgumentException("The number of target neurons must equal the output numbers of the neural network");
 
 		this.j_neural_net_feed_forward(input, input.length);
 		this.j_neural_net_back_prop(target, target.length);
@@ -159,8 +159,8 @@ public class NeuralNetwork {
 	 * @param target the target value
 	 */
 	public void backProp(double[] target) {
-//		if(target.length != this.numberOfOutputNeurons)
-//			throw new IllegalArgumentException("The number of target neurons must equal the output numbers of the neural network");
+		if(target.length != this.numberOfOutputNeurons)
+			throw new IllegalArgumentException("The number of target neurons must equal the output numbers of the neural network");
 
 		this.j_neural_net_back_prop(target, target.length);	
 	}
@@ -172,8 +172,8 @@ public class NeuralNetwork {
 	 * @param result result output array to store the results in
 	 */
 	public void result(double[] result) {
-//		if(result.length != this.numberOfOutputNeurons)
-//			throw new IllegalArgumentException("The number of result neurons must equal the output numbers of the neural network");
+		if(result.length != this.numberOfOutputNeurons)
+			throw new IllegalArgumentException("The number of result neurons must equal the output numbers of the neural network");
 
 		this.j_neural_net_get_results(result, result.length);
 	}
@@ -189,10 +189,10 @@ public class NeuralNetwork {
 	 * @param output the result of the neural network
 	 */
 	public void classifiy(double[] input, double[] output) {
-//		if(input.length != this.numberOfInputNeurons)
-//			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
-//		if(output.length != this.numberOfOutputNeurons)
-//			throw new IllegalArgumentException("The number of result neurons must equal the output numbers of the neural network");
+		if(input.length != this.numberOfInputNeurons)
+			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
+		if(output.length != this.numberOfOutputNeurons)
+			throw new IllegalArgumentException("The number of result neurons must equal the output numbers of the neural network");
 
 		this.j_neural_net_feed_forward(input, input.length);
 		this.j_neural_net_get_results(output, output.length);
