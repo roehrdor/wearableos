@@ -131,9 +131,8 @@ public class Archiver {
             // Get all files in the directory and in its sub directories
             List<File> files = getFilesInDirectory(Properties.storageDirectory);
 
-            android.util.Log.d("orDEUB", "Saving to " + outputFile);
-
-            byte[] bytes = new byte[1024];
+            final int BUFFER_SIZE = 1024;
+            byte[] bytes = new byte[BUFFER_SIZE];
             int length;
 
             // Create a new file output stream and zip output stream to save the files to a zip file
@@ -160,7 +159,7 @@ public class Archiver {
                     zos.putNextEntry(zipEntry);
 
                     // copy the file to the zip output stream
-                    while((length = fis.read()) >= 0)
+                    while((length = fis.read(bytes, 0, BUFFER_SIZE)) >= 0)
                         zos.write(bytes, 0, length);
 
                     // close the current entry and the now added file
@@ -170,6 +169,7 @@ public class Archiver {
             }
 
             // In the end close the zip file and the according output stream
+            zos.finish();
             zos.close();
             fos.close();
         } catch (IOException ioe) {
@@ -221,6 +221,4 @@ public class Archiver {
     public static void decryptFile(String key, java.io.File inputFile, java.io.File outputFile) {
         crypt(Cipher.DECRYPT_MODE, key, inputFile, outputFile);
     }
-
-
 }
