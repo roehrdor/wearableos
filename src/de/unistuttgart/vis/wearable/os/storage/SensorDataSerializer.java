@@ -57,12 +57,16 @@ public class SensorDataSerializer {
                 //
                 while (!jobIDS.isEmpty()) {
                     int id = jobIDS.remove(0);
-                    Vector<SensorData> data = mSensorData.get(id);
 
                     //
                     // Synchronize the access to the object
                     //
                     synchronized (mSensorData.get(id)) {
+                        Vector<SensorData> data = mSensorData.get(id);
+                        if(data == null || data.size() == 0) {
+                            continue;
+                        }
+
                         try {
                             long currentFileLength;
                             int latestData = 0;
@@ -95,6 +99,7 @@ public class SensorDataSerializer {
                             // latest inserted data to the beginning of the file this is quite
                             // easy
                             //
+                            raf.seek(0);
                             currentFileLength = file.length();
                             if (currentFileLength != 0L) {
                                 latestData = raf.readInt();
@@ -118,6 +123,8 @@ public class SensorDataSerializer {
                                 for (float fsd : sd.getData())
                                     raf.writeFloat(fsd);
                             }
+
+                            data.clear();
 
                             //
                             // Write the latest date to the beginning of the file
@@ -166,7 +173,7 @@ public class SensorDataSerializer {
 	public SensorDataSerializer(int sensorID, List<SensorData> sensorData) {
         synchronized (mSensorData) {
             if(!mSensorData.containsKey(sensorID))
-                mSensorData.put(sensorID, new Vector<SensorData>());
+                mSensorData.put(sensorID, new Vector<SensorData>(sensorData));
             else
                 mSensorData.get(sensorID).addAll(sensorData);
         }
