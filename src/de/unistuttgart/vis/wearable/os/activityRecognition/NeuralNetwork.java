@@ -60,7 +60,7 @@ public class NeuralNetwork {
 
 	// Statically load the library
 	static {
-		System.loadLibrary("neuralnetwork");
+		System.loadLibrary("neuralNetwork");
 	}
 	
 	/**
@@ -140,7 +140,7 @@ public class NeuralNetwork {
 	 *
 	 *
 	 * @param input the inputs to feed forward
-	 * @param the target result
+	 * @param target target result
 	 */
 	public void train(double[] input, double[] target) {
 		if(input.length != this.numberOfInputNeurons)
@@ -210,7 +210,7 @@ public class NeuralNetwork {
 	/**
 	 * Save the network for later use
 	 *
-	 * @param the file to save the network in
+	 * @param file the file to save the network in
 	 * @return errno
 	 */
 	public int saveNetwork(String file) {
