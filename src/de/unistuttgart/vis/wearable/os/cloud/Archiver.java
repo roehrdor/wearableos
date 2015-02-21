@@ -174,6 +174,8 @@ public class Archiver {
             fos.close();
         } catch (IOException ioe) {
             Log.e("GarmentOS", "Could not create compressed archive");
+            Log.e("orDEBUG", ioe.getMessage());
+            Log.e("orDEBUG", ioe.getLocalizedMessage());
         }
 
         //
