@@ -84,21 +84,21 @@
     <string name="button_har_manage">Manage Neural Network</string>
     <string name="title_train_settings">Training settings</string>
     <string name="radioButton_train_live">Live</string>
-    <string name="radioButton_train_DB">Databank (coming soon)</string>
+    <string name="radioButton_train_DB">Database (coming soon)</string>
     <string name="textView_train_start_date">Start:</string>
     <string name="textView_train_end_date">End:</string>
     <string name="textView_train_activity">Activity:</string>
     <string name="textView_train_timeWindow">Time window length:</string>
     <string name="button_train_start">Start</string>
-    <string name="button_train_cancle">Cancle</string>
+    <string name="button_train_cancle">Cancel</string>
     <string name="button_train_millisec">Milliseconds</string>
     <string name="edittext_train_recomended">2000</string>
     <string name="button_manager_sensors">Supported sensors</string>
     <string name="button_manager_sctivities">Supported activities</string>
     <string name="button_manager_save">Save neural network</string>
     <string name="har_button_manager_load">Load neural network</string>
-    <string name="textView_manager_numberOfTrainings">Numer of trainings:</string>
-    <string name="textView_manager_numberOfSkippedTrainings">Numer of skipped trainings:</string>
+    <string name="textView_manager_numberOfTrainings">Number of trainings:</string>
+    <string name="textView_manager_numberOfSkippedTrainings">Number of skipped trainings:</string>
     <string name="har_button_manager_delete">Delete neural network</string>
     <string name="refresh">refresh</string>
 

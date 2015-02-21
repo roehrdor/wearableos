@@ -11,6 +11,7 @@ import android.view.View;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Dropbox;
+import de.unistuttgart.vis.wearable.os.cloud.googleDrive.GoogleDrive;
 
 public class StorageActivity extends Activity {
 
@@ -30,10 +31,10 @@ public class StorageActivity extends Activity {
 //        startActivity(intent);
 //    }
 //
-//    public void changeToGoogleDrive(View view) {
-//        Intent intent = new Intent(getBaseContext(), GoogleDriveActivity.class);
-//        startActivity(intent);
-//    }
+    public void changeToGoogleDrive(View view) {
+        Intent intent = new Intent(getBaseContext(), GoogleDrive.class);
+        startActivity(intent);
+    }
 //
 //    public void changeToDBSettingsMenu(View view) {
 //        Intent intent = new Intent(getBaseContext(), DbSettingsActivity.class);

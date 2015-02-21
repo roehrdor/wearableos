@@ -111,8 +111,8 @@ public class Dropbox extends Activity {
 
                 try {
                     // set request for upload to Dropbox
-                    request = mDBApi.putFileOverwriteRequest("/GarmentOS/"
-                                    + "NAME", inputStream, tmp.length(),
+                    request = mDBApi.putFileOverwriteRequest("/Garment-OS/"
+                                    + "gos_sensors", inputStream, tmp.length(),
                             new ProgressListener() {
 
                                 @Override
@@ -182,7 +182,7 @@ public class Dropbox extends Activity {
         mySwitch = (Switch) findViewById(R.id.switch1);
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
                 if (isChecked){
                     AlertDialog.Builder alert = new AlertDialog.Builder(Dropbox.this);
 
@@ -198,10 +198,11 @@ public class Dropbox extends Activity {
 
                     alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
+                            buttonView.setChecked(false);
                             return;
                         }
                     });
-
+                    alert.setCancelable(false);
                     alert.show();
                 }
             }
