@@ -38,7 +38,7 @@ public class PSensorData {
         for(SensorData sd : sensorData) {
             this.time[c] = sd.getUnixDate();
             for(d = 0; d != this.dimension; ++d) {
-                this.data[c + d] = sd.getData()[d];
+                this.data[c * this.dimension + d] = sd.getData()[d];
             }
             ++c;
         }
@@ -69,7 +69,7 @@ public class PSensorData {
         for(int i = 0; i != length; ++i) {
             float[] data = new float[this.dimension];
             for(int j = 0; j != dimension; ++j) {
-                data[j] = this.data[i + j];
+                data[j] = this.data[i * dimension + j];
             }
             ret.add(new SensorData(data, time[i]));
         }
