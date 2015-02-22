@@ -1,4 +1,4 @@
-package de.unistuttgart.vis.wearable.os.activityRecognition;
+package de.unistuttgart.vis.wearable.os.activity;
 
 import java.io.Serializable;
 import java.util.ArrayList;

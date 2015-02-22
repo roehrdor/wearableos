@@ -110,7 +110,18 @@
             android:label="@string/title_activity_graph" >
         </activity>
         <activity android:name=".app.BluetoothActivity" />
-        <activity android:name=".app.HARActivity" />
+        <activity 
+            android:name=".app.HARActivity"
+            android:label="@string/title_activity_har" >
+        </activity>
+        <activity 
+            android:name=".app.HARActivityTraining"
+            android:label="@string/title_train_settings" >
+        </activity>
+        <activity 
+            android:name=".app.HARActivityManager"
+            android:label="@string/title_activity_har" >
+        </activity>
         <activity android:name=".app.NIYActivity" />
         <activity android:name=".cloud.Dropbox"/>
         <activity android:name=".cloud.googleDrive.GoogleDrive" android:label="Google Drive"/>

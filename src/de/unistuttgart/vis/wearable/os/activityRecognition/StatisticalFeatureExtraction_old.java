@@ -55,7 +55,7 @@ public class StatisticalFeatureExtraction_old {
 				} catch (Exception e) {
 					Log.e("har",
 							"[StatisticalFeatureExtraction] exception catched: "
-									+ e.toString() + " - " + e.getMessage());
+									+ e.toString() + " - " + e.getLocalizedMessage());
 					
 				}
 			}

@@ -440,10 +440,11 @@ public class HARActivityTraining extends Activity {
 									
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										HARActivityTraining.this.finish();
+										//HARActivityTraining.this.finish();
 										dialog.cancel();
 									}
 								}).setCancelable(false).show();
+						break;
 					}
 				}
 				// check if there is data in the database at the given time

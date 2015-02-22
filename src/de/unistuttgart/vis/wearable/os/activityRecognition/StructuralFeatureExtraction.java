@@ -29,7 +29,7 @@ public class StructuralFeatureExtraction {
 		double[] vector = new double[values.length];
 		double[][] vandermondeMatrix = new double[values.length][polynomDegree + 1];
 		for(int i = 0; i < values.length; i++) {
-			for(int j = 0; j < polynomDegree; j++) {
+			for(int j = 0; j <= polynomDegree; j++) {
 				vandermondeMatrix[i][j] = Math.pow(values[i], j);
 			}
 			vector[i] = i;
@@ -60,7 +60,7 @@ public class StructuralFeatureExtraction {
 		
 		// Error sum of squares
 		double SSE = 0;
-		Matrix residuals = A.times(pMatrix.minus(B));
+		Matrix residuals = A.times(pMatrix).minus(B);
 		SSE = residuals.norm2() * residuals.norm2();
 		meanVariation = 1.0 - SSE / TSS;
 		for(int i = polynomDegree; i >= 0; i--) {

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
@@ -30,6 +30,7 @@ public class HARActivity extends Activity {
 
 	final Context context = this;
 	private TextView harStatusTxt;
+	private TextView currentActivityTxt;
 	private Button trainBtn;
 	private Button testBtn;
 	private Button manageBtn;
@@ -44,6 +45,7 @@ public class HARActivity extends Activity {
 		}
 
 		harStatusTxt = (TextView) findViewById(R.id.har_textView_status_detail);
+		currentActivityTxt = (TextView) findViewById(R.id.har_textView_show_activity);
 
 		// creating train button
 		trainBtn = (Button) findViewById(R.id.button_har_train);
@@ -165,11 +167,11 @@ public class HARActivity extends Activity {
 		for (PSensor sensor : APIFunctions.API_getAllSensors()) {
 			// TODO look if it makes sense
 			if (APIFunctions.SENSORS_SENSOR_isEnabled(sensor.getID())) {
-				sensorsList.add(sensor.getDisplayedSensorName() + " ("
-						+ sensor.getID() + ") (enabled)");
+				sensorsList.add(sensor.getDisplayedSensorName() + " \nID: "
+						+ sensor.getID() + " (enabled)");
 			} else {
-				sensorsList.add(sensor.getDisplayedSensorName() + "("
-						+ sensor.getID() + ") (disabled)");
+				sensorsList.add(sensor.getDisplayedSensorName() + " \nID: "
+						+ sensor.getID() + " (disabled)");
 			}
 		}
 		final String[] sensors = Arrays.copyOf(sensorsList.toArray(),
@@ -189,19 +191,19 @@ public class HARActivity extends Activity {
 											.getInstance()
 											.addSupportedSensor(
 													Integer.valueOf(sensors[which]
-															.split(" ")[0]))) {
+															.split(" ")[2]))) {
 									}
 								} else if (ActivityRecognitionModule
 										.getInstance()
 										.getSupportedActivityList()
 										.contains(
 												Integer.valueOf(sensors[which]
-														.split(" ")[0]))) {
+														.split(" ")[2]))) {
 									ActivityRecognitionModule
 											.getInstance()
 											.removeSupportedSensor(
 													Integer.valueOf(sensors[which]
-															.split(" ")[0]));
+															.split(" ")[2]));
 								}
 							}
 						})
@@ -366,6 +368,8 @@ public class HARActivity extends Activity {
 	 * updates the HAR status text field
 	 */
 	private void updateHARStatus() {
+		currentActivityTxt.setText(ActivityRecognitionModule.getInstance()
+				.getCurrentActivity().getActivityEnum().toString());
 		if (!ActivityRecognitionModule.getInstance().isNeuralNetworkTrained()
 				&& ActivityRecognitionModule.getInstance()
 						.isCurrentlyTraining()) {

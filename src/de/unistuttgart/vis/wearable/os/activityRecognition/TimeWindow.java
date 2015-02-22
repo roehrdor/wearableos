@@ -19,7 +19,11 @@ public class TimeWindow extends LinkedHashMap<Integer, PSensorData> {
 	private int begin, end;
 
 	public TimeWindow(String activityLabel, int begin, int end) {
-		this.activityLabel = activityLabel;
+		if(activityLabel == null) {
+			this.activityLabel = "dead (activity label was null)";
+		} else {
+			this.activityLabel = activityLabel;
+		}
 		this.begin = begin;
 		this.end = end;
 	}
@@ -27,6 +31,10 @@ public class TimeWindow extends LinkedHashMap<Integer, PSensorData> {
 	public void addSensorDataByID(int sid) {
 		super.put(sid,
 				APIFunctions.SENSORS_SENSOR_getRawDataII(sid, begin, end));
+	}
+	
+	public PSensorData getSensorData(int sid) {
+		return this.get(sid);
 	}
 
 	public FeatureSet getFeatureSet() {
