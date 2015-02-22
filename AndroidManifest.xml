@@ -24,11 +24,13 @@
    
 
     <application
+
         android:name="de.unistuttgart.vis.wearable.os.handle.APIHandle"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+            >
         <activity
             android:name="de.unistuttgart.vis.wearable.os.app.MainActivity"
             android:label="@string/app_name" >
@@ -111,8 +113,10 @@
         <activity android:name=".app.HARActivity" />
         <activity android:name=".app.NIYActivity" />
         <activity android:name=".cloud.Dropbox"/>
-
-
+        <activity android:name=".cloud.googleDrive.GoogleDrive" android:label="Google Drive"/>
+        <activity android:name=".cloud.oneDrive.OneDrive" android:label="One Drive"/>
+        <meta-data android:name="com.google.android.gms.version"
+                   android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>
