@@ -52,7 +52,7 @@ public class APIFunctions {
 	//
 	// =============================================================================
 
-    public void addNewSensor(int sampleRate, int savePeriod, int smoothness,
+    public static void addNewSensor(int sampleRate, int savePeriod, int smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
                              MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                              MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
