@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" android:id="@+id/LinearLayout2">
+    android:orientation="vertical" android:id="@+id/LinearLayout2" android:background="#c0d6e4">
 
     <Button
         android:id="@+id/button1"
@@ -28,7 +28,7 @@
         android:padding="20dp"
         android:text="@string/btn_downloadDropbox"
         android:clickable="false"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:textColor="#FFFFFF"
         android:textSize="25sp" android:enabled="false"/>
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
