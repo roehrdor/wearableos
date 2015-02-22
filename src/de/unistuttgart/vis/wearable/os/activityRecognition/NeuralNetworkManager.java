@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
-import android.os.Environment;
 import android.util.Log;
 
 /**
@@ -38,10 +38,10 @@ public class NeuralNetworkManager {
 	// list with all currently supported activities
 	private List<String> supportedActivityList = new ArrayList<String>();
 	// name of the file where the neural network data is saved
-	private final File neuralNetworkFile = new File(
-			Environment.getExternalStorageDirectory() + "/nn.data");
-	private final File neuralNetworkDataFile = new File(
-			Environment.getExternalStorageDirectory() + "/nnm.data");
+	private static final File neuralNetworkFile = new File(
+			Properties.storageDirectory.getAbsolutePath() + "/nn.data");
+	private static final File neuralNetworkDataFile = new File(
+			Properties.storageDirectory.getAbsolutePath() + "/nnm.data");
 	private int inputNeurons = 0;
 
 	public NeuralNetworkManager() {
@@ -64,7 +64,7 @@ public class NeuralNetworkManager {
 	public void trainNeuralNetwork(TimeWindow timeWindow) {
 		if (supportedSensorList.size() == 0) {
 			Log.e("har",
-					"[ActivityRecognitionModule]:[startTraining] supportedSensorList = 0");
+					"[ActivityRecognitionModule]:[trainNeuralNetwork] supportedSensorList = 0");
 			throw new NullPointerException();
 		}
 		double[] features = new double[timeWindow.getFeatureSet().size()];
@@ -81,64 +81,82 @@ public class NeuralNetworkManager {
 			numberOfTrainings++;
 			neuralNetworkTrained = true;
 			Log.i("har",
-					"[ActivityRecognitionModule]:[startTraining] trained training: "
+					"[ActivityRecognitionModule]:[trainNeuralNetwork] trained training: "
 							+ getNumberOfTrainings() + " target: "
 							+ String.valueOf(target[0]));
+		} else {
+		
+		int temp = 0;
+		for(Entry<String, Double> entry : timeWindow.getFeatureSet()
+				.entrySet()) {
+			features[temp] = entry.getValue() / 4294967296.0;
+			neuralNetwork.train(features, target);
+			temp++;
 		}
-
-		for (int i = 1; i < Math.pow(supportedSensorList.size(), 2) - 1; i++) {
-			String formatPattern = "%" + supportedSensorList.size() + "s";
-
-			int j = 0, k = 0;
-
-			for (Entry<String, Double> entry : timeWindow.getFeatureSet()
-					.entrySet()) {
-
-				// if the features(, from the feature set), from one sensor are
-				// processed,
-				// increase k to skip to the next sensor from sensor list.
-				if (!entry
-						.getKey()
-						.substring(
-								0,
-								String.valueOf(supportedSensorList.get(k))
-										.length())
-						.equals(String.valueOf(supportedSensorList.get(k)))) {
-					k++;
-				}
-
-				if (String.format(formatPattern, Integer.toBinaryString(i))
-						.charAt(k) == '1') {
-					features[j] = entry.getValue() / 4294967296.0;
-					j++;
-
-				} else {
-					features[j] = 0;
-					j++;
-				}
-			}
-
-			try {
-				neuralNetwork.train(features, target);
-				if (i == Math.pow(supportedSensorList.size(), 2) - 2) {
-					numberOfTrainings++;
-					neuralNetworkTrained = true;
-					Log.i("har",
-							"[ActivityRecognitionModule]:[startTraining] trained training: "
-									+ getNumberOfTrainings() + " target: "
-									+ String.valueOf(target[0]));
-				}
-
-			} catch (IllegalArgumentException e) {
-				Log.i("har",
-						"[NeuralNetworkManager]:[trainNeuralNetwork] feature set size: "
-								+ features.length);
-				Log.e("har",
-						"[NeuralNetworkManager]:[trainNeuralNetwork] IllegalArgumentException"
-								+ e.getLocalizedMessage());
-			}
+		Log.i("har",
+				"[ActivityRecognitionModule]:[trainNeuralNetwork] trained training: "
+						+ getNumberOfTrainings() + " target: "
+						+ String.valueOf(target[0]));
+		numberOfTrainings++;
+		neuralNetworkTrained = true;
 		}
-	};
+//		for (int i = 1; i < Math.pow(supportedSensorList.size(), 2) - 1; i++) {
+//			String formatPattern = "%" + supportedSensorList.size() + "s";
+//
+//			int j = 0, k = 0;
+//
+//			for (Entry<String, Double> entry : timeWindow.getFeatureSet()
+//					.entrySet()) {
+//
+//				// if the features(, from the feature set), from one sensor are
+//				// processed,
+//				// increase k to skip to the next sensor from sensor list.
+//				if (!entry
+//						.getKey()
+//						.substring(
+//								0,
+//								String.valueOf(supportedSensorList.get(k))
+//										.length())
+//						.equals(String.valueOf(supportedSensorList.get(k)))) {
+//					k++;
+//				}
+//
+//				if (String.format(formatPattern, Integer.toBinaryString(i))
+//						.charAt(k) == '1') {
+//					features[j] = entry.getValue() / 4294967296.0;
+//					j++;
+//
+//				} else {
+//					features[j] = 0;
+//					j++;
+//				}
+//			}
+//			
+//			for(int c = 0; c < features.length; c++) {
+//				Log.i("har", "[NeuralNetworkManager]:[recognizeActivity] feature" + c +": " + features[c]);
+//			}
+//
+//			try {
+//				neuralNetwork.train(features, target);
+//				if (i == Math.pow(supportedSensorList.size(), 2) - 2) {
+//					numberOfTrainings++;
+//					neuralNetworkTrained = true;
+//					Log.i("har",
+//							"[ActivityRecognitionModule]:[startTraining] trained training: "
+//									+ getNumberOfTrainings() + " target: "
+//									+ String.valueOf(target[0]));
+//				}
+//
+//			} catch (IllegalArgumentException e) {
+//				Log.i("har",
+//						"[NeuralNetworkManager]:[trainNeuralNetwork] feature set size: "
+//								+ features.length);
+//				Log.e("har",
+//						"[NeuralNetworkManager]:[trainNeuralNetwork] IllegalArgumentException"
+//								+ e.getLocalizedMessage());
+//			}
+//		}
+	}
 
 	/**
 	 * recognizes the activities in a specific time window which is created
@@ -158,6 +176,8 @@ public class NeuralNetworkManager {
 			features[i] = entry.getValue() / 4294967296.0;
 			i++;
 		}
+		Log.i("har", "[NeuralNetworkManager]:[recognizeActivity] recent error rate: " 
+				+ neuralNetwork.recentError());
 		double[] targetArray = new double[1];
 		try {
 			neuralNetwork.classifiy(features, targetArray);
@@ -178,7 +198,7 @@ public class NeuralNetworkManager {
 	@SuppressWarnings("unchecked")
 	public boolean loadNeuralNetwork() {
 		Log.i("har", "[NeuralNetworkManager]:[loadNeuralNetwork] loading");
-		if (!neuralNetworkFile.exists() && !neuralNetworkDataFile.exists()) {
+		if (!neuralNetworkFile.exists() || !neuralNetworkDataFile.exists()) {
 			return false;
 		}
 		boolean nnconfig = false;
@@ -271,7 +291,7 @@ public class NeuralNetworkManager {
 		if (inputNeurons > 0) {
 			try {
 				neuralNetwork = new NeuralNetwork(new int[] { inputNeurons,
-						inputNeurons / 2, 1 });
+						32, 32, 1 });
 				neuralNetworkExisting = true;
 			} catch (IllegalArgumentException e) {
 				Log.e("har",

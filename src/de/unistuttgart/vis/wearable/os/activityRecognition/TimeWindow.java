@@ -1,6 +1,7 @@
 package de.unistuttgart.vis.wearable.os.activityRecognition;
 
 import java.util.LinkedHashMap;
+
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 

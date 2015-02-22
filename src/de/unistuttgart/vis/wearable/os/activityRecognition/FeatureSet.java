@@ -2,7 +2,6 @@ package de.unistuttgart.vis.wearable.os.activityRecognition;
 
 import java.util.LinkedHashMap;
 
-import android.util.Log;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
@@ -24,6 +23,11 @@ public class FeatureSet extends LinkedHashMap<String, Double> {
 			int sensorDimension = entry.getValue().getDimension();
 			int dataListSize = entry.getValue().toSensorDataList().size();
 			
+			if(dataListSize <= 2) {
+				timeWindow.setActivityLabel("dead (time window does not hold enough data)");
+				return;
+			}
+
 			if (sensorDimension == 0) {
 				timeWindow.setActivityLabel("dead (sensorDimension is 0)");
 				return;

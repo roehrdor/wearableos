@@ -62,8 +62,6 @@ public class ActivityRecognitionModule {
 //			}
 			listOfActivities.add(activity);
 			if(activityEnum.equals(ActivityEnum.NOACTIVITY)) {
-				Log.i("har", "[ActivityRecognitionModule]:[loadActivities] set current activity: "
-						+ activityEnum.toString());
 				setCurrentActivity(activity.getActivityEnum().toString());
 			}
 		}
@@ -148,9 +146,8 @@ public class ActivityRecognitionModule {
 						Looper.prepare();
 					}
 					
-					int timeWindowBegin = Utils.getCurrentUnixTimeStamp();
 					int timeWindowEnd = Utils.getCurrentUnixTimeStamp();
-					timeWindowBegin = timeWindowBegin - windowLength;
+					int timeWindowBegin = timeWindowEnd - (windowLength / 1000);
 					TimeWindow timeWindow = createTimeWindow("unlabeled", timeWindowBegin,
 							timeWindowEnd);
 					double recognizedActivity = 0;
@@ -165,22 +162,13 @@ public class ActivityRecognitionModule {
 								+ timeWindow.getActivityLabel());
 					}
 					
-					for(String s : getSupportedActivityList()) {
-						if(s.hashCode() / 4294967296.0 == recognizedActivity) {
-							setCurrentActivity(s);
-							break;
-						}
-					}
+					setCurrentActivity(closestActivity(recognizedActivity));
 					String activitiesString = "";
 					
 					for(String s : getSupportedActivityList()) {
 						double value = s.hashCode() / 4294967296.0;
 						activitiesString = activitiesString + String.valueOf(value) + ", ";
 					}
-					Log.i("har",
-							"[ActivityRecognitionModule]:[startRecognising] " +
-							String.valueOf(recognizedActivity) + ",- "
-							+ String.valueOf(activitiesString));
 					if(getCurrentActivity() == null) {
 						Log.i("har",
 								"[ActivityRecognitionModule]:[startRecognising] finished recognition: "
@@ -193,7 +181,7 @@ public class ActivityRecognitionModule {
 					
 				}
 
-			}, 0, windowLength / 4, TimeUnit.MILLISECONDS);
+			}, 0, windowLength / 2, TimeUnit.MILLISECONDS);
 			
 			future.get();
 			
@@ -214,6 +202,19 @@ public class ActivityRecognitionModule {
 							+ "exception in scheduled execution: "
 							+ e.getLocalizedMessage());
 		}
+	}
+	
+	private String closestActivity(double find) {
+		String closest = getSupportedActivityList().get(0);
+		double distance = Math.abs(closest.hashCode() / 4294967296.0 - find);
+		for(String s : getSupportedActivityList()) {
+			double tempDistance = Math.abs(s.hashCode() / 4294967296.0 - find);
+			if(distance >= tempDistance) {
+				closest = s;
+				distance = tempDistance;
+			}
+		}
+		return closest;
 	}
 
 	/**
@@ -267,9 +268,8 @@ public class ActivityRecognitionModule {
 						Looper.prepare();
 					}
 					
-					int timeWindowBegin = Utils.getCurrentUnixTimeStamp();
 					int timeWindowEnd = Utils.getCurrentUnixTimeStamp();
-					timeWindowBegin = timeWindowBegin - windowLength;
+					int timeWindowBegin = timeWindowEnd - (windowLength / 1000);
 					TimeWindow timeWindow = createTimeWindow(activity, timeWindowBegin,
 							timeWindowEnd);
 					if (!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
@@ -288,7 +288,7 @@ public class ActivityRecognitionModule {
 					}
 				}
 
-			}, 1000, windowLength / 4, TimeUnit.MILLISECONDS);
+			}, 1000, windowLength / 2, TimeUnit.MILLISECONDS);
 			
 			future.get();
 			
