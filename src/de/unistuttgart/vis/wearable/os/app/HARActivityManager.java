@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
@@ -47,11 +47,11 @@ public class HARActivityManager extends Activity {
 				List<String> sensorsList = new ArrayList<String>();
 				for(PSensor sensor : APIFunctions.API_getAllSensors()) {
 					if (APIFunctions.SENSORS_SENSOR_isEnabled(sensor.getID())) {
-						sensorsList.add(sensor.getDisplayedSensorName() + " ("
-								+ sensor.getID() + ") (enabled)");
+						sensorsList.add(sensor.getDisplayedSensorName() + " \nID: "
+								+ sensor.getID() + " (enabled)");
 					} else {
-						sensorsList.add(sensor.getDisplayedSensorName() + "("
-								+ sensor.getID() + ") (disabled)");
+						sensorsList.add(sensor.getDisplayedSensorName() + " \nID: "
+								+ sensor.getID() + " (disabled)");
 					}
 				}
 				final String[] sensors = Arrays.copyOf(sensorsList.toArray(), 
@@ -62,7 +62,7 @@ public class HARActivityManager extends Activity {
 				int i = 0;
 				for (String s : sensors) {
 					for (int l : supportedSensorList) {
-						if (s.split(" ")[0].equals(String.valueOf(l))) {
+						if (s.split(" ")[2].equals(String.valueOf(l))) {
 							checkedSensors[i] = true;
 						}
 					}
@@ -85,18 +85,18 @@ public class HARActivityManager extends Activity {
 											// it to the selected items
 											supportedSensorList.add(Integer
 													.valueOf(sensors[which]
-															.split(" ")[0]));
+															.split(" ")[2]));
 											Toast.makeText(context,
 													sensors[which] + " added",
 													Toast.LENGTH_SHORT).show();
 										} else if (supportedSensorList.contains(Integer
 												.valueOf(sensors[which]
-														.split(" ")[0]))) {
+														.split(" ")[2]))) {
 											// Else, if the item is already in
 											// the array, remove it
 											supportedSensorList.remove(Integer
 													.valueOf(sensors[which]
-															.split(" ")[0]));
+															.split(" ")[2]));
 											Toast.makeText(
 													context,
 													sensors[which] + " removed",

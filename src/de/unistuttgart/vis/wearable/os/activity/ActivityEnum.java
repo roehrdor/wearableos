@@ -1,4 +1,4 @@
-package de.unistuttgart.vis.wearable.os.activityRecognition;
+package de.unistuttgart.vis.wearable.os.activity;
 
 import android.os.Parcel;
 import android.os.Parcelable;

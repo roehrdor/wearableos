@@ -1,9 +1,6 @@
 package de.unistuttgart.vis.wearable.os.cloud.googleDrive;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.app.ProgressDialog;
@@ -101,7 +98,7 @@ public class DownloadResultCallbacks {
 								+ " und der Name ist: " + cloudFolderMetaData.getTitle());
 						Query query = new Query.Builder().addFilter(
 								Filters.and(Filters.eq(SearchableField.TITLE, Miscellaneous.getCloudDbName()),
-										Filters.eq(SearchableField.MIME_TYPE, Miscellaneous.getOctetStreamMimeType()),
+										Filters.eq(SearchableField.MIME_TYPE, Miscellaneous.getZipMimeType()),
 										Filters.eq(SearchableField.TRASHED, false))).build();
 
 						getCurrentCloudDBFolder()

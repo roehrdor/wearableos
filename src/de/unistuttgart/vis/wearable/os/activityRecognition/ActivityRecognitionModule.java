@@ -9,6 +9,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import de.unistuttgart.vis.wearable.os.activity.Activity;
+import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.os.Looper;
 import android.util.Log;
@@ -38,7 +40,7 @@ public class ActivityRecognitionModule {
 
 	private ActivityRecognitionModule() {
 		Log.i("har", "[ActivityRecognitionModule] load ActivityRecognitionModule");
-		//loadActivities();
+		loadActivities();
 		neuralNetworkManager = new NeuralNetworkManager();
 	}
 	
@@ -48,18 +50,16 @@ public class ActivityRecognitionModule {
 	 * If there are activities in the ActivityEnum which are not in the database,
 	 * a new activity is created.
 	 */
-	/*private void loadActivities() {
+	private void loadActivities() {
 		for(ActivityEnum activityEnum : ActivityEnum.values()) {
-			Activity activity = APIFunctions.getActivity(activityEnum);
-			if(activity == null) {
-				Log.i("har", "[ActivityRecognitionModule]:[loadActivities] create new activiy: "
-						+ activityEnum.toString());
+			Activity activity;
+//			if(activity == null) {
 				activity = new Activity();
 				activity.setActivityEnum(activityEnum);
-			} else {
-				Log.i("har", "[ActivityRecognitionModule]:[loadActivities] load activity: "
-						+ activityEnum.toString());
-			}
+//			} else {
+//				Log.i("har", "[ActivityRecognitionModule]:[loadActivities] load activity: "
+//						+ activityEnum.toString());
+//			}
 			listOfActivities.add(activity);
 			if(activityEnum.equals(ActivityEnum.NOACTIVITY)) {
 				Log.i("har", "[ActivityRecognitionModule]:[loadActivities] set current activity: "
@@ -67,7 +67,7 @@ public class ActivityRecognitionModule {
 				setCurrentActivity(activity.getActivityEnum().toString());
 			}
 		}
-	}*/
+	}
 
 	/**
 	 * TODO
@@ -111,7 +111,6 @@ public class ActivityRecognitionModule {
 	public TimeWindow createTimeWindow(String activity, int timeWindowBegin,
 			int timeWindowEnd) {
 		
-		Log.i("har", "createTimeWindow");
 		TimeWindow timeWindow = new TimeWindow(activity, timeWindowBegin, timeWindowEnd);
 		
 		for (int sensorID : getSupportedSensorList()) {
@@ -119,21 +118,14 @@ public class ActivityRecognitionModule {
 			timeWindow.addSensorDataByID(sensorID);
 			
 			if (timeWindow.get(sensorID) == null) {
-				timeWindow.setActivityLabel("broken (requested sensor is null)");
+				timeWindow.setActivityLabel("dead (requested sensor is null)");
 				return timeWindow;
 			}
-			//TODO look error
-//			if(timeWindow.getVirutalSensor(sensor).getRawData().length == 0) {
-//				timeWindow.setActivityLabel("broken (no raw data available)");
-//				return timeWindow;
-//			}
+			
+			
 		}
 		FeatureSet featureSet = new FeatureSet(timeWindow);
-		if (neuralNetworkManager.getInputNeurons() == featureSet.size()) {
-			timeWindow.setFeatureSet(featureSet);
-		} else {
-			timeWindow.setActivityLabel("broken (wrong feature number)");
-		}
+		timeWindow.setFeatureSet(featureSet);
 		return timeWindow;
 	}
 
@@ -163,7 +155,7 @@ public class ActivityRecognitionModule {
 							timeWindowEnd);
 					double recognizedActivity = 0;
 					
-					if (!timeWindow.getActivityLabel().substring(0, 5).equals("broken")) {
+					if (!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						recognizedActivity = recognizeActivity(timeWindow);
 						
 					} else {
@@ -209,18 +201,18 @@ public class ActivityRecognitionModule {
 			neuralNetworkManager.setCurrentlyRecognizing(false);
 			Log.e("har",
 					"[ActivityRecognitionModule]:[startRecognising] Scheduled "
-							+ "execution was interrupted: " + e.toString());
+							+ "execution was interrupted: " + e.getLocalizedMessage());
 		} catch (CancellationException e) {
 			neuralNetworkManager.setCurrentlyRecognizing(false);
 			Log.i("har",
 					"[ActivityRecognitionModule]:[startRecognising] Watcher thread "
-							+ "has been cancelled: " + e.toString());
+							+ "has been cancelled: " + e.getLocalizedMessage());
 		} catch (ExecutionException e) {
 			neuralNetworkManager.setCurrentlyRecognizing(false);
 			Log.e("har",
 					"[ActivityRecognitionModule]:[startRecognising] Uncaught "
 							+ "exception in scheduled execution: "
-							+ e.toString());
+							+ e.getLocalizedMessage());
 		}
 	}
 
@@ -249,7 +241,7 @@ public class ActivityRecognitionModule {
 			return neuralNetworkManager.recognizeActivity(timeWindow);
 		} catch (NullPointerException e) {
 			Log.e("har", "[ActivityRecognitionModule]:[recognizeActivity] skipping recognition: "
-					+ e.getMessage());
+					+ e.getLocalizedMessage());
 		}
 		return 0.0;
 	}
@@ -280,11 +272,9 @@ public class ActivityRecognitionModule {
 					timeWindowBegin = timeWindowBegin - windowLength;
 					TimeWindow timeWindow = createTimeWindow(activity, timeWindowBegin,
 							timeWindowEnd);
-					
-					if (!timeWindow.getActivityLabel().substring(0, 5).equals("broken")) {
+					if (!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						trainNeuralNetwork(timeWindow);
 						skippedTrainings = 0;
-						
 					} else {
 						totalskippedTrainings++;
 						skippedTrainings++;
@@ -292,11 +282,9 @@ public class ActivityRecognitionModule {
 								+ "training, because the time window is "
 								+ timeWindow.getActivityLabel());
 					}
-					if(skippedTrainings >= 64) {
+					if(skippedTrainings >= 8) {
 						skippedTrainings = 0;
 						future.cancel(false);
-//						throw new CancellationException("scheduler stopped due to too"
-//								+ " many errors while creating time windows");
 					}
 				}
 
@@ -308,18 +296,18 @@ public class ActivityRecognitionModule {
 			neuralNetworkManager.setCurrentlyTraining(false);
 			Log.e("har",
 					"[ActivityRecognitionModule]:[startTraining] Scheduled "
-							+ "execution was interrupted: " + e.getMessage());
+							+ "execution was interrupted: " + e.getLocalizedMessage());
 		} catch (CancellationException e) {
 			neuralNetworkManager.setCurrentlyTraining(false);
 			Log.i("har",
 					"[ActivityRecognitionModule]:[startTraining] Watcher thread "
-							+ "has been cancelled: " + e.getMessage());
+							+ "has been cancelled: " + e.getLocalizedMessage());
 		} catch (ExecutionException e) {
 			neuralNetworkManager.setCurrentlyTraining(false);
 			Log.e("har",
 					"[ActivityRecognitionModule]:[startTraining] Uncaught "
 							+ "exception in scheduled execution: "
-							+ e.getMessage());
+							+ e.getLocalizedMessage());
 		}
 	}
 	
@@ -362,7 +350,7 @@ public class ActivityRecognitionModule {
 					TimeWindow timeWindow = createTimeWindow(activity, timeWindowBegin,
 							timeWindowEnd);
 					
-					if (!timeWindow.getActivityLabel().equals("broken")) {
+					if (!timeWindow.getActivityLabel().equals("dead")) {
 						trainNeuralNetwork(timeWindow);
 						skippedTrainings = 0;
 						
@@ -387,19 +375,19 @@ public class ActivityRecognitionModule {
 		} catch (InterruptedException e) {
 			neuralNetworkManager.setCurrentlyTraining(false);
 			Log.e("har",
-					"[ActivityRecognitionModule]:[startTraining] Scheduled "
-							+ "execution was interrupted: " + e.getMessage());
+					"[ActivityRecognitionModule]:[startTraining2] Scheduled "
+							+ "execution was interrupted: " + e.getLocalizedMessage());
 		} catch (CancellationException e) {
 			neuralNetworkManager.setCurrentlyTraining(false);
 			Log.i("har",
-					"[ActivityRecognitionModule]:[startTraining] Watcher thread "
-							+ "has been cancelled: " + e.getMessage());
+					"[ActivityRecognitionModule]:[startTraining2] Watcher thread "
+							+ "has been cancelled: " + e.getLocalizedMessage());
 		} catch (ExecutionException e) {
 			neuralNetworkManager.setCurrentlyTraining(false);
 			Log.e("har",
-					"[ActivityRecognitionModule]:[startTraining] Uncaught "
+					"[ActivityRecognitionModule]:[startTraining2] Uncaught "
 							+ "exception in scheduled execution: "
-							+ e.getMessage());
+							+ e.getLocalizedMessage());
 		}
 	}
 
@@ -420,7 +408,6 @@ public class ActivityRecognitionModule {
 	 */
 	public void trainNeuralNetwork(TimeWindow timeWindow) {
 		try {
-			Log.i("har", "[ActivityRecognitionModule]:[trainNeuralNetwork]");
 			neuralNetworkManager.trainNeuralNetwork(timeWindow);
 			nullSensorTimeWindows = 0;
 		} catch (NullPointerException e) {
@@ -429,12 +416,12 @@ public class ActivityRecognitionModule {
 			if(maximumSkippedTrainings < nullSensorTimeWindows) {
 				maximumSkippedTrainings = nullSensorTimeWindows;
 			}
-			Log.e("har", "[ActivityRecognitionModule]:[trainNeuralNetwork] sensors are Null");
+			Log.e("har", "[ActivityRecognitionModule]:[trainNeuralNetwork] sensors are Null "
+					+ e.getLocalizedMessage());
 		}
 		if(nullSensorTimeWindows > 63) {
 			future.cancel(false);
-//			throw new CancellationException("The sensore in the time window were null "
-//					+ "8 times in a row, stopping training!");
+			nullSensorTimeWindows = 0;
 		}
 	}
 

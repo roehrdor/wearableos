@@ -68,7 +68,36 @@ public class UploadResultCallbacks {
 			}
 			Log.i("Test-App", "Zeile 395");
             // TODO proceed with upload
-		}
+            setCurrentCloudDBFolder(Drive.DriveApi.getFolder(
+                    GoogleDrive.getGoogleApiClient(),
+                    result.getDriveFolder().getDriveId()));
+
+            Query query = new Query.Builder()
+                    .addFilter(
+                            Filters.and(
+                                    Filters.eq(
+                                            SearchableField.TITLE,
+                                            Miscellaneous.getCloudDbName()),
+
+                                    Filters.eq(
+                                            SearchableField.TRASHED,
+                                            false),
+
+                                    Filters.eq(
+                                            SearchableField.MIME_TYPE,
+                                            Miscellaneous.getZipMimeType())))
+                    .build();
+
+            getCurrentCloudDBFolder()
+                    .queryChildren(
+                            GoogleDrive
+                                    .getGoogleApiClient(),
+                            query).setResultCallback(
+                    new UploadResultCallbacks()
+                            .getFileQueryResultCallback());
+
+        }
+
 	};
 
 	public ResultCallback<DriveFolderResult> getFolderCreationCallback() {
@@ -327,7 +356,7 @@ public class UploadResultCallbacks {
 
 														Filters.eq(
 																SearchableField.MIME_TYPE,
-																Miscellaneous.getOctetStreamMimeType())))
+																Miscellaneous.getZipMimeType())))
 								.build();
 
 						getCurrentCloudDBFolder()
@@ -521,7 +550,7 @@ public class UploadResultCallbacks {
 					Log.i("Test-App", "Zeile 368");
 
 					MetadataChangeSet fileUploadChangeSet = new MetadataChangeSet.Builder()
-							.setMimeType(Miscellaneous.getOctetStreamMimeType())
+							.setMimeType(Miscellaneous.getZipMimeType())
 							.setTitle(Miscellaneous.getCloudDbName()).build();
 					if (mode == 'u') {
 						Drive.DriveApi

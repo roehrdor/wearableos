@@ -12,6 +12,7 @@ import android.view.View;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Dropbox;
 import de.unistuttgart.vis.wearable.os.cloud.googleDrive.GoogleDrive;
+import de.unistuttgart.vis.wearable.os.cloud.oneDrive.OneDrive;
 
 public class StorageActivity extends Activity {
 
@@ -25,12 +26,12 @@ public class StorageActivity extends Activity {
         Intent intent = new Intent(getBaseContext(), Dropbox.class);
         startActivity(intent);
     }
-//
-//    public void changeToOneDrive(View view) {
-//        Intent intent = new Intent(getBaseContext(), OneDriveActivity.class);
-//        startActivity(intent);
-//    }
-//
+
+    public void changeToOneDrive(View view) {
+        Intent intent = new Intent(getBaseContext(), OneDrive.class);
+        startActivity(intent);
+  }
+
     public void changeToGoogleDrive(View view) {
         Intent intent = new Intent(getBaseContext(), GoogleDrive.class);
         startActivity(intent);

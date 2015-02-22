@@ -19,7 +19,7 @@ public class Miscellaneous {
 
     private static final String CLOUD_DB_NAME = "gos_sensors";
 
-    private static final String OCTET_STREAM_MIME_TYPE = "application/octet-stream";
+    private static final String ZIP_MIME_TYPE = "application/x-zip";
 
     public static String getCloudDbFolderName(){
         return CLOUD_DB_FOLDER_NAME;
@@ -28,8 +28,8 @@ public class Miscellaneous {
         return CLOUD_DB_NAME;
     }
 
-    public static String getOctetStreamMimeType(){
-        return OCTET_STREAM_MIME_TYPE;
+    public static String getZipMimeType(){
+        return ZIP_MIME_TYPE;
     }
 
 	public boolean getCancelRequestStatus() {
