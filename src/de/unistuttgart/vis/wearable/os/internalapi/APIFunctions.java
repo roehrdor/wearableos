@@ -8,6 +8,9 @@
 package de.unistuttgart.vis.wearable.os.internalapi;
 
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
+import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
+import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
 /**
  * <p>
@@ -48,6 +51,22 @@ public class APIFunctions {
 	// only be done by using the provided Settings Application.
 	//
 	// =============================================================================
+
+    public void addNewSensor(int sampleRate, int savePeriod, int smoothness,
+                             String displayedSensorName, SensorType sensorType, String bluetoothID,
+                             MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
+                             MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(sampleRate, savePeriod,
+                                    smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
+                                    rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
+                                    displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 
 	public static String[] getRegisteredApplications() {
 		if (APIHandle.isInternalServiceBound()) {
