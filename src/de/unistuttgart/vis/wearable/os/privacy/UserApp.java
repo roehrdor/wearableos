@@ -8,6 +8,9 @@
 package de.unistuttgart.vis.wearable.os.privacy;
 
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
+import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
@@ -23,11 +26,13 @@ public class UserApp implements java.io.Serializable  {
 	private final int ID;
 	private String name;
 	private java.util.Set<Integer> prohibitedSensors = new java.util.HashSet<Integer>();
+	private java.util.Map<SensorType, Integer> defaultSensors = new java.util.HashMap<SensorType, Integer>();
 	private int permissionFlags = Constants.BASE_PERMISSION;
 	private boolean activityRecognitionGranted = false;
 
 	/**
 	 * Create a new UserApp object with the given name
+	 * and sets the dafault sensors to the internal Android Sensors
 	 * 
 	 * @param name
 	 *            the name of the application
@@ -35,6 +40,29 @@ public class UserApp implements java.io.Serializable  {
 	public UserApp(String name, int ID) {
 		this.name = name;
 		this.ID = ID;
+		for (Sensor sensor: SensorManager.getAllSensors()) {
+			if (sensor.isInternalSensor()) {
+				defaultSensors.put(sensor.getSensorType(), sensor.getSensorID());
+			}
+		}
+	}
+
+	/**
+	 * returns the sensorID of the standard sensor for the given SensorType
+	 * @param sensorType the SensorType you want the default sensorID from
+	 * @return the sensorID of the default sensor for the given sensorType
+	 */
+	public int getDefaultSensor(SensorType sensorType) {
+		return defaultSensors.get(sensorType);
+	}
+
+	/**
+	 * sets the default sensor of the given SensorType to the given sensorID
+	 * @param sensorType the sensorType to set
+	 * @return	the new sensorID of the given sensorType
+	 */
+	public void setDefaultSensor(SensorType sensorType, int sensorID) {
+		defaultSensors.put(sensorType, sensorID);
 	}
 
 	/**
