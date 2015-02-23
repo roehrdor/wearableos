@@ -70,6 +70,37 @@ public class Archiver {
         return files;
     }
 
+
+    /**
+     * Unpack the encrypted archive
+     *
+     * @param key       the key to decrypt the archive file
+     * @param inputFile the inputfile to be decrypted first and then unpacked
+     */
+    public static void unpackEncryptedFile(String key, File inputFile) {
+        decryptFile(inputFile, key);
+        unpackArchiveFile(inputFile);
+    }
+
+    /**
+     * Unpack the packed archive file and merge the files as far as possible
+     *
+     * @param inputFile the input file to unpack
+     */
+    public static void unpackArchiveFile(File inputFile) {
+        Properties.FILE_STATUS_FIELDS_LOCK.lock();
+        Properties.FILE_ARCHIVING.set(true);
+        while(Properties.FILES_IN_USE.get() != 0) {
+            Utils.sleepUninterrupted(200);
+        }
+        Properties.FILE_STATUS_FIELDS_LOCK.unlock();
+
+        // TODO here
+
+        Properties.FILE_ARCHIVING.set(false);
+    }
+
+
     /**
      * Create a compressed archive file containing all sensor data and the storage file containing
      * the privacy information and sensor settings.

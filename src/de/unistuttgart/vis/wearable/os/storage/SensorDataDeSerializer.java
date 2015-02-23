@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.storage;
 
@@ -343,7 +343,7 @@ public class SensorDataDeSerializer implements Runnable {
 	 * 
 	 * @param raf
 	 *            the file to search the time stamp in
-	 * @param time
+	 * @param value
 	 *            the time to search for
 	 * @param offset
 	 *            the offset from the beginning of the file
@@ -380,7 +380,7 @@ public class SensorDataDeSerializer implements Runnable {
 	 * 
 	 * @param raf
 	 *            the file to search the time stamp in
-	 * @param time
+	 * @param value
 	 *            the time to search for
 	 * @param offset
 	 *            the offset from the beginning of the file
