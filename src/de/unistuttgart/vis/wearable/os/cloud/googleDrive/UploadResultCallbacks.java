@@ -145,7 +145,7 @@ public class UploadResultCallbacks {
 								GoogleDrive.getGoogleApiClient())
 								.setResultCallback(getNewDBCreateCallback());
 
-					} else {
+					} if(cloudFileMetaData!=null) {
 
 						Log.i("Test-App", "Zeile 310");
 
@@ -348,7 +348,7 @@ public class UploadResultCallbacks {
 										Filters.and(
 												Filters.eq(
 														SearchableField.TITLE,
-														Miscellaneous.getCloudDbName()),
+														Miscellaneous.getCloudDbName()+".zip"),
 
 												Filters.eq(
 														SearchableField.TRASHED,
