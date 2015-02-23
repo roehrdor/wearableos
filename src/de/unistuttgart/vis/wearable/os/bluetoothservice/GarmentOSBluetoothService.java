@@ -3,7 +3,9 @@ package de.unistuttgart.vis.wearable.os.bluetoothservice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -39,6 +41,8 @@ public class GarmentOSBluetoothService extends Service{
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing
     // connection
     public static final int STATE_CONNECTED = 3; // now connected to a remote
+	private static final String BT_DRIVER = null;
+	private static final String BT_ID = null;
     // device
     private ConnectThread mConnectThread;
     private static ConnectedThread mConnectedThread;
@@ -48,6 +52,8 @@ public class GarmentOSBluetoothService extends Service{
     public static String deviceName;
     public Vector<Byte> packdata = new Vector<Byte>(2048);
     public static BluetoothDevice device = null;
+    private String driver = "";
+    private String sensorId = "";
     
     
     //HARDCODE
@@ -80,6 +86,8 @@ public class GarmentOSBluetoothService extends Service{
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
             String macAddress = (String) intent.getSerializableExtra(BT_DEVICE);
+            driver = (String) intent.getSerializableExtra(BT_DRIVER);
+            sensorId = (String) (intent.getSerializableExtra(BT_ID));
             device = mBluetoothAdapter.getRemoteDevice(macAddress);
             deviceName = device.getName();
             if (macAddress != null && macAddress.length() > 0) {
@@ -393,6 +401,16 @@ public class GarmentOSBluetoothService extends Service{
                     //TODO Verwaltungsmodul einbauen
                     float[] dataFloat = {Float.parseFloat(readMessage)};
                     SensorData data = new SensorData(dataFloat, Utils.dateToUnix(new Date()));
+                    
+                    Collection<Sensor> set = de.unistuttgart.vis.wearable.os.sensors.SensorManager.getAllSensors();
+                    
+                    for (Iterator<Sensor> iterator = set.iterator(); iterator.hasNext();) {
+						if (iterator.next().getDisplayedSensorName() == sensorId) {
+							Sensor saveSensor = iterator.next();
+							saveSensor.addRawData(data);
+							Log.i("BTInput", "Writen to " + iterator.next().getDisplayedSensorName() + " Data: " + dataFloat );
+						}
+					}
 					Log.i("BTInput", "Writen to db");
 					
                     
