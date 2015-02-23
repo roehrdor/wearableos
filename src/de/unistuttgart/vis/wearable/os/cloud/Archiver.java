@@ -176,7 +176,7 @@ public class Archiver {
      *            the decrypt mode
      * @return the cipher object
      */
-    private static Cipher makeCipher(String pass, Boolean decryptMode) {
+    private static Cipher makeCipher(String pass, boolean decryptMode) {
         Cipher cipher = null;
         try {
             // Use a KeyFactory to derive the corresponding key from the passphrase:
@@ -213,21 +213,20 @@ public class Archiver {
     public static void encryptFile(File fileName, String pass) {
         byte[] decData;
         byte[] encData;
-        File inFile = fileName;
         try {
             // Generate the cipher using pass:
             Cipher cipher;
             cipher = makeCipher(pass, true);
 
             // Read in the file:
-            FileInputStream inStream = new FileInputStream(inFile);
+            FileInputStream inStream = new FileInputStream(fileName);
 
             int blockSize = 8;
             // Figure out how many bytes are padded
-            int paddedCount = blockSize - ((int) inFile.length() % blockSize);
+            int paddedCount = blockSize - ((int) fileName.length() % blockSize);
 
             // Figure out full size including padding
-            int padded = (int) inFile.length() + paddedCount;
+            int padded = (int) fileName.length() + paddedCount;
 
             decData = new byte[padded];
 
@@ -236,7 +235,7 @@ public class Archiver {
             inStream.close();
 
             // Write out padding bytes as per PKCS5 algorithm
-            for (int i = (int) inFile.length(); i < padded; ++i) {
+            for (int i = (int) fileName.length(); i < padded; ++i) {
                 decData[i] = (byte) paddedCount;
             }
 
@@ -262,14 +261,13 @@ public class Archiver {
     public static void decryptFile(File fileName, String pass) {
         byte[] encData;
         byte[] decData;
-        File inFile = fileName;
         try {
             // Generate the cipher using pass:
             Cipher cipher = makeCipher(pass, false);
 
             // Read in the file:
-            FileInputStream inStream = new FileInputStream(inFile);
-            encData = new byte[(int) inFile.length()];
+            FileInputStream inStream = new FileInputStream(fileName);
+            encData = new byte[(int) fileName.length()];
             inStream.read(encData);
             inStream.close();
             // Decrypt the file data:
