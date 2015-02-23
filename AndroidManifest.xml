@@ -122,7 +122,6 @@
             android:name=".app.HARActivityManager"
             android:label="@string/title_activity_har" >
         </activity>
-        <activity android:name=".app.NIYActivity" />
         <activity android:name=".cloud.Dropbox"/>
         <activity android:name=".cloud.googleDrive.GoogleDrive" android:label="Google Drive"/>
         <activity android:name=".cloud.oneDrive.OneDrive" android:label="One Drive"/>

@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.handle;
 
@@ -33,7 +33,18 @@ public class APIHandle extends android.app.Application {
 	private static android.content.Intent garmentInternalAPIIntent = new android.content.Intent(IGarmentInternalAPI.class.getName());
 	
 	private static boolean serviceBound = false;
-	private static boolean serviceInternalBound = false;		
+	private static boolean serviceInternalBound = false;
+
+    //
+    // The unique application package ID
+    //
+    private static String appPackageID = null;
+
+    /**
+     * Get the App package ID to determine the rights of the application
+     * @return the app package id
+     */
+    public static String getAppPackageID() {return appPackageID;}
 	
 	
 	// =========================================================
@@ -125,7 +136,12 @@ public class APIHandle extends android.app.Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
+        //
+        // Get the unique Application package ID
+        //
+        appPackageID = getApplicationInfo().packageName;
+
 		//
 		// In case we are not connected to the public service
 		//

@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.service;
 
@@ -44,7 +44,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	 *            the callback flag
 	 */
 	@Override
-	public void registerCallback(IGarmentCallback callback, int flag)
+	public void registerCallback(String app, IGarmentCallback callback, int flag)
 			throws android.os.RemoteException {
 		if (callback != null) {
 			GarmentOSSerivce.mCallbacks.register(new CallbackNode(
@@ -62,7 +62,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	 *            the callback flag
 	 */
 	@Override
-	public void unregisterCallback(IGarmentCallback callback, int flag)
+	public void unregisterCallback(String app, IGarmentCallback callback, int flag)
 			throws android.os.RemoteException {
 		if (callback != null) {
 			GarmentOSSerivce.mCallbacks.unregister(new CallbackNode(
@@ -72,7 +72,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
     @Override
-    public PSensor[] API_getAllSensors() throws RemoteException {
+    public PSensor[] API_getAllSensors(String app) throws RemoteException {
         java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
         PSensor[] psensors = new PSensor[sensors.size()];
         int i = -1;
@@ -82,7 +82,7 @@ class APIBinder extends IGarmentAPI.Stub {
     }
 
     @Override
-    public PSensor API_getSensorById(int id) throws RemoteException {
+    public PSensor API_getSensorById(String app, int id) throws RemoteException {
         return SensorManager.getSensorByID(id).toParcelableAPI();
     }
 
@@ -90,7 +90,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	// Functions will be here
 	//
 	@Override
-	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
+	public boolean SENSORS_SENSOR_isEnabled(String app, int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -99,7 +99,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public String SENSORS_SENSOR_getDisplayedSensorName(int sid)
+	public String SENSORS_SENSOR_getDisplayedSensorName(String app, int sid)
 			throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
@@ -109,7 +109,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getSampleRate(int sid) throws RemoteException {
+	public int SENSORS_SENSOR_getSampleRate(String app, int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -118,7 +118,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getSavePeriod(int sid) throws RemoteException {
+	public int SENSORS_SENSOR_getSavePeriod(String app, int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -127,7 +127,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public float SENSORS_SENSOR_getSmoothness(int sid) throws RemoteException {
+	public float SENSORS_SENSOR_getSmoothness(String app, int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -136,7 +136,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getSensorType(int sid) throws RemoteException {
+	public int SENSORS_SENSOR_getSensorType(String app, int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -147,7 +147,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getGraphType(int sid) throws RemoteException {
+	public int SENSORS_SENSOR_getGraphType(String app, int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -158,7 +158,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
+	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(String app, int sid)
 			throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
@@ -170,7 +170,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid)
+	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(String app, int sid)
 			throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
@@ -182,7 +182,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	}
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawData(int sid) {
+    public PSensorData SENSORS_SENSOR_getRawData(String app, int sid) {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -191,7 +191,7 @@ class APIBinder extends IGarmentAPI.Stub {
     }
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -200,7 +200,7 @@ class APIBinder extends IGarmentAPI.Stub {
     }
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, int start, int end) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
