@@ -93,7 +93,7 @@ public class Dropbox extends Activity {
 
 
             // Database Path
-            tmp = new File(Dropbox.this.getFilesDir().getAbsolutePath()+File.separator+"tmp");
+            tmp = new File(Dropbox.this.getFilesDir().getAbsolutePath()+File.separator+"tmp.zip");
 
             if (mySwitch.isChecked()) {
                 Archiver.createEncryptedArchiveFile(key, tmp);
@@ -112,7 +112,7 @@ public class Dropbox extends Activity {
                 try {
                     // set request for upload to Dropbox
                     request = mDBApi.putFileOverwriteRequest("/Garment-OS/"
-                                    + "gos_sensors", inputStream, tmp.length(),
+                                    + "gos_sensors.zip", inputStream, tmp.length(),
                             new ProgressListener() {
 
                                 @Override

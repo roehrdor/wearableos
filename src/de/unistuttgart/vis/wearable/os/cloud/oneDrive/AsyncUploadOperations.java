@@ -166,7 +166,7 @@ public class AsyncUploadOperations {
 
 			this.uploadJsonObject = params[0];
 			// TODO upload archive
-            File file = new File(OneDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName());
+            File file = new File(OneDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
 
             if(password.equals("")){
                 if(file.exists()){
@@ -184,7 +184,7 @@ public class AsyncUploadOperations {
             }
 
 			OneDrive.getConnectClient().uploadAsync(
-					uploadJsonObject.optString(Miscellaneous.UPLOAD_LOCATION),Miscellaneous.getCloudDbName(), file,
+					uploadJsonObject.optString(Miscellaneous.UPLOAD_LOCATION),Miscellaneous.getCloudDbName()+".zip", file,
 					OverwriteOption.Overwrite, new LiveUploadOperationListener() {
 
 						@Override

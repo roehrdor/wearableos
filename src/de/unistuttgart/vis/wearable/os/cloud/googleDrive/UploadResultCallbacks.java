@@ -470,7 +470,7 @@ public class UploadResultCallbacks {
 		protected Boolean doInBackground(DriveContents... params) {
 			// Database Path
 
-			File file = new File(GoogleDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName());
+			File file = new File(GoogleDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
 
             if(password.equals("")){
                 if(file.exists()){
@@ -551,7 +551,7 @@ public class UploadResultCallbacks {
 
 					MetadataChangeSet fileUploadChangeSet = new MetadataChangeSet.Builder()
 							.setMimeType(Miscellaneous.getZipMimeType())
-							.setTitle(Miscellaneous.getCloudDbName()).build();
+							.setTitle(Miscellaneous.getCloudDbName()+".zip").build();
 					if (mode == 'u') {
 						Drive.DriveApi
 								.getFolder(
