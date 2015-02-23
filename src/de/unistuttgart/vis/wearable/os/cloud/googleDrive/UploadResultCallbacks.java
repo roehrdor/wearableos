@@ -142,7 +142,7 @@ public class UploadResultCallbacks {
 						// erstellen
 
 						Drive.DriveApi.newDriveContents(
-								GoogleDrive.getGoogleApiClient())
+                                GoogleDrive.getGoogleApiClient())
 								.setResultCallback(getNewDBCreateCallback());
 
 					} if(cloudFileMetaData!=null) {
@@ -407,7 +407,7 @@ public class UploadResultCallbacks {
 	public ResultCallback<DriveContentsResult> getNewDBCreateCallback() {
 		return this.newDBCreateCallback;
 	}
-
+    File file;
 	private class AsyncDriveFileUploadTask extends
 			AsyncTask<DriveContents, String, Boolean> {
         private String password;
@@ -454,10 +454,9 @@ public class UploadResultCallbacks {
 		@Override
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
+            file.delete();
 
-			// TODO handle data loss
-
-		}
+        }
 
 		@Override
 		protected void onProgressUpdate(String... values) {
@@ -470,7 +469,7 @@ public class UploadResultCallbacks {
 		protected Boolean doInBackground(DriveContents... params) {
 			// Database Path
 
-			File file = new File(GoogleDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
+			file = new File(GoogleDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
 
             if(password.equals("")){
                 if(file.exists()){

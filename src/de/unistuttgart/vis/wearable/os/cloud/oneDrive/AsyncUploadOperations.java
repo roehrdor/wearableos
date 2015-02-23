@@ -166,7 +166,7 @@ public class AsyncUploadOperations {
 
 			this.uploadJsonObject = params[0];
 			// TODO upload archive
-            File file = new File(OneDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
+            final File file = new File(OneDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
 
             if(password.equals("")){
                 if(file.exists()){
@@ -200,6 +200,7 @@ public class AsyncUploadOperations {
 
 						@Override
 						public void onUploadFailed(LiveOperationException arg0, LiveOperation arg1) {
+                            file.delete();
 							publishProgress("Upload abgebrochen");
 							progressDialog.dismiss();
 							Log.i("Test-App", "Nach cancel komme ich, nicht doch");
@@ -208,6 +209,7 @@ public class AsyncUploadOperations {
 
 						@Override
 						public void onUploadCompleted(LiveOperation arg0) {
+                            file.delete();
 							publishProgress("Datenbank erfolgreich zu One Drive hochgeladen");
 							progressDialog.dismiss();
 
