@@ -31,7 +31,7 @@ public class Properties {
     //
     // These constants are used to start the services
     //
-    public static final String GARMENT_SERVICE = "de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce";
+    public static final String GARMENT_SERVICE = "de.unistuttgart.vis.wearable.os.service.GarmentOSService";
     public static final String GARMENT_INTERNAL_SENSOR = "de.unistuttgart.vis.wearable.os.internalservice.GarmentOSServiceInternal";
 
 }

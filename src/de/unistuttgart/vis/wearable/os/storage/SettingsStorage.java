@@ -18,7 +18,7 @@ import java.util.HashMap;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
-import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 
 /**
  * This class is used store the sensor properties and the privacy settings.
@@ -56,7 +56,7 @@ public class SettingsStorage {
      * @return the sensor settings
      */
     public static java.util.HashMap<Integer, Sensor> readSensors() {
-        android.content.Context context = GarmentOSSerivce.getContext();
+        android.content.Context context = GarmentOSService.getContext();
         java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME_SENSOR);
         java.io.ObjectInputStream ois = null;
         java.io.FileInputStream fis = null;
@@ -108,7 +108,7 @@ public class SettingsStorage {
      * @return the application settings
      */
     public static java.util.HashMap<String, UserApp> readApps() {
-        android.content.Context context = GarmentOSSerivce.getContext();
+        android.content.Context context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
         java.io.File file = new java.io.File(context.getFilesDir(), FILE_NAME_APPS);
         java.io.ObjectInputStream ois = null;
         java.io.FileInputStream fis = null;
@@ -169,7 +169,7 @@ public class SettingsStorage {
 	public static void saveSensorAndPrivacy(
 			java.util.Map<Integer, Sensor> sensors,
 			java.util.Map<String, UserApp> privacy) {
-		android.content.Context context = GarmentOSSerivce.getContext();
+		android.content.Context context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
         if(sensors != null) {
             saveSensors(sensors, context);
         }

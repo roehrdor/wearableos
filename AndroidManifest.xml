@@ -43,7 +43,7 @@
         
         <!-- The public service -->
         <service 
-            android:name="de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce"
+            android:name=".service.GarmentOSService"
             android:process=":remote">
             <intent-filter>
                 <action android:name="de.unistuttgart.vis.wearable.os.api.IGarmentAPI"/>

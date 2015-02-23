@@ -8,7 +8,7 @@
 package de.unistuttgart.vis.wearable.os.storage;
 
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.service.GarmentOSSerivce;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 
 /**
  * <p>
@@ -99,7 +99,7 @@ public class SensorDataDeSerializer implements Runnable {
 		this.sensorID = sensorID;
 		this.noDatasetsToRead = noDatasetsToRead;
 		this.startTime = startTime;
-		this.context = GarmentOSSerivce.getContext();	
+		this.context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
 		this.sensorData = sensorData;
 		this.jobFlag = START_NUMBER;
 	}
@@ -127,7 +127,7 @@ public class SensorDataDeSerializer implements Runnable {
 	 */
 	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int startTime, int endTime, int maxNumberOfValues) {
 		this.sensorID = sensorID;
-		this.context = GarmentOSSerivce.getContext();
+		this.context = GarmentOSService.getContext();
 		this.sensorData = sensorData;
 		
 		if(maxNumberOfValues < 0)

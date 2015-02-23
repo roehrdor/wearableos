@@ -47,7 +47,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	public void registerCallback(String app, IGarmentCallback callback, int flag)
 			throws android.os.RemoteException {
 		if (callback != null) {
-			GarmentOSSerivce.mCallbacks.register(new CallbackNode(
+			de.unistuttgart.vis.wearable.os.service.GarmentOSService.mCallbacks.register(new CallbackNode(
 					android.os.Binder.getCallingPid(), android.os.Binder
 							.getCallingUid(), callback, flag));
 		}
@@ -65,7 +65,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	public void unregisterCallback(String app, IGarmentCallback callback, int flag)
 			throws android.os.RemoteException {
 		if (callback != null) {
-			GarmentOSSerivce.mCallbacks.unregister(new CallbackNode(
+			de.unistuttgart.vis.wearable.os.service.GarmentOSService.mCallbacks.unregister(new CallbackNode(
 					android.os.Binder.getCallingPid(), android.os.Binder
 							.getCallingUid(), callback, flag));
 		}
