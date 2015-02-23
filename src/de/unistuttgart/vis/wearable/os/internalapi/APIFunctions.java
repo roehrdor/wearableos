@@ -62,6 +62,7 @@ public class APIFunctions {
                                     smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
                                     rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
                                     displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());
+                return;
             } catch (android.os.RemoteException e) {
             }
         }
