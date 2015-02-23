@@ -13,17 +13,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Key;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+
 
 import de.unistuttgart.vis.wearable.os.properties.Properties;
-import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
@@ -40,51 +45,6 @@ public class Archiver {
      */
     private Archiver() {
         throw new IllegalAccessError("This constructor shall not be used");
-    }
-
-    /**
-     * Do the encryption / decryption process for the given file and key. The mode defines whether
-     * the given file needs to be decrypted or encrypted.
-     *
-     * @param mode   the mode whether the file needs to be decrypted or encrypted
-     * @param key    the key to decrypt / encrypt the file with
-     * @param input  the input file to be decrypted / encrypted
-     * @param output the resulting output file
-     */
-    private static void crypt(int mode, String key, File input, File output) {
-        try {
-            byte[] inputBytes, outputBytes;
-            FileInputStream fis;
-            FileOutputStream fos;
-            Key kKey;
-            Cipher cipher;
-
-            //
-            // Create a key for the decryption / encryption process, create the Cipher object and
-            // initialize it
-            //
-            kKey = new SecretKeySpec(key.getBytes(), Constants.CRYPTO_ALGORITHM);
-            cipher = Cipher.getInstance(Constants.CRYPTO_TRANSFORM);
-            cipher.init(mode, kKey);
-
-            //
-            // Read the input file to a byte array
-            //
-            fis = new FileInputStream(input);
-            inputBytes = new byte[(int)input.length()];
-            fis.read(inputBytes);
-            fis.close();
-
-            //
-            // Let the cipher to its work with encrypting / decrypting the file and save the
-            // resulting bytes in the output file.
-            //
-            fos = new FileOutputStream(output);
-            outputBytes = cipher.doFinal(inputBytes);
-            fos.write(outputBytes);
-            fos.close();
-
-        } catch(Exception e) {}
     }
 
     /**
@@ -189,7 +149,7 @@ public class Archiver {
      * Create a compressed and encrypted archive file containing all sensor data and the storage
      * file containing the privacy information and sensor settings. This function call is actually
      * the same as first calling {@link de.unistuttgart.vis.wearable.os.cloud.Archiver#createArchiveFile(java.io.File)}
-     * and afterwards calling the {@link de.unistuttgart.vis.wearable.os.cloud.Archiver#encryptFile(String, java.io.File, java.io.File)}
+     * and afterwards calling the {@link de.unistuttgart.vis.wearable.os.cloud.Archiver#encryptFile(java.io.File, String)}
      * method.
      *
      * @param key        the key to encrypt the file with
@@ -197,30 +157,142 @@ public class Archiver {
      */
     public static void createEncryptedArchiveFile(String key, File outputFile) {
         createArchiveFile(outputFile);
-        encryptFile(key, outputFile, outputFile);
+        encryptFile(outputFile, key);
+    }
+
+    //
+    // Arbitrarily selected 8-byte salt sequence:
+    //
+    private static final byte[] salt = { (byte) 0x43, (byte) 0x76, (byte) 0x95,
+            (byte) 0xc7, (byte) 0x5b, (byte) 0xd7, (byte) 0x45, (byte) 0x17 };
+
+    /**
+     * Create a cipher object based on the given password and the decryption
+     * mode
+     *
+     * @param pass
+     *            the password to use for de/encryption
+     * @param decryptMode
+     *            the decrypt mode
+     * @return the cipher object
+     */
+    private static Cipher makeCipher(String pass, Boolean decryptMode) {
+        Cipher cipher = null;
+        try {
+            // Use a KeyFactory to derive the corresponding key from the passphrase:
+            PBEKeySpec keySpec = new PBEKeySpec(pass.toCharArray());
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+            SecretKey key = keyFactory.generateSecret(keySpec);
+
+            // Create parameters from the salt and an arbitrary number of
+            // iterations:
+            PBEParameterSpec pbeParamSpec = new PBEParameterSpec(salt, 42);
+
+            // Set up the cipher:
+            cipher = Cipher.getInstance("PBEWithMD5AndDES");
+
+            // Set the cipher mode to decryption or encryption:
+            if (decryptMode) {
+                cipher.init(Cipher.ENCRYPT_MODE, key, pbeParamSpec);
+            } else {
+                cipher.init(Cipher.DECRYPT_MODE, key, pbeParamSpec);
+            }
+        } catch(GeneralSecurityException gse) {
+        }
+        return cipher;
     }
 
     /**
-     * Encrypt the given file using the given password and save the encrypted file to the given
-     * output file.
+     * Encrypt the given file with the given password
      *
-     * @param key        the key to encrypt the file with
-     * @param inputFile  the input file to encrypt
-     * @param outputFile the encrypted output file
+     * @param fileName
+     *            the file to encrypt
+     * @param pass
+     *            the password to use for encryption
      */
-    public static void encryptFile(String key, File inputFile, File outputFile) {
-        crypt(Cipher.ENCRYPT_MODE, key, inputFile, outputFile);
+    public static void encryptFile(File fileName, String pass) {
+        byte[] decData;
+        byte[] encData;
+        File inFile = fileName;
+        try {
+            // Generate the cipher using pass:
+            Cipher cipher;
+            cipher = makeCipher(pass, true);
+
+            // Read in the file:
+            FileInputStream inStream = new FileInputStream(inFile);
+
+            int blockSize = 8;
+            // Figure out how many bytes are padded
+            int paddedCount = blockSize - ((int) inFile.length() % blockSize);
+
+            // Figure out full size including padding
+            int padded = (int) inFile.length() + paddedCount;
+
+            decData = new byte[padded];
+
+            inStream.read(decData);
+
+            inStream.close();
+
+            // Write out padding bytes as per PKCS5 algorithm
+            for (int i = (int) inFile.length(); i < padded; ++i) {
+                decData[i] = (byte) paddedCount;
+            }
+
+            // Encrypt the file data:
+            encData = cipher.doFinal(decData);
+
+            // Write the encrypted data to a new file:
+            FileOutputStream outStream = new FileOutputStream(fileName);
+            outStream.write(encData);
+            outStream.close();
+        } catch (GeneralSecurityException gse) {
+        } catch (IOException e) {}
     }
 
     /**
-     * Decrypt the given file using the given password and save the decrypted file to the given
-     * output file.
+     * Decrypt the given file with the given password
      *
-     * @param key        the key to decrypt the file with
-     * @param inputFile  the input file to decrypt
-     * @param outputFile the decrypted output file
+     * @param fileName
+     *            the file to be decrypted
+     * @param pass
+     *            the password to use for decryption
      */
-    public static void decryptFile(String key, java.io.File inputFile, java.io.File outputFile) {
-        crypt(Cipher.DECRYPT_MODE, key, inputFile, outputFile);
+    public static void decryptFile(File fileName, String pass) {
+        byte[] encData;
+        byte[] decData;
+        File inFile = fileName;
+        try {
+            // Generate the cipher using pass:
+            Cipher cipher = makeCipher(pass, false);
+
+            // Read in the file:
+            FileInputStream inStream = new FileInputStream(inFile);
+            encData = new byte[(int) inFile.length()];
+            inStream.read(encData);
+            inStream.close();
+            // Decrypt the file data:
+            decData = cipher.doFinal(encData);
+
+            // Figure out how much padding to remove
+
+            int padCount = (int) decData[decData.length - 1];
+
+            // Naive check, will fail if plaintext file actually contained
+            // this at the end
+            // For robust check, check that padCount bytes at the end have same
+            // value
+            if (padCount >= 1 && padCount <= 8) {
+                decData = Arrays.copyOfRange(decData, 0, decData.length - padCount);
+            }
+
+            // Write the decrypted data to a new file:
+            FileOutputStream target = new FileOutputStream(fileName);
+            target.write(decData);
+            target.close();
+        } catch (GeneralSecurityException gse) {
+        } catch (IOException e) {
+        }
     }
 }
