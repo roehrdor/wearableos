@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.microsoft.live.LiveOperation;
@@ -25,8 +24,8 @@ public class AsyncUploadOperations {
 
 	/**
 	 * LiveOperationListener that traverses the results received by One Drive in
-	 * form of JSONObjects and creates the GarmentOS database directory and
-	 * database file at One Drive in that directory
+	 * form of JSONObjects and creates the GarmentOS sensor archive directory and
+	 * archive file at One Drive in that directory
 	 */
 	final LiveOperationListener listFoldersListener = new LiveOperationListener() {
 
@@ -53,7 +52,7 @@ public class AsyncUploadOperations {
 						currentJsonObject = resultJsonArray.getJSONObject(i);
 
 						if (currentJsonObject.optString(Miscellaneous.NAME).equals(
-								de.unistuttgart.vis.wearable.os.cloud.oneDrive.Miscellaneous.getCloudDbFolderName())) {
+								de.unistuttgart.vis.wearable.os.cloud.oneDrive.Miscellaneous.getCloudArchiveFolderName())) {
 							uploadJsonObject = currentJsonObject;
 
 						}
@@ -67,7 +66,7 @@ public class AsyncUploadOperations {
 
 					Map<String, String> folder = new HashMap<String, String>();
 					folder.put(Miscellaneous.NAME,
-							Miscellaneous.getCloudDbFolderName());
+							Miscellaneous.getCloudArchiveFolderName());
 					folder.put(Miscellaneous.DESCRIPTION,
 							"The folder for the synchronisation of the sensor files");
 
@@ -81,7 +80,7 @@ public class AsyncUploadOperations {
 
                                 // the creation of the folder at One Drive is
                                 // finished, the process continues with the
-                                // upload of the database file
+                                // upload of the sensor archive file
                                 @Override
                                 public void onComplete(LiveOperation arg0) {
                                     Toast.makeText(OneDrive.getMainContext(),
@@ -91,7 +90,7 @@ public class AsyncUploadOperations {
                                     new OneDriveAsyncUploadTask(OneDrive.getPassword()).execute(resultJsonObject);
                                 }
                             });
-					// The database file is directly uploaded to the already
+					// The sensor archive file is directly uploaded to the already
 					// existing directory at One Drive
 				} else {
 					new OneDriveAsyncUploadTask(OneDrive.getPassword()).execute(uploadJsonObject);
@@ -99,7 +98,7 @@ public class AsyncUploadOperations {
 				}
 			} else {
 				Toast.makeText(OneDrive.getMainContext(),
-						"Konnte keine Dateiliste wegen \nNetzwerkproblemen erhalten,", Toast.LENGTH_SHORT)
+						"Couldn't get file list \nbecause of connectivity problems,", Toast.LENGTH_SHORT)
 						.show();
 			}
 
@@ -121,7 +120,7 @@ public class AsyncUploadOperations {
 			// create Progress Dialog to display the progress of upload
 			progressDialog = new ProgressDialog(OneDrive.getMainContext());
 			progressDialog.setMax(100);
-			progressDialog.setMessage("Uploading " +Miscellaneous.getCloudDbName());
+			progressDialog.setMessage("Uploading " +Miscellaneous.getCloudArchiveName());
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progressDialog.setProgress(0);
 			progressDialog.setCancelable(false);
@@ -166,7 +165,7 @@ public class AsyncUploadOperations {
 
 			this.uploadJsonObject = params[0];
 			// TODO upload archive
-            final File file = new File(OneDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
+            final File file = new File(OneDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudArchiveName()+".zip");
 
             if(password.equals("")){
                 if(file.exists()){
@@ -184,7 +183,7 @@ public class AsyncUploadOperations {
             }
 
 			OneDrive.getConnectClient().uploadAsync(
-					uploadJsonObject.optString(Miscellaneous.UPLOAD_LOCATION),Miscellaneous.getCloudDbName()+".zip", file,
+					uploadJsonObject.optString(Miscellaneous.UPLOAD_LOCATION),Miscellaneous.getCloudArchiveName()+".zip", file,
 					OverwriteOption.Overwrite, new LiveUploadOperationListener() {
 
 						@Override
@@ -192,7 +191,7 @@ public class AsyncUploadOperations {
 							progressDialog
 									.setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
 							if (cancelRequest) {
-								publishProgress("Upload abgebrochen");
+								publishProgress("Upload cancelled");
 								arg2.cancel();
 
 							}
@@ -201,16 +200,15 @@ public class AsyncUploadOperations {
 						@Override
 						public void onUploadFailed(LiveOperationException arg0, LiveOperation arg1) {
                             file.delete();
-							publishProgress("Upload abgebrochen");
+							publishProgress("Upload cancelled");
 							progressDialog.dismiss();
-							Log.i("Test-App", "Nach cancel komme ich, nicht doch");
 
 						}
 
 						@Override
 						public void onUploadCompleted(LiveOperation arg0) {
                             file.delete();
-							publishProgress("Datenbank erfolgreich zu One Drive hochgeladen");
+							publishProgress("Successfully uploaded sensor archive");
 							progressDialog.dismiss();
 
 						}

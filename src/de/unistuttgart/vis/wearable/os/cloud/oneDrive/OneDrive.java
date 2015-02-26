@@ -26,7 +26,7 @@ import de.unistuttgart.vis.wearable.os.R;
 
 
 /**
- * Activity to provide functionality to upload or download a database file to or
+ * Activity to provide functionality to upload or download an archive file to or
  * from One Drive
  *
  */
@@ -124,14 +124,14 @@ public class OneDrive extends Activity {
                                    LiveConnectSession session, Object userState) {
             if (status == LiveStatus.CONNECTED) {
                 Toast.makeText(getApplicationContext(),
-                        "In One Drive angemeldet", Toast.LENGTH_SHORT).show();
+                        "Signed in to One Drive", Toast.LENGTH_SHORT).show();
                 client = new LiveConnectClient(session);
                 client.getAsync("me/skydrive" + "/files",
                         asyncUploadOperations.getListFilesListener());
 
             } else {
                 Toast.makeText(getApplicationContext(),
-                        "Konnte sich nicht mit One Drive verbinden",
+                        "Couldn't connect with One Drive",
                         Toast.LENGTH_SHORT).show();
                 client = null;
             }
@@ -156,14 +156,14 @@ public class OneDrive extends Activity {
                                    LiveConnectSession session, Object userState) {
             if (status == LiveStatus.CONNECTED) {
                 Toast.makeText(getApplicationContext(),
-                        "In One Drive angemeldet", Toast.LENGTH_SHORT).show();
+                        "Signed in to One Drive", Toast.LENGTH_SHORT).show();
                 client = new LiveConnectClient(session);
                 client.getAsync("me/skydrive/files",
                         asyncDownloadOperations.getDownloadListener());
 
             } else {
                 Toast.makeText(getApplicationContext(),
-                        "Konnte sich nicht mit One Drive verbinden",
+                        "Couldn't connect with One Drive",
                         Toast.LENGTH_SHORT).show();
                 client = null;
             }
@@ -192,7 +192,7 @@ public class OneDrive extends Activity {
     }
 
     /**
-     * method to trigger the upload process of the database
+     * method to trigger the upload process of the sensor archive
      */
     public void uploadDB(View view) {
 
@@ -205,7 +205,7 @@ public class OneDrive extends Activity {
                             asyncUploadOperations.getListFilesListener());
 
                 } else {
-                    Toast.makeText(this, "Verbinde mit One Drive...",
+                    Toast.makeText(this, "Connecting with One Drive...",
                             Toast.LENGTH_SHORT).show();
                     signInToOneDrive('u');
                 }
@@ -213,7 +213,7 @@ public class OneDrive extends Activity {
             } else {
                 Toast.makeText(
                         getApplicationContext(),
-                        "Keine Internetverbindung vorhanden, bitte aktivieren Sie entweder WiFi \noder Mobile Daten",
+                        "No internet connection available, please activate wifi \nor mobile data",
                         Toast.LENGTH_SHORT).show();
             }
     }
@@ -222,7 +222,7 @@ public class OneDrive extends Activity {
 
 
     /**
-     * method to trigger the download of the database
+     * method to trigger the download of the sensor archive
      */
     public void downloadDB(View view) {
         if (internetAvailable()) {
@@ -230,14 +230,15 @@ public class OneDrive extends Activity {
                 client.getAsync("me/skydrive/files",
                         asyncDownloadOperations.getDownloadListener());
             } else {
-                Toast.makeText(this, "Verbinde mit One Drive...",
+                Toast.makeText(this, "Connecting with...",
                         Toast.LENGTH_SHORT).show();
                 signInToOneDrive('d');
             }
         } else {
             Toast.makeText(
                     getApplicationContext(),
-                    "Keine Internetverbindung vorhanden, bitte aktivieren Sie entweder WiFi \noder Mobile Daten",
+                    "No internet connection available, please activate wifi \n" +
+                            "or mobile data",
                     Toast.LENGTH_SHORT).show();
         }
     }

@@ -24,7 +24,7 @@ import de.unistuttgart.vis.wearable.os.R;
 
 
 /**
- * Activity to provide functionality to upload or download a database file to or
+ * Activity to provide functionality to upload or download an archive file to or
  * from Google Drive
  *
  */
@@ -35,7 +35,7 @@ public class GoogleDrive extends Activity implements
 
 
     private static Context context;
-    private static DriveFolder currentCloudDBFolder;
+    private static DriveFolder currentCloudArchiveFolder;
     private static char mode = 'n';
     private static String password ="";
     private Switch switchUseEncryption = null;
@@ -54,12 +54,12 @@ public class GoogleDrive extends Activity implements
         return password;
     }
 
-    public static DriveFolder getCurrentCloudDBFolder() {
-        return currentCloudDBFolder;
+    public static DriveFolder getCurrentCloudArchiveFolder() {
+        return currentCloudArchiveFolder;
     }
 
-    public static void setCurrentCloudDBFolder(DriveFolder currentCloudDBFolder) {
-        GoogleDrive.currentCloudDBFolder = currentCloudDBFolder;
+    public static void setCurrentCloudArchiveFolder(DriveFolder currentCloudArchiveFolder) {
+        GoogleDrive.currentCloudArchiveFolder = currentCloudArchiveFolder;
     }
 
     public static GoogleApiClient getGoogleApiClient() {
@@ -106,13 +106,13 @@ public class GoogleDrive extends Activity implements
      * the database file at the desired local directory represented by an
      * Outputstream TODO
      */
-    public void downloadDB(View view) {
+    public void downloadArchive(View view) {
         setMode('d');
         signInToGoogleDrive();
 
     }
 
-    public void uploadDB(View view) {
+    public void uploadArchive(View view) {
 
             setMode('u');
             signInToGoogleDrive();
@@ -132,7 +132,7 @@ public class GoogleDrive extends Activity implements
                     .getRootFolder(getGoogleApiClient());
             Query query = new Query.Builder().addFilter(
                     Filters.and(Filters.eq(SearchableField.TITLE,
-                                    Miscellaneous.getCloudDbFolderName()), Filters.eq(
+                                    Miscellaneous.getCloudArchiveFolderName()), Filters.eq(
                                     SearchableField.MIME_TYPE, DriveFolder.MIME_TYPE),
                             Filters.eq(SearchableField.TRASHED, false)))
                     .build();
@@ -145,7 +145,7 @@ public class GoogleDrive extends Activity implements
                 drFolder.queryChildren(getGoogleApiClient(), query)
                         .setResultCallback(
                                 downloadCallbackHelper
-                                        .getFolderqueryresultcallback());
+                                        .getFolderQueryResultCallback());
             }
 
         }
@@ -216,7 +216,7 @@ public class GoogleDrive extends Activity implements
             GooglePlayServicesUtil.getErrorDialog(arg0.getErrorCode(), this, 0)
                     .show();
         }
-        Toast.makeText(this, "Verbindung nicht erfolgreich", Toast.LENGTH_SHORT)
+        Toast.makeText(this, "Connection not successful", Toast.LENGTH_SHORT)
                 .show();
     }
 
@@ -233,14 +233,14 @@ public class GoogleDrive extends Activity implements
                         if (arg0.isSuccess()) {
                             Toast.makeText(
                                     getBaseContext(),
-                                    "Synchronisation mit Google Drive abgeschlossen",
+                                    "Synchronisation with Google Drive successful",
                                     Toast.LENGTH_SHORT).show();
                             checkForFolderInGoogleDrive();
                         } else {
                             Toast.makeText(
                                     getBaseContext(),
-                                    "Synchronisation mit Google Drive fehlgeschlagen, "
-                                            + "\nein erneutes Anmelden ist notewendig",
+                                    "Synchronisation with Google Drive failed, "
+                                            + "\nlogging in again is necessary",
                                     Toast.LENGTH_SHORT).show();
                             setGoogleApiClient(null);
                         }

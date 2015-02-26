@@ -1,20 +1,14 @@
 package de.unistuttgart.vis.wearable.os.cloud.oneDrive;
 
 import java.io.File;
-import java.lang.reflect.Field;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-
-
 import com.microsoft.live.LiveDownloadOperation;
 import com.microsoft.live.LiveDownloadOperationListener;
 import com.microsoft.live.LiveOperation;
@@ -24,7 +18,7 @@ import com.microsoft.live.LiveOperationListener;
 public class AsyncDownloadOperations {
 
 	/**
-	 * Traverses the file list at the database directory of One Drive to find the
+	 * Traverses the file list at the archive directory of One Drive to find the
 	 * desired file
 	 */
 	public LiveOperationListener liveDownloadPreparationListener = new LiveOperationListener() {
@@ -45,7 +39,7 @@ public class AsyncDownloadOperations {
 						JSONObject cloudFolderFile = cloudFolderFiles.getJSONObject(i);
 
 						if (cloudFolderFile.optString(Miscellaneous.NAME).equals(
-								Miscellaneous.getCloudDbName())
+								Miscellaneous.getCloudArchiveName())
 								&& cloudFolderFile.optString(Miscellaneous.TYPE).equals("file")) {
 							correctCloudFile = cloudFolderFile;
 
@@ -63,7 +57,7 @@ public class AsyncDownloadOperations {
 				}
 			} else {
 				Toast.makeText(OneDrive.getMainContext(),
-						"Keine Datenbankdatei bei OneDrive vorhanden", Toast.LENGTH_SHORT).show();
+						"No archive file available", Toast.LENGTH_SHORT).show();
 			}
 		}
 	};
@@ -78,7 +72,7 @@ public class AsyncDownloadOperations {
 
 	/**
 	 * Searches the folders in the root of the One Drive for the desired folder
-	 * where the database is stored
+	 * where the archive is stored
 	 */
 	final LiveOperationListener downloadListener = new LiveOperationListener() {
 
@@ -97,7 +91,7 @@ public class AsyncDownloadOperations {
 					jO = cloudRootFileArray.getJSONObject(i);
 
 					if (jO.optString(Miscellaneous.NAME).equals(
-						Miscellaneous.getCloudDbFolderName())
+						Miscellaneous.getCloudArchiveFolderName())
 							&& jO.optString(Miscellaneous.TYPE).equals("folder")) {
 						// The folder was found and now the desired file is
 						// searched inside of that folder
@@ -108,7 +102,7 @@ public class AsyncDownloadOperations {
 					}
 				}
 			} catch (JSONException e) {
-				Toast.makeText(OneDrive.getMainContext(), "Konnte nicht Liste der Ordner erhalten",
+				Toast.makeText(OneDrive.getMainContext(), "Couldn't get list of directories",
 						Toast.LENGTH_LONG).show();
 			}
 		}
@@ -129,7 +123,7 @@ public class AsyncDownloadOperations {
 			// create Progress Dialog to display the progress of upload
 			progressDialog = new ProgressDialog(OneDrive.getMainContext());
 			progressDialog.setMax(100);
-			progressDialog.setMessage("Downloading " + Miscellaneous.getCloudDbName());
+			progressDialog.setMessage("Downloading " + Miscellaneous.getCloudArchiveName());
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progressDialog.setProgress(0);
 			progressDialog.setCancelable(false);
@@ -172,10 +166,10 @@ public class AsyncDownloadOperations {
 			this.downloadJsonObject = params[0];
 
 			// The required directories are created on the
-			// internal sdcard
+			// internal SDCard
 			// TODO import downloaded archive
 			File downloadDestination = new File("");
-			// The download of the database file to the created
+			// The download of the archive file to the created
 			// directory is initiated
 			OneDrive.getConnectClient().downloadAsync(
 					downloadJsonObject.optString(Miscellaneous.ID) + "/content", downloadDestination,
@@ -188,7 +182,7 @@ public class AsyncDownloadOperations {
 							progressDialog
 									.setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
 							if (cancelRequest) {
-								publishProgress("Download abgebrochen");
+								publishProgress("Download cancelled");
 								progressDialog.dismiss();
 								operation.cancel();
 							}
@@ -197,14 +191,14 @@ public class AsyncDownloadOperations {
 						@Override
 						public void onDownloadFailed(LiveOperationException exception,
 								LiveDownloadOperation operation) {
-							publishProgress("Download abgebrochen");
+							publishProgress("Download cancelled");
 							progressDialog.dismiss();
-							Log.i("Test-App", "Nach cancel komme ich, nicht doch");
+
 						}
 
 						@Override
 						public void onDownloadCompleted(LiveDownloadOperation operation) {
-							publishProgress("Datenbank erfolgreich von One Drive heruntergeladen");
+							publishProgress("Successfully downloaded archive");
 							progressDialog.dismiss();
 						}
 

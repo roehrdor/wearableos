@@ -11,11 +11,11 @@ public class Miscellaneous {
 	public static final String[] SCOPES = { "wl.skydrive" };
 	// TODO remove when releasing source code
 	public static final String CLIENT_ID = "000000004C129114";
-    private static final String CLOUD_DB_FOLDER_NAME = "Garment-OS";
+    private static final String CLOUD_ARCHIVE_FOLDER_NAME = "Garment-OS";
 	private Miscellaneous() {
 		throw new AssertionError();
 	}
-    private static final String CLOUD_DB_NAME = "gos_sensors";
+    private static final String CLOUD_ARCHIVE_NAME = "gos_sensors";
 	public static final String CODE = "code";
 	public static final String DATA = "data";
 	public static final String DESCRIPTION = "description";
@@ -45,11 +45,11 @@ public class Miscellaneous {
 	public static final String UPLOAD_LOCATION = "upload_location";
 	public static final String FOLDER = "folder";
 
-    public static String getCloudDbFolderName(){
-        return CLOUD_DB_FOLDER_NAME;
+    public static String getCloudArchiveFolderName(){
+        return CLOUD_ARCHIVE_FOLDER_NAME;
     }
-    public static String getCloudDbName(){
-        return CLOUD_DB_NAME;
+    public static String getCloudArchiveName(){
+        return CLOUD_ARCHIVE_NAME;
     }
 
 }

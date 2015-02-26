@@ -28,7 +28,7 @@ import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 
 /**
  * Class to provide the ResultCallbacks that are done in the background to
- * handle the upload process of the database file
+ * handle the upload process of the archive file
  * 
  */
 public class UploadResultCallbacks {
@@ -46,15 +46,15 @@ public class UploadResultCallbacks {
 	private DriveFile currentCloudDBFile = null;
 
 	/**
-	 * Callback required to check whether the creation of the database folder at
+	 * Callback required to check whether the creation of the archive folder at
 	 * Google Drive was successful
 	 */
-	private DriveFile getCloudDatabaseFile() {
+	private DriveFile getCloudArchiveFile() {
 
 		return this.currentCloudDBFile;
 	}
 
-	private void setCloudDatabaseFile(DriveFile currentDriveFile) {
+	private void setCloudArchiveFile(DriveFile currentDriveFile) {
 		this.currentCloudDBFile = currentDriveFile;
 	}
 
@@ -66,8 +66,6 @@ public class UploadResultCallbacks {
 
 				return;
 			}
-			Log.i("Test-App", "Zeile 395");
-            // TODO proceed with upload
             setCurrentCloudDBFolder(Drive.DriveApi.getFolder(
                     GoogleDrive.getGoogleApiClient(),
                     result.getDriveFolder().getDriveId()));
@@ -77,7 +75,7 @@ public class UploadResultCallbacks {
                             Filters.and(
                                     Filters.eq(
                                             SearchableField.TITLE,
-                                            Miscellaneous.getCloudDbName()),
+                                            Miscellaneous.getCloudArchiveName()),
 
                                     Filters.eq(
                                             SearchableField.TRASHED,
@@ -105,7 +103,7 @@ public class UploadResultCallbacks {
 	}
 
 	/**
-	 * Looks for the latest database file to overwrite it with the local one,
+	 * Looks for the latest archive file to overwrite it with the local one,
 	 * though internal problems with google's drive api prevent a reliable
 	 * detection, through a previous call of the requestSync methode this is
 	 * circumvented
@@ -125,11 +123,11 @@ public class UploadResultCallbacks {
 						Toast.LENGTH_SHORT).show();
 			} else {
 				MetadataBuffer fileMetadataBuffer = null;
-				Log.i("Test-App", "Zeile 90");
+
 				try {
 					fileMetadataBuffer = arg0.getMetadataBuffer();
 					Log.i("Test-App",
-							"Number of files fulfilling contraints: "
+							"Number of files fulfilling constraints: "
 									+ fileMetadataBuffer.getCount());
 					if (fileMetadataBuffer.getCount() > 0) {
 						cloudFileMetaData = Miscellaneous
@@ -137,9 +135,8 @@ public class UploadResultCallbacks {
 					}
 
 					if (cloudFileMetaData == null) {
-						Log.i("Test-App", "Zeile 317");
-						// Schon in GarmentOS Datenbank Ordner, Datei nun
-						// erstellen
+
+						// Already in archive folder of Google Drive, uploading file
 
 						Drive.DriveApi.newDriveContents(
                                 GoogleDrive.getGoogleApiClient())
@@ -147,14 +144,14 @@ public class UploadResultCallbacks {
 
 					} if(cloudFileMetaData!=null) {
 
-						Log.i("Test-App", "Zeile 310");
 
-						final DriveFile cloudDatabaseFile = Drive.DriveApi
+
+						final DriveFile cloudArchiveFile = Drive.DriveApi
 								.getFile(GoogleDrive
 										.getGoogleApiClient(),
 										cloudFileMetaData.getDriveId());
-						setCloudDatabaseFile(cloudDatabaseFile);
-						cloudDatabaseFile.open(
+						setCloudArchiveFile(cloudArchiveFile);
+						cloudArchiveFile.open(
                                 GoogleDrive.getGoogleApiClient(),
                                 DriveFile.MODE_WRITE_ONLY, null)
 								.setResultCallback(
@@ -176,7 +173,7 @@ public class UploadResultCallbacks {
 
 	/**
 	 * Overwrites contents of existing DriveFile via its associated contents and
-	 * the provided OutputStream where data of the new database file is written
+	 * the provided OutputStream where data of the new archive file is written
 	 * to
 	 */
 	private final ResultCallback<DriveContentsResult> overwriteExistingFileCallback = new ResultCallback<DriveContentsResult>() {
@@ -185,13 +182,11 @@ public class UploadResultCallbacks {
 		public void onResult(DriveContentsResult arg0) {
 
 			if (!arg0.getStatus().isSuccess()) {
-				Log.i("Test-App", "Konnte nicht Contents erhalten");
+
 				return;
 			}
 
 			final DriveContents existingFileContents = arg0.getDriveContents();
-			Log.i("Test.App", "Der Inhalt ist vorhanden: "
-					+ (existingFileContents != null));
 
 			new AsyncDriveFileUploadTask('o', GoogleDrive.getPassword()).execute(existingFileContents);
 
@@ -215,15 +210,15 @@ public class UploadResultCallbacks {
 
 		@Override
 		public void onResult(DriveFileResult arg0) {
-			//
+
 			if (!arg0.getStatus().isSuccess()) {
 				Toast.makeText(GoogleDrive.getMainContext(),
-						"Upload fehlgeschlagen, Anmeldung erneut notwendig",
+						"Upload failed, signing in again is necessary",
 						Toast.LENGTH_SHORT).show();
 				GoogleDrive.setGoogleApiClient(null);
 			} else {
 				Toast.makeText(GoogleDrive.getMainContext(),
-						"Upload erfolgreich", Toast.LENGTH_SHORT).show();
+						"Upload successful", Toast.LENGTH_SHORT).show();
 				if (GoogleDrive.getGoogleApiClient() != null) {
 					Drive.DriveApi.requestSync(
 							GoogleDrive.getGoogleApiClient())
@@ -247,12 +242,12 @@ public class UploadResultCallbacks {
 			if (!arg0.getStatus().isSuccess()) {
 				Toast.makeText(
 						GoogleDrive.getMainContext(),
-						"Synchronisation fehlgeschlagen, \nerneute Anmeldung erforderlich",
+						"Synchronisation failed, \nsigning in again is necessary",
 						Toast.LENGTH_SHORT).show();
 				GoogleDrive.setGoogleApiClient(null);
 			}
 			Toast.makeText(GoogleDrive.getMainContext(),
-					"Synchronisation des Uploads abgeschlossen",
+					"Finished synchronising the upload",
 					Toast.LENGTH_SHORT).show();
 
 		}
@@ -272,10 +267,10 @@ public class UploadResultCallbacks {
 		public void onResult(Status arg0) {
 			if (!arg0.isSuccess()) {
 				Toast.makeText(GoogleDrive.getMainContext(),
-						"Upload fehlgeschlagen", Toast.LENGTH_SHORT).show();
+						"Upload failed", Toast.LENGTH_SHORT).show();
 			} else {
 				Toast.makeText(GoogleDrive.getMainContext(),
-						"Upload abgeschlossen", Toast.LENGTH_SHORT).show();
+						"Upload successful", Toast.LENGTH_SHORT).show();
 			}
 			Drive.DriveApi
 					.requestSync(GoogleDrive.getGoogleApiClient())
@@ -288,7 +283,7 @@ public class UploadResultCallbacks {
 	}
 
 	/**
-	 * Callback required to check whether the database folder is already present
+	 * Callback required to check whether the archive folder is already present
 	 * at Google Drive
 	 */
 	private final ResultCallback<MetadataBufferResult> folderQueryResultCallback = new ResultCallback<MetadataBufferResult>() {
@@ -297,17 +292,15 @@ public class UploadResultCallbacks {
 		@Override
 		public void onResult(MetadataBufferResult arg0) {
 			if (!arg0.getStatus().isSuccess()) {
-				Log.i("Test-App", "Zeile 242 Couldn't request directory information");
+
 				return;
 			} else {
 
 				MetadataBuffer folderMetadataBuffer = null;
-				Log.i("Test-App", "Zeile 314");
+
 				try {
 					folderMetadataBuffer = arg0.getMetadataBuffer();
-					Log.i("Test-App", "Zeile 245"
-							+ " Number of directories fulfilling constraints: "
-							+ folderMetadataBuffer.getCount());
+
 					if (folderMetadataBuffer.getCount() > 0) {
 						cloudFolderMetaData = Miscellaneous
 								.getLatestMetadata(folderMetadataBuffer);
@@ -316,9 +309,9 @@ public class UploadResultCallbacks {
 					// New folder is created
 					if (cloudFolderMetaData == null) {
 						setCurrentCloudDBFolder(null);
-						Log.i("Test-App", "Zeile 260");
+
 						MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-								.setTitle(Miscellaneous.getCloudDbFolderName())
+								.setTitle(Miscellaneous.getCloudArchiveFolderName())
 								.build();
 						Drive.DriveApi
 								.getRootFolder(
@@ -332,23 +325,17 @@ public class UploadResultCallbacks {
 						// Using existing folder for upload
 					} else {
 
-						Log.i("Test-App", "Zeile 267");
 
 						setCurrentCloudDBFolder(Drive.DriveApi.getFolder(
 								GoogleDrive.getGoogleApiClient(),
 								cloudFolderMetaData.getDriveId()));
-						Log.i("Test-App",
-								"Id ist: "
-										+ getCurrentCloudDBFolder()
-												.getDriveId()
-										+ " und der Name ist: "
-										+ cloudFolderMetaData.getTitle());
+
 						Query query = new Query.Builder()
 								.addFilter(
 										Filters.and(
 												Filters.eq(
 														SearchableField.TITLE,
-														Miscellaneous.getCloudDbName()+".zip"),
+														Miscellaneous.getCloudArchiveName()+".zip"),
 
 												Filters.eq(
 														SearchableField.TRASHED,
@@ -385,7 +372,7 @@ public class UploadResultCallbacks {
 	/**
 	 * Handles the upload of a new content of the future drive file to an
 	 * existing DriveFolder and creating the corresponding DriveFile for the
-	 * database file after that
+	 * archive file after that
 	 */
 	private final ResultCallback<DriveContentsResult> newDBCreateCallback = new ResultCallback<DriveApi.DriveContentsResult>() {
 
@@ -423,7 +410,7 @@ public class UploadResultCallbacks {
 					GoogleDrive.getMainContext());
 			progressDialog.setMax(100);
 			progressDialog
-					.setMessage("Uploading " + Miscellaneous.getCloudDbName());
+					.setMessage("Uploading " + Miscellaneous.getCloudArchiveName());
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progressDialog.setProgress(0);
 			progressDialog.setCancelable(false);
@@ -467,9 +454,9 @@ public class UploadResultCallbacks {
 
 		@Override
 		protected Boolean doInBackground(DriveContents... params) {
-			// Database Path
+			// Archive path
 
-			file = new File(GoogleDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudDbName()+".zip");
+			file = new File(GoogleDrive.getMainContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudArchiveName()+".zip");
 
             if(password.equals("")){
                 if(file.exists()){
@@ -519,18 +506,18 @@ public class UploadResultCallbacks {
 									fileOutputStream.close();
 									driveFileContents.discard(GoogleDrive.getGoogleApiClient());
 									progressDialog.dismiss();
-									publishProgress("Upload abgebrochen");
+									publishProgress("Upload cancelled");
 									break;
 								} catch (IOException e) {
 									progressDialog.dismiss();
-									publishProgress("Upload abgebrochen");
+									publishProgress("Upload cancelled");
 								}
 							}
 						}
 					}
 				} catch (IOException e) {
 					progressDialog.dismiss();
-					publishProgress("Upload abgebrochen");
+					publishProgress("Upload cancelled");
 
 				} finally {
 					try {
@@ -540,17 +527,17 @@ public class UploadResultCallbacks {
 						progressDialog.dismiss();
 					} catch (IOException e) {
 						progressDialog.dismiss();
-						publishProgress("Upload abgebrochen");
+						publishProgress("Upload cancelled");
 
 					}
 				}
 				if (!cancelRequest) {
 					progressDialog.dismiss();
-					Log.i("Test-App", "Zeile 368");
+
 
 					MetadataChangeSet fileUploadChangeSet = new MetadataChangeSet.Builder()
 							.setMimeType(Miscellaneous.getZipMimeType())
-							.setTitle(Miscellaneous.getCloudDbName()+".zip").build();
+							.setTitle(Miscellaneous.getCloudArchiveName()+".zip").build();
 					if (mode == 'u') {
 						Drive.DriveApi
 								.getFolder(
@@ -566,9 +553,7 @@ public class UploadResultCallbacks {
 					} else {
                         driveFileContents.commit(GoogleDrive.getGoogleApiClient(), fileUploadChangeSet).setResultCallback(
                                 getAfterFileOverWriteCallback());
-                        //getCloudDatabaseFile().commit(
-                          //      GoogleDrive.getGoogleApiClient(),
-                            //    driveFileContents, fileUploadChangeSet);
+
 
 					}
 
@@ -579,7 +564,7 @@ public class UploadResultCallbacks {
 				}
 			} catch (IOException e) {
 				progressDialog.dismiss();
-				publishProgress("Upload abgebrochen");
+				publishProgress("Upload cancelled");
 
 				e.printStackTrace();
 			}

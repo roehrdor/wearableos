@@ -19,49 +19,49 @@ import com.google.android.gms.drive.query.SearchableField;
 
 /**
  * Class to provide the ResultCallbacks that are done in the background to
- * handle the download process of the database file because of missing functions
- * for an easy download via the SDK this will need the use of an InputStream of
+ * handle the download process of the sensor archive file.
+ * Because of missing functions for an easy download via the SDK this will need the use of an InputStream of
  * the DriveFiles content to the OutputStream of the file on the SDCard
  *
  * 
  */
 public class DownloadResultCallbacks {
-	private static DriveFolder currentDBFolder = null;
+	private static DriveFolder currentArchiveFolder = null;
 
-	public static void setCurrentCloudDBFolder(DriveFolder driveFolder) {
-		currentDBFolder = driveFolder;
-
-	}
-
-	public static DriveFolder getCurrentCloudDBFolder() {
-		return currentDBFolder;
+	public static void setCurrentCloudArchiveFolder(DriveFolder driveFolder) {
+		currentArchiveFolder = driveFolder;
 
 	}
 
-	private static DriveFile currentCloudDBFile = null;
-
-	private static long currentCloudDBFileSize = 0;
-
-	private static long getCurrentCloudDBFileSize() {
-		return currentCloudDBFileSize;
-	}
-
-	private static void setCurrentCloudDBFileSize(long currentCloudDBFileSize) {
-		DownloadResultCallbacks.currentCloudDBFileSize = currentCloudDBFileSize;
-	}
-
-	public static void setCurrentCloudDBFile(DriveFile driveFile) {
-		currentCloudDBFile = driveFile;
+	public static DriveFolder getCurrentCloudArchiveFolder() {
+		return currentArchiveFolder;
 
 	}
 
-	public static DriveFile getCurrentCloudDBFile() {
-		return currentCloudDBFile;
+	private static DriveFile currentCloudArchiveFile = null;
+
+	private static long currentCloudArchiveFileSize = 0;
+
+	private static long getCurrentCloudArchiveFileSize() {
+		return currentCloudArchiveFileSize;
+	}
+
+	private static void setCurrentCloudArchiveFileSize(long currentCloudArchiveFileSize) {
+		DownloadResultCallbacks.currentCloudArchiveFileSize = currentCloudArchiveFileSize;
+	}
+
+	public static void setCurrentCloudArchiveFile(DriveFile driveFile) {
+		currentCloudArchiveFile = driveFile;
+
+	}
+
+	public static DriveFile getCurrentCloudArchiveFile() {
+		return currentCloudArchiveFile;
 
 	}
 
 	/**
-	 * Callback required to check whether the database folder is already present
+	 * Callback required to check whether the archive folder is already present
 	 * at Google Drive
 	 */
 	private final ResultCallback<MetadataBufferResult> folderQueryResultCallback = new ResultCallback<MetadataBufferResult>() {
@@ -71,37 +71,37 @@ public class DownloadResultCallbacks {
 		public void onResult(MetadataBufferResult arg0) {
 			MetadataBuffer folderMetadataBuffer = null;
 			if (!arg0.getStatus().isSuccess()) {
-				Toast.makeText(GoogleDrive.getMainContext(), "Konnte Ordner nicht abfragen",
+				Toast.makeText(GoogleDrive.getMainContext(), "Couldn't request directory",
 						Toast.LENGTH_SHORT).show();
 				return;
 			} else {
 				try {
 					folderMetadataBuffer = arg0.getMetadataBuffer();
-					Log.i("Test-App", "Zeile 245" + " Anzahl Ordner, die Kriterien erf�llen: "
+					Log.i("gosDEBUG", "Line 245" + " Amount of directories satisfying constraints: "
 							+ folderMetadataBuffer.getCount());
 					if (folderMetadataBuffer.getCount() > 0) {
 						cloudFolderMetaData = Miscellaneous.getLatestMetadata(folderMetadataBuffer);
 					}
 
-					// New folder is created
+					// New directory is created
 					if (cloudFolderMetaData == null) {
 						Toast.makeText(GoogleDrive.getMainContext(),
-								"Keine Datenbank zum Download vorhanden", Toast.LENGTH_SHORT).show();
+								"No archive file available", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
 
-						Log.i("Test-App", "Zeile 267");
+						Log.i("gosDEBUG", "Line 93");
 
-						setCurrentCloudDBFolder(Drive.DriveApi.getFolder(
-								GoogleDrive.getGoogleApiClient(), cloudFolderMetaData.getDriveId()));
-						Log.i("Test-App", "Id ist: " + getCurrentCloudDBFolder().getDriveId()
-								+ " und der Name ist: " + cloudFolderMetaData.getTitle());
+						setCurrentCloudArchiveFolder(Drive.DriveApi.getFolder(
+                                GoogleDrive.getGoogleApiClient(), cloudFolderMetaData.getDriveId()));
+						Log.i("gosDEBUG", "Id is: " + getCurrentCloudArchiveFolder().getDriveId()
+								+ " and the name is: " + cloudFolderMetaData.getTitle());
 						Query query = new Query.Builder().addFilter(
-								Filters.and(Filters.eq(SearchableField.TITLE, Miscellaneous.getCloudDbName()),
+								Filters.and(Filters.eq(SearchableField.TITLE, Miscellaneous.getCloudArchiveName()),
 										Filters.eq(SearchableField.MIME_TYPE, Miscellaneous.getZipMimeType()),
 										Filters.eq(SearchableField.TRASHED, false))).build();
 
-						getCurrentCloudDBFolder()
+						getCurrentCloudArchiveFolder()
 								.queryChildren(GoogleDrive.getGoogleApiClient(), query).setResultCallback(
 										getFileQueryResultCallback());
 
@@ -115,7 +115,7 @@ public class DownloadResultCallbacks {
 		}
 	};
 
-	public ResultCallback<MetadataBufferResult> getFolderqueryresultcallback() {
+	public ResultCallback<MetadataBufferResult> getFolderQueryResultCallback() {
 		return this.folderQueryResultCallback;
 	}
 
@@ -124,9 +124,8 @@ public class DownloadResultCallbacks {
 	}
 
 	/**
-	 * Looks for the latest database file to download it, though internal problems
-	 * with google's drive API prevent a reliable detection, through a previous
-	 * call of the requestSync method this is circumvented
+	 * Looks for the latest archive file to download it, even though the api sometimes prevents a reliable detection,
+     * through a previous call of the requestSync method this is circumvented
 	 */
 	private final ResultCallback<MetadataBufferResult> fileQueryResultCallback = new ResultCallback<MetadataBufferResult>() {
 
@@ -138,30 +137,30 @@ public class DownloadResultCallbacks {
 
 			if (!arg0.getStatus().isSuccess()) {
 				Toast.makeText(GoogleDrive.getMainContext(),
-						"Konnte keine Abfrage f�r die aktuellste \n" + "Datenbankdatei in Google Drive machen",
+						"Couldn't make a request for the latest \n" + "archive file in Google Drive",
 						Toast.LENGTH_SHORT).show();
 				return;
 			} else {
 				try {
 					fileMetadataBuffer = arg0.getMetadataBuffer();
-					Log.i("Test-App", "Zeile 133 " + fileMetadataBuffer.getCount());
+					Log.i("gosDEBUG", "Line 133 " + fileMetadataBuffer.getCount());
 					if (fileMetadataBuffer.getCount() > 0) {
 						cloudFileMetaData = Miscellaneous.getLatestMetadata(fileMetadataBuffer);
 					}
 
 					if (cloudFileMetaData == null) {
 						Toast.makeText(GoogleDrive.getMainContext(),
-								"Keine Datenbank zum Download verf�gbar", Toast.LENGTH_SHORT).show();
+								"No archive file for download available", Toast.LENGTH_SHORT).show();
 						return;
 					} else {
 
-						Log.i("Test-App", "Zeile 155");
-						setCurrentCloudDBFileSize(cloudFileMetaData.getFileSize());
-						final DriveFile cloudDatabaseFile = Drive.DriveApi.getFile(
+						Log.i("gosDEBUG", "Line 155");
+						setCurrentCloudArchiveFileSize(cloudFileMetaData.getFileSize());
+						final DriveFile cloudArchiveFile = Drive.DriveApi.getFile(
 								GoogleDrive.getGoogleApiClient(), cloudFileMetaData.getDriveId());
-						setCurrentCloudDBFile(cloudDatabaseFile);
-						cloudDatabaseFile.open(GoogleDrive.getGoogleApiClient(),
-								DriveFile.MODE_READ_ONLY, null).setResultCallback(readExistingFileCallback);
+						setCurrentCloudArchiveFile(cloudArchiveFile);
+						cloudArchiveFile.open(GoogleDrive.getGoogleApiClient(),
+                                DriveFile.MODE_READ_ONLY, null).setResultCallback(readExistingFileCallback);
 
 					}
 
@@ -177,7 +176,7 @@ public class DownloadResultCallbacks {
 	};
 	/**
 	 * Reads the contents of an existing DriveFile an writes it to the local
-	 * database file via its OutputStream
+	 * sensor files via its OutputStream
 	 */
 	private final ResultCallback<DriveContentsResult> readExistingFileCallback = new ResultCallback<DriveContentsResult>() {
 
@@ -185,11 +184,11 @@ public class DownloadResultCallbacks {
 		public void onResult(DriveContentsResult arg0) {
 
 			if (!arg0.getStatus().isSuccess()) {
-				Log.i("Test-App", "Konnte nicht Contents erhalten");
+				Log.i("gosDEBUG", "Couldn't get contents");
 				return;
 			}
 			final DriveContents existingFileContents = arg0.getDriveContents();
-			Log.i("Test.App", "Der Inhalt ist vorhanden: " + (existingFileContents != null));
+			Log.i("gosDEBUG", "Content available: " + (existingFileContents != null));
 			new AsyncDriveFileDownloadTask(GoogleDrive.getPassword()).execute(existingFileContents);
 
 		}
@@ -205,7 +204,7 @@ public class DownloadResultCallbacks {
 			// create Progress Dialog to display the progress of upload
 			progressDialog = new ProgressDialog(GoogleDrive.getMainContext());
 			progressDialog.setMax(100);
-			progressDialog.setMessage("Downloading " + Miscellaneous.getCloudDbName());
+			progressDialog.setMessage("Downloading " + Miscellaneous.getCloudArchiveName());
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progressDialog.setProgress(0);
 			progressDialog.setCancelable(false);
@@ -234,28 +233,19 @@ public class DownloadResultCallbacks {
 		protected Boolean doInBackground(DriveContents... params) {
 			DriveContents existingFileContents = params[0];
             // TODO use internal path or make temp path
-			//File localDBFile = new File(APIFunctions.getDatabasePathPreference()+File.separator+DataBaseHelper.getDbName());
-			double totalBytes = getCurrentCloudDBFileSize();
+
+			double totalBytes = getCurrentCloudArchiveFileSize();
 			int currentBytes = 0;
 
 			try {
                 // TODO handle downloaded archive
-				//if (localDBFile.exists() && !localDBFile.canWrite() && !cancelRequest) {
-				//	progressDialog.dismiss();
-//
-//					publishProgress("Konnte nicht auf lokale Datenbank zugreifen");
-//					return null;
-//				} else
-                    {
-					// Deletes the local database file and creates it to create
-					// an exact copy of the DriveFile
-					//localDBFile.delete();
-					// TODO handle the downloaded file via import or replace sensor files
-					//new File(APIFunctions.getDatabasePathPreference()).mkdirs();
-                    // TODO outputstream to file object of archive
-					//BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(localDBFile));
 
-					// Overwrite the local file.
+                    {
+					// TODO handle the downloaded file via import or replace sensor files
+
+                    // TODO outputstream to file object of archive
+
+					// Overwrite the local sensor files
 					BufferedInputStream contentInputStream = new BufferedInputStream(existingFileContents.getInputStream());
 
 					int fileByte = 0;
@@ -266,35 +256,32 @@ public class DownloadResultCallbacks {
 							if (fileByte != -1 && !cancelRequest) {
 								currentBytes++;
 								progressDialog.setProgress((int) ((currentBytes / totalBytes) * 100));
-								//fileOutputStream.write(fileByte);
-								Log.i("Test-App", "Schreibe Byte 340");
+
+								Log.i("gosDEBUG", "Writing Byte 340");
 							} else if (fileByte != -1 && cancelRequest) {
 								contentInputStream.close();
-								//fileOutputStream.flush();
-								//fileOutputStream.close();
-								//localDBFile.delete();
+
 								progressDialog.dismiss();
 								break;
 							}
 						}
 					} catch (IOException e) {
 
-						publishProgress("Zugriff auf die Datei fehlgeschlagen...");
+						publishProgress("Couldn't access file...");
 
 					} finally {
 						try {
 
 							contentInputStream.close();
-							//fileOutputStream.flush();
-							//fileOutputStream.close();
-							publishProgress("Datenbank erfolgreich heruntergeladen");
+
+							publishProgress("Successfully downloaded file");
 
 							progressDialog.dismiss();
 							return true;
 
 						} catch (IOException e) {
 							progressDialog.dismiss();
-							publishProgress("Download fehlgeschlagen...");
+							publishProgress("Download failed...");
 							e.printStackTrace();
 
 						}
@@ -305,7 +292,7 @@ public class DownloadResultCallbacks {
 			}
             catch (Exception e) {
 				progressDialog.dismiss();
-				publishProgress("Zugriff auf die Datei fehlgeschlagen...");
+				publishProgress("Couldn't access the file...");
 				e.printStackTrace();
 			}
 			return null;
