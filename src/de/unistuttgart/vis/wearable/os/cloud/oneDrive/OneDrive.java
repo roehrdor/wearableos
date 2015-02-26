@@ -230,7 +230,7 @@ public class OneDrive extends Activity {
                 client.getAsync("me/skydrive/files",
                         asyncDownloadOperations.getDownloadListener());
             } else {
-                Toast.makeText(this, "Connecting with...",
+                Toast.makeText(this, "Connecting with One Drive...",
                         Toast.LENGTH_SHORT).show();
                 signInToOneDrive('d');
             }
