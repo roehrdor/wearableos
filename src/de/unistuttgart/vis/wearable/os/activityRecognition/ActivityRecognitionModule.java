@@ -418,6 +418,14 @@ public class ActivityRecognitionModule {
 			}
 			Log.e("har", "[ActivityRecognitionModule]:[trainNeuralNetwork] sensors are Null "
 					+ e.getLocalizedMessage());
+		} catch (IllegalArgumentException e) {
+			totalskippedTrainings++;
+			nullSensorTimeWindows++;
+			if(maximumSkippedTrainings < nullSensorTimeWindows) {
+				maximumSkippedTrainings = nullSensorTimeWindows;
+			}
+			Log.e("har", "[ActivityRecognitionModule]:[trainNeuralNetwork] "
+					+ e.getLocalizedMessage());
 		}
 		if(nullSensorTimeWindows > 63) {
 			future.cancel(false);

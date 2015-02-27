@@ -5,7 +5,7 @@ import Jama.QRDecomposition;
 
 public class StructuralFeatureExtraction {
 	
-	private float[] values;
+	private double[] values;
 	private Matrix pMatrix;
 	private int polynomDegree = 0;
 	private double meanVariation = 0;
@@ -19,23 +19,33 @@ public class StructuralFeatureExtraction {
 //	}
 	
 	public StructuralFeatureExtraction(float[] values, int polynomDegree) {
-		this.values = values;
+		this.values = convertFloatToDouble(values);
 		this.polynomDegree = polynomDegree;
 		coefficients = new double[this.polynomDegree + 1];
 		compute();
 	}
 	
+	private double[] convertFloatToDouble(float[] valuesFloat) {
+		double[] valuesDouble = new double[valuesFloat.length];
+		for(int i = 0; i < valuesFloat.length; i++) {
+			valuesDouble[i] = valuesFloat[i];
+		}
+		return valuesDouble;
+	}
+	
 	private void compute() {
 		double[] vector = new double[values.length];
+		for(int i = 0; i < vector.length; i++) {
+			vector[i] = i + 1;
+		}
 		double[][] vandermondeMatrix = new double[values.length][polynomDegree + 1];
 		for(int i = 0; i < values.length; i++) {
 			for(int j = 0; j <= polynomDegree; j++) {
-				vandermondeMatrix[i][j] = Math.pow(values[i], j);
+				vandermondeMatrix[i][j] = Math.pow(vector[i], j);
 			}
-			vector[i] = i;
 		}
 		Matrix A = new Matrix(vandermondeMatrix);
-		Matrix B = new Matrix(vector, values.length);
+		Matrix B = new Matrix(values, vector.length);
 		
 		// Least square method
 		QRDecomposition qr = new QRDecomposition(A);
@@ -45,15 +55,15 @@ public class StructuralFeatureExtraction {
 		pMatrix = qr.solve(B);
 		
 		double mean = 0;
-		for(double value : vector) {
+		for(double value : values) {
 			mean += value;
 		}
-		mean = mean / values.length;
+		mean = mean / vector.length;
 		double deviation = 0;
 		
 		// Total sum of squares
 		double TSS = 0;
-		for(double value : vector) {
+		for(double value : values) {
 			deviation = value - mean;
 			TSS += Math.pow(deviation, 2);
 		}

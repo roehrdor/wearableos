@@ -75,6 +75,9 @@ public class NeuralNetworkManager {
 			for (Entry<String, Double> entry : timeWindow.getFeatureSet()
 					.entrySet()) {
 				features[i] = entry.getValue() / 4294967296.0;
+				if(Math.abs(features[i]) > 1) {
+					throw new IllegalArgumentException("|Feature " + i + "| > 1");
+				}
 				i++;
 			}
 			neuralNetwork.train(features, target);
@@ -90,6 +93,9 @@ public class NeuralNetworkManager {
 		for(Entry<String, Double> entry : timeWindow.getFeatureSet()
 				.entrySet()) {
 			features[temp] = entry.getValue() / 4294967296.0;
+			if(Math.abs(features[temp]) > 1) {
+				throw new IllegalArgumentException("|Feature " + temp + "| > 1");
+			}
 			neuralNetwork.train(features, target);
 			temp++;
 		}
