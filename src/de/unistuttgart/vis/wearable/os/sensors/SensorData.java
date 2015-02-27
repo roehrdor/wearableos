@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.sensors;
 
@@ -16,6 +16,7 @@ package de.unistuttgart.vis.wearable.os.sensors;
 public class SensorData {
 	private float[] data;
 	private int date;
+    private int dimension;
 
 	/**
 	 * Create a new SensorData Object
@@ -29,6 +30,8 @@ public class SensorData {
 	public SensorData(float[] data, int date) {
 		this.data = data;
 		this.date = date;
+        if(data != null)
+            this.dimension = this.data.length;
 	}
 
 	/**
@@ -47,6 +50,8 @@ public class SensorData {
 		int pos = -1;
 		for(float d : data) 
 			this.data[++pos] = d;
+        if(data != null)
+            this.dimension = this.data.length;
 	}
 
 	/**
@@ -75,4 +80,13 @@ public class SensorData {
 	public int getUnixDate() {
 		return this.date;
 	}
+
+    /**
+     * Get the dimension of the sensor data object
+     *
+     * @return the dimension
+     */
+    public int getDimension() {
+        return this.dimension;
+    }
 }
