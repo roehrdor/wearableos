@@ -10,10 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.Toast;
+import android.widget.*;
 
 
 import com.microsoft.live.LiveAuthClient;
@@ -38,41 +35,22 @@ public class OneDrive extends Activity {
     private AsyncUploadOperations asyncUploadOperations = new AsyncUploadOperations();
     private Switch switchUseEncryption = null;
     private static String password = "";
+    private Button button = null;
+    private boolean isExport = true;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = OneDrive.this;
         this.auth = new LiveAuthClient(this, Miscellaneous.CLIENT_ID);
         setContentView(R.layout.activity_one_drive);
-        switchUseEncryption = (Switch)findViewById(R.id.switch4);
-        switchUseEncryption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(OneDrive.this);
-
-                    alert.setTitle("Please enter password:");
-                    final EditText input = new EditText(OneDrive.this);
-                    alert.setView(input);
-
-                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            password = input.getText().toString();
-                        }
-                    });
-
-                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            buttonView.setChecked(false);
-                            password="";
-                            return;
-                        }
-                    });
-                    alert.setCancelable(false);
-                    alert.show();
-                }
-            }
-        });
+        button = (Button) findViewById(R.id.button1);
+        if(!getIntent().getBooleanExtra("isExport",false)) {
+            button.setText("Import SensorData");
+            isExport = false;
+        }
+        password=getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
     }
 
     @Override
@@ -191,17 +169,26 @@ public class OneDrive extends Activity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    public void startImportExport(View view){
+        if(isExport){
+            uploadArchive();
+        }
+        else{
+            downloadArchive();
+        }
+    }
+
     /**
      * method to trigger the upload process of the sensor archive
      */
-    public void uploadDB(View view) {
+    public void uploadArchive() {
 
             if (internetAvailable()) {
 
                 if (getConnectClient() != null
                         && !getConnectClient().getSession().isExpired()) {
 
-                    client.getAsync("me/skydrive" + "/files",
+                    client.getAsync("me/skydrive/files",
                             asyncUploadOperations.getListFilesListener());
 
                 } else {
@@ -224,7 +211,7 @@ public class OneDrive extends Activity {
     /**
      * method to trigger the download of the sensor archive
      */
-    public void downloadDB(View view) {
+    public void downloadArchive() {
         if (internetAvailable()) {
             if (client != null && !client.getSession().isExpired()) {
                 client.getAsync("me/skydrive/files",
