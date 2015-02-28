@@ -57,19 +57,7 @@
             android:background="#606060"
             android:drawableLeft="@drawable/export_db"
             android:onClick="exportDB"
-            android:text="@string/btn_exportDB"
-            android:textColor="#FFFFFF"
-            android:textSize="25sp" />
-
-        <Button
-            android:id="@+id/Button05"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="#606060"
-            android:drawableLeft="@drawable/db_settings"
-            android:onClick="changeToDBSettingsMenu"
-            android:text="@string/btn_DbSettings"
+            android:text="@string/btn_local"
             android:textColor="#FFFFFF"
             android:textSize="25sp" />
 

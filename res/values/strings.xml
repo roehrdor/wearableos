@@ -101,5 +101,9 @@
     <string name="textView_manager_numberOfSkippedTrainings">Number of skipped trainings:</string>
     <string name="har_button_manager_delete">Delete neural network</string>
     <string name="refresh">refresh</string>
+    <string name="btn_Import">Import</string>
+    <string name="btn_Export">Export</string>
+    <string name="btn_local">Local</string>
+
 
 </resources>

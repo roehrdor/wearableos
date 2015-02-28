@@ -15,25 +15,30 @@ import de.unistuttgart.vis.wearable.os.cloud.googleDrive.GoogleDrive;
 import de.unistuttgart.vis.wearable.os.cloud.oneDrive.OneDrive;
 
 public class StorageActivity extends Activity {
+    private boolean isExport = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isExport = getIntent().getBooleanExtra("isExtra", false);
         setContentView(R.layout.activity_storage);
     }
 
     public void changeToDropBox(View view) {
         Intent intent = new Intent(getBaseContext(), Dropbox.class);
+        intent.putExtra("isExtra",isExport);
         startActivity(intent);
     }
 
     public void changeToOneDrive(View view) {
         Intent intent = new Intent(getBaseContext(), OneDrive.class);
+        intent.putExtra("isExtra",isExport);
         startActivity(intent);
   }
 
     public void changeToGoogleDrive(View view) {
         Intent intent = new Intent(getBaseContext(), GoogleDrive.class);
+        intent.putExtra("isExtra",isExport);
         startActivity(intent);
     }
 //
