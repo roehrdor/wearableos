@@ -32,11 +32,6 @@ public class StorageActivity extends Activity {
         isExport = getIntent().getBooleanExtra("isExport", false);
         setContentView(R.layout.activity_storage);
         mySwitch = (Switch) findViewById(R.id.switch5);
-        if (!isExport){
-            mySwitch.setVisibility(View.INVISIBLE);
-            TextView text = (TextView) findViewById(R.id.textView9);
-            text.setVisibility(View.INVISIBLE);
-        }
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
