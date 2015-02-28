@@ -7,26 +7,16 @@ package de.unistuttgart.vis.wearable.os.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 
 public class ExportDbActivity extends Activity {
 
@@ -110,37 +100,16 @@ public class ExportDbActivity extends Activity {
 
     }
 
-    public void saveDB(View view) {
-//        String dbPath = getBaseContext().getDatabasePath(
-//                DataBaseHelper.getDbName()).getAbsolutePath();
-//        File dbfile = new File(dbPath);
-//        File newFile = new File(currentFilePath + File.separator
-//                + DataBaseHelper.getDbName());
-//        InputStream is = null;
-//        OutputStream os = null;
-//        try {
-//            is = new FileInputStream(dbfile);
-//            os = new FileOutputStream(newFile);
-//            byte[] buffer = new byte[1024];
-//            int length;
-//            while ((length = is.read(buffer)) > 0) {
-//                os.write(buffer, 0, length);
-//            }
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                is.close();
-//                os.close();
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//            Toast.makeText(getBaseContext(), "Database export finished",
-//                    Toast.LENGTH_SHORT).show();
-//        }
+    public void saveSensorArchive(View view) {
 
+        File tmp = new File(currentFilePath+File.separator+"gos_sensors.zip");
+        if (getIntent().getBooleanExtra("encrypted",false)){
+            Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"),tmp);
+        } else {
+            Archiver.createArchiveFile(tmp);
+        }
+        Toast.makeText(getBaseContext(), "Database export finished",
+                Toast.LENGTH_SHORT).show();
     }
 
 }

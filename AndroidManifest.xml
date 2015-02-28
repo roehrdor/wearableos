@@ -125,7 +125,7 @@
         <activity android:name=".cloud.Dropbox"/>
         <activity android:name=".cloud.googleDrive.GoogleDrive" android:label="Google Drive"/>
         <activity android:name=".cloud.oneDrive.OneDrive" android:label="One Drive"/>
-        <activity android:name=".app.Import"/>
+        <activity android:name=".app.Import_ExportActivity"/>
         <meta-data android:name="com.google.android.gms.version"
                    android:value="@integer/google_play_services_version" />
     </application>

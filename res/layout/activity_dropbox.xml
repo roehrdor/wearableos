@@ -19,21 +19,5 @@
         android:text="@string/btn_uploadDropbox"
         android:textColor="#FFFFFF"
         android:textSize="25sp" />
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" android:weightSum="1" android:paddingTop="50dp"
-            android:paddingLeft="15dp">
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/encrypt"
-                android:id="@+id/textView" android:layout_weight="0.80"/>
-        <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/switch1" android:layout_gravity="right" android:gravity="right"/>
-    </LinearLayout>
 
 </LinearLayout>

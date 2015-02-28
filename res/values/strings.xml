@@ -104,6 +104,7 @@
     <string name="btn_Import">Import</string>
     <string name="btn_Export">Export</string>
     <string name="btn_local">Local</string>
+    <string name="btn_importDropbox">Import</string>
 
 
 </resources>

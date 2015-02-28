@@ -11,10 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.Toast;
+import android.widget.*;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.ProgressListener;
 import com.dropbox.client2.android.AndroidAuthSession;
@@ -37,11 +34,10 @@ public class Dropbox extends Activity {
     private static final String APP_SECRET = "z82qqqj2jegxtbp";
     private static final Session.AccessType ACCESS_TYPE = Session.AccessType.AUTO;
     private Context context;
+    private Button button;
     private boolean upload = false;
     private Upload uploadTask;
     private File tmp;
-    private Switch mySwitch;
-    private String key;
     private boolean finished = false;
     private FileInputStream inputStream;
 
@@ -95,8 +91,8 @@ public class Dropbox extends Activity {
             // Database Path
             tmp = new File(Dropbox.this.getFilesDir().getAbsolutePath()+File.separator+"tmp.zip");
 
-            if (mySwitch.isChecked()) {
-                Archiver.createEncryptedArchiveFile(key, tmp);
+            if (getIntent().getBooleanExtra("encrypted",false)) {
+                Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"), tmp);
             } else {
                 Archiver.createArchiveFile(tmp);
             }
@@ -179,35 +175,10 @@ public class Dropbox extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dropbox);
         context = this.getBaseContext();
-        mySwitch = (Switch) findViewById(R.id.switch1);
-        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(Dropbox.this);
-
-                    alert.setTitle("Please enter password:");
-                    final EditText input = new EditText(Dropbox.this);
-                    alert.setView(input);
-
-                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            key = input.getText().toString();
-                        }
-                    });
-
-                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            buttonView.setChecked(false);
-                            return;
-                        }
-                    });
-                    alert.setCancelable(false);
-                    alert.show();
-                }
-            }
-        });
-
+        button = (Button) findViewById(R.id.button1);
+        if(!getIntent().getBooleanExtra("isExport",false)) {
+            button.setText("Import SensorData");
+        }
     }
 
     @Override
