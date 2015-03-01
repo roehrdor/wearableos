@@ -26,8 +26,8 @@ import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
  * @author roehrdor
  */
 public class SettingsStorage {
-	private static final String FILE_NAME_SENSOR = "storageS";
-    private static final String FILE_NAME_APPS = "storageA";
+	public static final String FILE_NAME_SENSOR = "storageS";
+    public static final String FILE_NAME_APPS = "storageA";
 
     //
     // Auto update Thread save changes automatically every few seconds

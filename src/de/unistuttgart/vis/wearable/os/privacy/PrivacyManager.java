@@ -46,6 +46,18 @@ public class PrivacyManager {
 		this.save();
 	}
 
+    /**
+     * Add an existing app e.g. from a read file
+     *
+     * @param app the app to be added
+     */
+    public void addApp(UserApp app) {
+        if (!this.apps.containsKey(app.getName())) {
+            this.apps.put(app.getName(), app);
+        }
+        this.save();
+    }
+
 	/**
 	 * Save the current settings to file
 	 */

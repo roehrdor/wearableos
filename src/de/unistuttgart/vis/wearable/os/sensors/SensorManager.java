@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ *
+ * (c) GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.sensors;
 
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
@@ -41,7 +48,7 @@ public final class SensorManager {
      *
      * @param sensor the sensor to add to the system
      */
-    protected static void addNewSensor(Sensor sensor) {
+    public static void addNewSensor(Sensor sensor) {
         allSensors.put(sensor.getSensorID(), sensor);
     }
 
