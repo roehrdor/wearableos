@@ -102,7 +102,7 @@
             android:windowSoftInputMode="stateAlwaysHidden"  >
         </activity>
         <activity
-            android:name=".app.ExportDbActivity"
+            android:name=".app.ImportExportArchiveActivity"
             android:label="@string/title_activity_export_db" >
         </activity>
         <activity

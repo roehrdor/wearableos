@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.TextView;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Dropbox;
 import de.unistuttgart.vis.wearable.os.cloud.googleDrive.GoogleDrive;
@@ -95,7 +94,7 @@ public class StorageActivity extends Activity {
     }
 
     public void export(View view) {
-        Intent intent = new Intent(getBaseContext(), ExportDbActivity.class);
+        Intent intent = new Intent(getBaseContext(), ImportExportArchiveActivity.class);
         intent.putExtra("isExport",isExport);
         if (encrypted){
             intent.putExtra("key", key);

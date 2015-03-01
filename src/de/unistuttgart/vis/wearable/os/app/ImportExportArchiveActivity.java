@@ -18,7 +18,7 @@ import java.util.List;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 
-public class ExportDbActivity extends Activity {
+public class ImportExportArchiveActivity extends Activity {
 
     private File currentDir;
     private List<String> folders;
@@ -27,13 +27,24 @@ public class ExportDbActivity extends Activity {
     private String currentFilePath;
     private Button btnSave;
     private TextView text;
+    private boolean isExport = true;
+    private boolean archiveExists = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export_db);
+
         text = (TextView) findViewById(R.id.textView1);
+
         btnSave = (Button) findViewById(R.id.button1);
+        isExport = getIntent().getBooleanExtra("isExport", false);
+        if (!isExport) {
+            btnSave.setText("Import");
+            text.setText(getResources().getString(R.string.textView_text_no_archive_for_import));
+        }
+
         btnSave.setEnabled(false);
         currentDir = new File("/mnt/");
         folders = fill(currentDir);
@@ -71,18 +82,12 @@ public class ExportDbActivity extends Activity {
 
     /**
      * Returns a list of all folders in the current folder and checks if write
-     * access is provided for the current folder
+     * access is provided for the current folder if exporting and checks for
+     * the appropriate archive file when importing
      */
     private List<String> fill(File f) {
         File[] dirs = f.listFiles();
         currentFilePath = f.getAbsolutePath();
-        if (f.canWrite() && f.canRead()) {
-            btnSave.setEnabled(true);
-            text.setVisibility(View.INVISIBLE);
-        } else {
-            btnSave.setEnabled(false);
-            text.setVisibility(View.VISIBLE);
-        }
         this.setTitle("Current Folder: " + f.getName());
         List<String> dir = new ArrayList<String>();
         try {
@@ -94,23 +99,56 @@ public class ExportDbActivity extends Activity {
 
         }
         Collections.sort(dir);
-        if (!f.getName().equalsIgnoreCase("mnt"))
+        if (!f.getName().equalsIgnoreCase("mnt")) {
             dir.add(0, "Parent Directory");
-        return dir;
+        }
+        if (isExport) {
+            if (f.canWrite() && f.canRead()) {
+                btnSave.setEnabled(true);
+                text.setVisibility(View.INVISIBLE);
+            } else {
+                btnSave.setEnabled(false);
+                text.setVisibility(View.VISIBLE);
+            }
 
+
+        }
+        if (!isExport) {
+            archiveExists = false;
+            if (f.canRead()) {
+                for (File currentFile : f.listFiles()) {
+                    if (currentFile.canRead() && currentFile.isFile() && currentFile.getName().equals("gos_sensors.zip")) {
+                        archiveExists = true;
+                        break;
+                    }
+                }
+            }
+            if (archiveExists) {
+                btnSave.setEnabled(true);
+                text.setVisibility(View.INVISIBLE);
+            }
+            if (!archiveExists) {
+                btnSave.setEnabled(false);
+                text.setVisibility(View.VISIBLE);
+            }
+        }
+
+        return dir;
     }
 
     public void saveSensorArchive(View view) {
-
-        File tmp = new File(currentFilePath+File.separator+"gos_sensors.zip");
-        if (getIntent().getBooleanExtra("encrypted",false)){
-            Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"),tmp);
-        } else {
-            Archiver.createArchiveFile(tmp);
+        if (isExport) {
+            File tmp = new File(currentFilePath + File.separator + "gos_sensors.zip");
+            if (getIntent().getBooleanExtra("encrypted", false)) {
+                Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"), tmp);
+            } else {
+                Archiver.createArchiveFile(tmp);
+            }
+            Toast.makeText(getBaseContext(), "Archive export finished",
+                    Toast.LENGTH_SHORT).show();
+            onBackPressed();
+        } else{
+            // TODO Handle import
         }
-        Toast.makeText(getBaseContext(), "Database export finished",
-                Toast.LENGTH_SHORT).show();
     }
-
 }
-

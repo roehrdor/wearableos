@@ -105,6 +105,7 @@
     <string name="btn_Export">Export</string>
     <string name="btn_local">Local</string>
     <string name="btn_importDropbox">Import</string>
+    <string name="textView_text_no_archive_for_import">No archive available for import</string>
 
 
 </resources>
