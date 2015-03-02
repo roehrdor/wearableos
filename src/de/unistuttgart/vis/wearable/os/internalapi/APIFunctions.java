@@ -8,6 +8,7 @@
 package de.unistuttgart.vis.wearable.os.internalapi;
 
 import android.hardware.Sensor;
+import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
@@ -53,6 +54,28 @@ public class APIFunctions {
 	// only be done by using the provided Settings Application.
 	//
 	// =============================================================================
+
+    public static void registerCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().registerCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void unregisterCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().unregisterCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 
     public static void addNewSensor(int sampleRate, int savePeriod, int smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
