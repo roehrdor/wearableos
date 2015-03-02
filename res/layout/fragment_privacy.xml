@@ -12,20 +12,8 @@
         android:background="#c0d6e4"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="60dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="10dp"
-            android:text="@string/privacySettings"
-            android:textColor="#606060"
-            android:textSize="35sp" />
-
         <ListView
-            android:id="@+id/listView1"
+            android:id="@+id/listView_apps"
             android:textColor="#606060"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
