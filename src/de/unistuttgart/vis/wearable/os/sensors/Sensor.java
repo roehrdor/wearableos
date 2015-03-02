@@ -193,14 +193,6 @@ public class Sensor implements Externalizable {
         if (!isEnabled) {
             return;
         }
-        // TODO needed?
-//        if (isInternalSensor
-//                && rawData.size() > 0
-//                && sensorData.getDate().getTime() < (rawData
-//                .get(rawData.size() - 1).getDate()
-//                .getTime() + 1000 / (sampleRate - 1))) {
-//            return;
-//        }
 
         rawData.add(sensorData);
 
