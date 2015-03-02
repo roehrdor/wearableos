@@ -217,6 +217,21 @@ public class PSensor {
             return null;
     }
 
+    /**
+     * Get the last numberOfValues Sensor data
+     *
+     * @param numberOfValues the number of values we want to get
+     * @return the values
+     */
+    public java.util.Vector<SensorData> getRawData(int numberOfValues) {
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataN(this.ID, numberOfValues);
+        if(pd != null) {
+            this.rawData = pd.toSensorDataList();
+            return this.rawData;
+        } else
+            return null;
+    }
+
 
     // =====================================================================
     //
