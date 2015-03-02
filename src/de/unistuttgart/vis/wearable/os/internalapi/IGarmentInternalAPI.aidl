@@ -26,6 +26,7 @@ interface IGarmentInternalAPI {
 
 	String[]    API_getSensorNames();
 	PSensor[]   API_getAllSensors();
+	PSensor[]   API_getAllSensorsByType(int sensorType);
 	PSensor     API_getSensorById(int id);
 	
 	

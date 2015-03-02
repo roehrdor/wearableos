@@ -18,6 +18,7 @@ interface IGarmentAPI {
 	void unregisterCallback(String app, IGarmentCallback callback, int ID);
 
 	PSensor[]   API_getAllSensors(String app);
+	PSensor[]   API_getAllSensorsByType(int sensorType);
     PSensor     API_getSensorById(String app, int id);
 	
 	// 

@@ -12,6 +12,7 @@ import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
@@ -74,6 +75,16 @@ class APIBinder extends IGarmentAPI.Stub {
     @Override
     public PSensor[] API_getAllSensors(String app) throws RemoteException {
         java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
+        PSensor[] psensors = new PSensor[sensors.size()];
+        int i = -1;
+        for(Sensor s : sensors)
+            psensors[++i] = s.toParcelableAPI();
+        return psensors;
+    }
+
+    @Override
+    public PSensor[] API_getAllSensorsByType(int sensorType) {
+        java.util.Collection<Sensor> sensors = SensorManager.getAllSensors(SensorType.values()[sensorType]);
         PSensor[] psensors = new PSensor[sensors.size()];
         int i = -1;
         for(Sensor s : sensors)

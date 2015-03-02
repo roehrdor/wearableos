@@ -119,6 +119,18 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static PSensor[] getAllSensors(SensorType sensorType) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return null;
+                return APIHandle.getGarmentInternalAPIHandle().API_getAllSensorsByType(sensorType.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
     public static PSensor API_getSensorById(int id) {
         if (APIHandle.isInternalServiceBound()) {
             try {

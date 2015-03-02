@@ -8,6 +8,7 @@
 package de.unistuttgart.vis.wearable.os.api;
 
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
 /**
  * This class provides of all the available function that can be called from any
@@ -37,6 +38,18 @@ public class APIFunctions {
         if (APIHandle.isServiceBound()) {
             try {
                 return APIHandle.getGarmentAPIHandle().API_getAllSensors(APIHandle.getAppPackageID());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor[] getAllSensors(SensorType sensorType) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return null;
+                return APIHandle.getGarmentAPIHandle().API_getAllSensorsByType(sensorType.ordinal());
             } catch (android.os.RemoteException e) {
             }
         }
