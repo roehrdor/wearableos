@@ -7,8 +7,11 @@
  */
 package de.unistuttgart.vis.wearable.os.sensors;
 
+import android.graphics.Bitmap;
+
 import java.util.Arrays;
 
+import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 
 /**
@@ -18,26 +21,32 @@ import de.unistuttgart.vis.wearable.os.graph.GraphType;
  * @author pfaehlfd
  */
 public enum SensorType {
-	HEARTRATE(1, new MeasurementSystems[]{}),
-	ACCELEROMETER(3, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}),
-	MAGNETIC_FIELD(3, new MeasurementSystems[]{MeasurementSystems.TESLA}),
-	GYROSCOPE(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}),
-	LIGHT(1, new MeasurementSystems[]{MeasurementSystems.LUX}),
-	PRESSURE(1, new MeasurementSystems[]{MeasurementSystems.PASCAL}),
-	PROXIMITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}),
-	GRAVITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}),
-	ROTATION_VECTOR(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}),
-	RELATIVE_HUMIDITY(1, new MeasurementSystems[]{MeasurementSystems.PERCENT}),
-	TEMPERATURE(1, new MeasurementSystems[]{MeasurementSystems.TEMPERATURE}),
-	GPS_SENSOR(4, new MeasurementSystems[]{MeasurementSystems.GPS});
+	HEARTRATE(1, new MeasurementSystems[]{}, R.drawable.heartrate),
+	ACCELEROMETER(3, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.accelerometer),
+	MAGNETIC_FIELD(3, new MeasurementSystems[]{MeasurementSystems.TESLA}, R.drawable.magnetic_field),
+	GYROSCOPE(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.ic_launcher),
+	LIGHT(1, new MeasurementSystems[]{MeasurementSystems.LUX}, R.drawable.ic_launcher),
+	PRESSURE(1, new MeasurementSystems[]{MeasurementSystems.PASCAL}, R.drawable.pressure),
+	PROXIMITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.proximity),
+	GRAVITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.ic_launcher),
+	ROTATION_VECTOR(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.rotation_vector),
+	RELATIVE_HUMIDITY(1, new MeasurementSystems[]{MeasurementSystems.PERCENT}, R.drawable.ic_launcher),
+	TEMPERATURE(1, new MeasurementSystems[]{MeasurementSystems.TEMPERATURE}, R.drawable.temperature),
+	GPS_SENSOR(4, new MeasurementSystems[]{MeasurementSystems.GPS}, R.drawable.gps);
 	
 	int dimension;
 	MeasurementSystems[] measurementSystems;
+    int iconID;
 	
-	private SensorType(int dimension, MeasurementSystems[] measurementSystems) {
+	private SensorType(int dimension, MeasurementSystems[] measurementSystems, int iconID) {
 		this.dimension = dimension;
 		this.measurementSystems = measurementSystems;
+        this.iconID = iconID;
 	}
+
+    public int getIconID() {
+        return iconID;
+    }
 
     @Deprecated
 	public int getDimension() {

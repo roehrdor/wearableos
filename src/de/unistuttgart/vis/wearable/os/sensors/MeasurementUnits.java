@@ -2,6 +2,9 @@ package de.unistuttgart.vis.wearable.os.sensors;
 
 import java.util.Arrays;
 
+/**
+ * @author pfaehlfd
+ */
 public enum MeasurementUnits {
     NONE(new MeasurementSystems[]{MeasurementSystems.RADIAN, MeasurementSystems.PERCENT, MeasurementSystems.TEMPERATURE, MeasurementSystems.LUX, MeasurementSystems.GPS}, 1, false, ""),
     HECTO(new MeasurementSystems[]{MeasurementSystems.PASCAL}, 0.01, false, "h"),
