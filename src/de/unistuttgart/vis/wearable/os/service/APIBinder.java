@@ -266,8 +266,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        //TODO
-        return null;
+        return new PSensorData(sensor.getRawData(numberOfValues));
     }
 
     /**
