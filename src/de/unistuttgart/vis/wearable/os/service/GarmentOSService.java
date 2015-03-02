@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.service;
 
+import android.os.Message;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
@@ -50,7 +51,12 @@ public class GarmentOSService extends android.app.Service {
 	 *            the object to be sent
 	 */
 	public static void callback(int flag, BaseCallbackObject bco) {
-		mHandler.obtainMessage(Constants.CALLBACK, flag, 0x0, bco);
+        Message msg = new Message();
+        msg.what = Constants.CALLBACK;
+        msg.arg1 = flag;
+        msg.arg2 = 0x0;
+        msg.obj = bco;
+        mHandler.sendMessage(msg);
 	}
 	
 	

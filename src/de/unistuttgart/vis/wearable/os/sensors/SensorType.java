@@ -22,7 +22,7 @@ public enum SensorType {
 	HEARTRATE(1, new MeasurementSystems[]{}, R.drawable.heartrate),
 	ACCELEROMETER(3, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.accelerometer),
 	MAGNETIC_FIELD(3, new MeasurementSystems[]{MeasurementSystems.TESLA}, R.drawable.magnetic_field),
-	GYROSCOPE(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.ic_launcher),
+	GYROSCOPE(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.gyroscope),
 	LIGHT(1, new MeasurementSystems[]{MeasurementSystems.LUX}, R.drawable.light),
 	PRESSURE(1, new MeasurementSystems[]{MeasurementSystems.PASCAL}, R.drawable.pressure),
 	PROXIMITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.proximity),

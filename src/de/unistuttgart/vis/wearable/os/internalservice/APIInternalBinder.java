@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalservice;
 
@@ -180,9 +180,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return false;
-        return sensor.isEnabled();
+        return sensor != null && sensor.isEnabled();
 	}
 
 	@Override
@@ -391,6 +389,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData(sensor.getRawData(numberOfValues));
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues).clone());
     }
 }

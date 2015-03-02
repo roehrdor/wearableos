@@ -17,7 +17,7 @@ import android.os.Parcel;
  * @author roehrdor
  */
 public class CallBackObject extends BaseCallbackObject {
-	Object value = new Object();
+	public Object value = new Object();
 
 	/**
 	 * Create a new call back object with the given value

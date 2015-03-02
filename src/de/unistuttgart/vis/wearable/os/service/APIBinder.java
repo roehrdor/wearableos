@@ -109,9 +109,7 @@ class APIBinder extends IGarmentAPI.Stub {
 
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return false;
-        return sensor.isEnabled();
+        return sensor != null && sensor.isEnabled();
 	}
 
 	@Override
@@ -266,7 +264,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData(sensor.getRawData(numberOfValues));
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues).clone());
     }
 
     /**

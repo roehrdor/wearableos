@@ -29,6 +29,9 @@ public class BaseCallbackObject implements android.os.Parcelable {
 			case 0:
 				ret = new CallBackObject(source);
 				break;
+            case 1:
+                ret = new ValueChangedCallback(source);
+                break;
 			default:
 				break;
 			}

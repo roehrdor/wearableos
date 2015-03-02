@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ *
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.sensors;
 
 import java.io.Externalizable;
@@ -7,9 +14,14 @@ import java.io.ObjectOutput;
 import java.util.Date;
 import java.util.Vector;
 
+import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
+import de.unistuttgart.vis.wearable.os.api.CallBackObject;
+import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
+import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.sensorDriver.SensorDriver;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
@@ -195,6 +207,8 @@ public class Sensor implements Externalizable {
         }
 
         rawData.add(sensorData);
+
+        GarmentOSService.callback(CallbackFlags.VALUE_CHANGED, new ValueChangedCallback(sensorData.getUnixDate(), sensorData.getData()));
 
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
@@ -421,7 +435,6 @@ public class Sensor implements Externalizable {
     public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
         this.isInternalSensor = input.readBoolean();
         this.isEnabled = input.readBoolean();
-        android.util.Log.d("orDEBUG", "READ IN SENSOR " + this.isEnabled());
         this.sensorID = input.readInt();
         this.bluetoothID = input.readUTF();
         this.sampleRate = input.readInt();
