@@ -17,6 +17,7 @@ import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
@@ -156,16 +157,21 @@ public class GraphRenderer {
 	}
 
 	public static ChartThreadTuple createGraph(final PSensor sensor,
-			Context context) {
+			Context context, final int numberOfValuesToBeShown) {
 
 		GraphDataGenerator generator = new GraphDataGenerator() {
 
 			@Override
 			public GraphData[] getData() {
-				Vector<SensorData> data = sensor.getRawData();
+				Vector<SensorData> data = sensor.getRawData(numberOfValuesToBeShown);
 
-				int numberOfDimensions = sensor.getSensorType().getDimension();
+                if (data == null || data.size() == 0)
+                {
+                    return new GraphData[0];
+                }
 
+				int numberOfDimensions = data.get(0).getDimension();
+                Log.d("fpDEBUG", "showing graph with " + data.size() + " values");
 				final GraphData[] graphs = new GraphData[numberOfDimensions];
 				for (int dimension = 0; dimension < numberOfDimensions; dimension++) {
 					double[] values = new double[data.size()];
