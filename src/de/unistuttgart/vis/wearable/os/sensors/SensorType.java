@@ -25,12 +25,12 @@ public enum SensorType {
 	ACCELEROMETER(3, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.accelerometer),
 	MAGNETIC_FIELD(3, new MeasurementSystems[]{MeasurementSystems.TESLA}, R.drawable.magnetic_field),
 	GYROSCOPE(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.ic_launcher),
-	LIGHT(1, new MeasurementSystems[]{MeasurementSystems.LUX}, R.drawable.ic_launcher),
+	LIGHT(1, new MeasurementSystems[]{MeasurementSystems.LUX}, R.drawable.light),
 	PRESSURE(1, new MeasurementSystems[]{MeasurementSystems.PASCAL}, R.drawable.pressure),
 	PROXIMITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.proximity),
-	GRAVITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.ic_launcher),
+	GRAVITY(1, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.gravity),
 	ROTATION_VECTOR(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.rotation_vector),
-	RELATIVE_HUMIDITY(1, new MeasurementSystems[]{MeasurementSystems.PERCENT}, R.drawable.ic_launcher),
+	RELATIVE_HUMIDITY(1, new MeasurementSystems[]{MeasurementSystems.PERCENT}, R.drawable.relative_humidity),
 	TEMPERATURE(1, new MeasurementSystems[]{MeasurementSystems.TEMPERATURE}, R.drawable.temperature),
 	GPS_SENSOR(4, new MeasurementSystems[]{MeasurementSystems.GPS}, R.drawable.gps);
 	

@@ -268,7 +268,7 @@ public class Sensor implements Externalizable {
      * @param numberOfValues    the number of SensorData to be returned
      * @return  the newest SensorData of the Sensor
      */
-    public synchronized Vector<SensorData> getSensorData(int numberOfValues) {
+    public synchronized Vector<SensorData> getRawData(int numberOfValues) {
         Vector<SensorData> returnData = new Vector<SensorData>();
         if (rawData.size() < numberOfValues) {
             SensorDataDeSerializer deSerializer =
