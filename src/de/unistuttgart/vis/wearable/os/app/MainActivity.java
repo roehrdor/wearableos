@@ -57,7 +57,6 @@ public class MainActivity extends Activity {
         //
         initializeServices();
 
-
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
     }
@@ -78,25 +77,21 @@ public class MainActivity extends Activity {
 
     public void openAboutActivity(View view) {
         Intent intent = new Intent(this, AboutActivity.class);
-
         startActivity(intent);
     }
 
     public void openStorageActivity(View view) {
         Intent intent = new Intent(this, Import_ExportActivity.class);
-
         startActivity(intent);
     }
 
     public void openBluetoothActivity(View view) {
         Intent intent = new Intent(this, BluetoothActivity.class);
-
         startActivity(intent);
     }
 
     public void openHARActivity(View view) {
         Intent intent = new Intent(this, HARActivity.class);
-
         startActivity(intent);
     }
 

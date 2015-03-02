@@ -218,4 +218,14 @@ class APIBinder extends IGarmentAPI.Stub {
             return null;
         return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
     }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataN(String app, int sid, int numberOfValues) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        //TODO
+        return null;
+    }
 }

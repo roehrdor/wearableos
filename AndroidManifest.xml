@@ -24,13 +24,11 @@
    
 
     <application
-
         android:name="de.unistuttgart.vis.wearable.os.handle.APIHandle"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-            >
+        android:theme="@style/AppTheme" >
         <activity
             android:name="de.unistuttgart.vis.wearable.os.app.MainActivity"
             android:label="@string/app_name" >
@@ -38,7 +36,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         
         <!-- The public service -->
@@ -61,6 +58,7 @@
             </intent-filter>            
         </service>
 
+        <!-- Dropbox Activity -->
         <activity
                 android:name="com.dropbox.client2.android.AuthActivity"
                 android:configChanges="orientation|keyboard"
@@ -68,60 +66,84 @@
                 android:screenOrientation="portrait" >
             <intent-filter>
                 <data android:scheme="db-hfo4su0wieruugc" />
-
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Privacy Activity -->
         <activity
             android:name=".app.PrivacyActivity"
             android:label="@string/title_activity_privacy" >
         </activity>
+
+        <!-- Sensors Activity -->
         <activity
             android:name=".app.SensorsActivity"
             android:label="@string/title_activity_sensors" >
         </activity>
+
+        <!-- About Activity -->
         <activity
             android:name=".app.AboutActivity"
             android:label="@string/title_activity_about" >
         </activity>
+
+        <!-- Storage Activity -->
         <activity
             android:name=".app.StorageActivity"
             android:label="@string/title_activity_storage" >
         </activity>
+
+        <!-- Sensor Detail Activity -->
         <activity
             android:name=".app.SensorDetailActivity"
             android:label="@string/title_activity_sensor_detail"
             android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
+
+        <!-- Add Sensor Activity -->
         <activity
             android:name=".app.AddSensorActivity"
             android:label="@string/title_activity_sensor_add"
             android:windowSoftInputMode="stateAlwaysHidden"  >
         </activity>
+
+        <!-- Import / Export Activity -->
         <activity
             android:name=".app.ImportExportArchiveActivity"
             android:label="@string/title_activity_export_db" >
         </activity>
+
+        <!-- Graph Activity -->
         <activity
             android:name=".app.GraphActivity"
             android:label="@string/title_activity_graph" >
         </activity>
+
+        <!-- Bluetooth Activity -->
         <activity android:name=".app.BluetoothActivity" />
+
+        <!-- HAR Activity -->
         <activity 
             android:name=".app.HARActivity"
             android:label="@string/title_activity_har" >
         </activity>
+
+        <!-- HAR Training Activity -->
         <activity 
             android:name=".app.HARActivityTraining"
             android:label="@string/title_train_settings" >
         </activity>
+
+        <!-- HAR Manager Activity -->
         <activity 
             android:name=".app.HARActivityManager"
             android:label="@string/title_activity_har" >
         </activity>
+
+        <!-- Cloud Solutions Activity -->
         <activity android:name=".cloud.Dropbox"/>
         <activity android:name=".cloud.googleDrive.GoogleDrive" android:label="Google Drive"/>
         <activity android:name=".cloud.oneDrive.OneDrive" android:label="One Drive"/>
