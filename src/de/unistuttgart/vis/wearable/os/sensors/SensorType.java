@@ -7,8 +7,6 @@
  */
 package de.unistuttgart.vis.wearable.os.sensors;
 
-import android.graphics.Bitmap;
-
 import java.util.Arrays;
 
 import de.unistuttgart.vis.wearable.os.R;
