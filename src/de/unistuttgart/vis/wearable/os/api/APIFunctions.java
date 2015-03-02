@@ -27,6 +27,21 @@ public class APIFunctions {
 		return 0xFFFFFFFFFFl;
 	}
 
+    public static SensorType[] getAvailableSensorTypes() {
+        if(APIHandle.isServiceBound()) {
+            try {
+                int[] sensorTypes = APIHandle.getGarmentAPIHandle().API_getSensorTypes();
+                SensorType[] sensorTypesO = new SensorType[sensorTypes.length];
+                int i = -1;
+                for(int sensorType : sensorTypes)
+                    sensorTypesO[++i] = SensorType.values()[sensorType];
+                return sensorTypesO;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
     public static void registerCallback(IGarmentCallback callback, int cause) {
         if(APIHandle.isServiceBound()) {
             try {

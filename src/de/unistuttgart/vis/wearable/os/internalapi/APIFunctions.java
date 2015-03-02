@@ -3,11 +3,10 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
-import android.hardware.Sensor;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
@@ -71,6 +70,21 @@ public class APIFunctions {
             try {
                 APIHandle.getGarmentAPIHandle().unregisterCallback(APIHandle.getAppPackageID(), callback, cause);
                 return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static SensorType[] getAvailableSensorTypes() {
+        if(APIHandle.isServiceBound()) {
+            try {
+                int[] sensorTypes = APIHandle.getGarmentAPIHandle().API_getSensorTypes();
+                SensorType[] sensorTypesO = new SensorType[sensorTypes.length];
+                int i = -1;
+                for(int sensorType : sensorTypes)
+                    sensorTypesO[++i] = SensorType.values()[sensorType];
+                return sensorTypesO;
             } catch(android.os.RemoteException e) {
             }
         }

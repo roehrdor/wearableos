@@ -18,6 +18,8 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
+import java.util.HashSet;
+
 /**
  * This class implements the function calls passed through by the
  * {@link APIFunctions} class.
@@ -73,6 +75,21 @@ class APIBinder extends IGarmentAPI.Stub {
 							.getCallingUid(), callback, flag));
 		}
 	}
+
+    @Override
+    public int[] API_getSensorTypes() throws RemoteException {
+        java.util.Set<Integer> sensorTypes = new HashSet<Integer>();
+        java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
+        int[] sensorTypesArray;
+        int i = -1;
+        for(Sensor s : sensors) {
+            sensorTypes.add(s.getSensorType().ordinal());
+        }
+        sensorTypesArray = new int[sensorTypes.size()];
+        for(int sensorType : sensorTypes)
+            sensorTypesArray[++i] = sensorType;
+        return sensorTypesArray;
+    }
 
     @Override
     public PSensor[] API_getAllSensors(String app) throws RemoteException {
