@@ -7,9 +7,14 @@ import java.io.ObjectOutput;
 import java.util.Date;
 import java.util.Vector;
 
+import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
+import de.unistuttgart.vis.wearable.os.api.CallBackObject;
+import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
+import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.sensorDriver.SensorDriver;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
@@ -195,6 +200,8 @@ public class Sensor implements Externalizable {
         }
 
         rawData.add(sensorData);
+
+        GarmentOSService.callback(CallbackFlags.VALUE_CHANGED, new ValueChangedCallback(sensorData.getUnixDate(), sensorData.getData()));
 
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);

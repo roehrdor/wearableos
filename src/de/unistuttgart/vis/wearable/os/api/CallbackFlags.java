@@ -76,6 +76,7 @@ public final class CallbackFlags {
 	public static final int HEART_RATE_CHANGED = 0x100;
 	public static final int PULSE_CHANGED = 0x200;
 	public static final int SKINCONDUCTANCE_CHANGED = 0x400;
+    public static final int VALUE_CHANGED = 0x800;
 
 	/**
 	 * <p>

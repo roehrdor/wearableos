@@ -12,7 +12,6 @@ import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
@@ -49,6 +48,7 @@ class APIBinder extends IGarmentAPI.Stub {
 	@Override
 	public void registerCallback(String app, IGarmentCallback callback, int flag)
 			throws android.os.RemoteException {
+        android.util.Log.d("orDEBUG", "APIBINDER - register callback " + callback);
 		if (callback != null) {
 			de.unistuttgart.vis.wearable.os.service.GarmentOSService.mCallbacks.register(new CallbackNode(
 					android.os.Binder.getCallingPid(), android.os.Binder
@@ -109,9 +109,7 @@ class APIBinder extends IGarmentAPI.Stub {
 
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return false;
-        return sensor.isEnabled();
+        return sensor != null && sensor.isEnabled();
 	}
 
 	@Override
@@ -230,7 +228,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData().clone());
+        return new PSensorData(sensor.getRawData());
     }
 
     @Override
@@ -242,7 +240,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond).clone());
+        return new PSensorData(sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond));
     }
 
     @Override
@@ -254,7 +252,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+        return new PSensorData(sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)));
     }
 
     @Override
