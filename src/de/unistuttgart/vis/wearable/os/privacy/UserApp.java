@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.privacy;
 
@@ -29,6 +29,27 @@ public class UserApp implements java.io.Serializable  {
 	private java.util.Map<SensorType, Integer> defaultSensors = new java.util.HashMap<SensorType, Integer>();
 	private int permissionFlags = Constants.BASE_PERMISSION;
 	private boolean activityRecognitionGranted = false;
+
+    // This field is used to determine whether this object has changed and if so
+    // new data needs to be passed through the parcelable interface
+    // otherwise we can use the already cached data
+    private long changeID;
+
+    /**
+     * Get a unique change ID to determine whether the object has changed or not
+     *
+     * @return the change id
+     */
+    public long getChangeID() {
+        return this.changeID;
+    }
+
+    /**
+     * This function shall be called on any update made to the object
+     */
+    protected void updateChangedID() {
+        this.changeID = System.currentTimeMillis();
+    }
 
 	/**
 	 * Create a new UserApp object with the given name
@@ -59,9 +80,9 @@ public class UserApp implements java.io.Serializable  {
 	/**
 	 * sets the default sensor of the given SensorType to the given sensorID
 	 * @param sensorType the sensorType to set
-	 * @return	the new sensorID of the given sensorType
 	 */
 	public void setDefaultSensor(SensorType sensorType, int sensorID) {
+        this.updateChangedID();
 		defaultSensors.put(sensorType, sensorID);
 	}
 
@@ -93,9 +114,7 @@ public class UserApp implements java.io.Serializable  {
 	 *         sensor
 	 */
 	public boolean sensorProhibited(int id) {
-		boolean ret = prohibitedSensors.contains(id);
-		PrivacyManager.instance.save();
-		return ret;
+		return prohibitedSensors.contains(id);
 	}
 
 	/**
@@ -112,6 +131,7 @@ public class UserApp implements java.io.Serializable  {
 	 *         permission has been changed
 	 */
 	public boolean grantPermission(int id) {
+        this.updateChangedID();
 		boolean ret = prohibitedSensors.remove(id);
 		PrivacyManager.instance.save();
 		return ret;
@@ -125,10 +145,11 @@ public class UserApp implements java.io.Serializable  {
 	 * Note this function will return false if the permission for the given
 	 * sensor has already been revoked and never been granted again.
 	 * 
-	 * @param id
-	 * @return
+	 * @param id the app id
+	 * @return true if the update has been done successfully
 	 */
 	public boolean revokePermission(int id) {
+        this.updateChangedID();
 		boolean ret = prohibitedSensors.add(id);
 		PrivacyManager.instance.save();
 		return ret;
@@ -151,6 +172,7 @@ public class UserApp implements java.io.Serializable  {
 		// Basic check whether a possibly wrong flag has been set
 		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
 			return false;
+        this.updateChangedID();
 		this.permissionFlags |= flag;
 		PrivacyManager.instance.save();
 		return true;
@@ -171,6 +193,7 @@ public class UserApp implements java.io.Serializable  {
 		// Basic check whether a possibly wrong flag has been set
 		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
 			return false;
+        this.updateChangedID();
 		this.permissionFlags ^= (flag ^ Constants.BASE_PERMISSION);
 		PrivacyManager.instance.save();
 		return true;
@@ -186,6 +209,7 @@ public class UserApp implements java.io.Serializable  {
 	public boolean sensorTypeGranted(int flag) {
 		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
 			return false;
+        this.updateChangedID();
 		return (this.permissionFlags & flag) == Constants.BASE_PERMISSION;
 	}
 
@@ -195,6 +219,7 @@ public class UserApp implements java.io.Serializable  {
 	 */
 	public void grantActivityRecognition() {
 		this.activityRecognitionGranted = true;
+        this.updateChangedID();
 		PrivacyManager.instance.save();
 	}
 
@@ -204,6 +229,7 @@ public class UserApp implements java.io.Serializable  {
 	 */
 	public void denyActivityRecognition() {
 		this.activityRecognitionGranted = false;
+        this.updateChangedID();
 		PrivacyManager.instance.save();
 	}
 
@@ -224,6 +250,6 @@ public class UserApp implements java.io.Serializable  {
 	 * @return the parcel able user application object
 	 */
 	public PUserApp toParcelable() {
-		return new PUserApp(this.name, this.ID, this.prohibitedSensors);
+		return new PUserApp(this.name, this.ID);
 	}
 }
