@@ -102,7 +102,7 @@ public class PUserApp implements android.os.Parcelable {
 		// if we already cached this sensor return true
 		if (this.prohibitedSensors.contains(id))
 			return true;
-		
+
 		else {
 			// Otherwise check whether the permission is denied in the service
 			// if so add it to the local set
@@ -142,8 +142,8 @@ public class PUserApp implements android.os.Parcelable {
 	 * Note this function will return false if the permission for the given
 	 * sensor has already been revoked and never been granted again.
 	 * 
-	 * @param id
-	 * @return
+	 * @param id the sensor id to revoke permissions for
+	 * @return true if revoked successfully
 	 */
 	public boolean revokePermission(int id) {
 		prohibitedSensors.add(id);
@@ -165,9 +165,8 @@ public class PUserApp implements android.os.Parcelable {
 	 */
 	public boolean denySensorType(int flag) {
 		// Basic check whether a possibly wrong flag has been set
-		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
-			return false;		
-		return APIFunctions.PRIVACY_USERAPP_denySensorType(this.ID, flag);
+		return ((BASE_PERMISSION_CHECK_FLAG & flag) == Constants.BASE_PERMISSION) &&
+                APIFunctions.PRIVACY_USERAPP_denySensorType(this.ID, flag);
 	}
 
 	/**
@@ -183,9 +182,8 @@ public class PUserApp implements android.os.Parcelable {
 	 */
 	public boolean allowSensorType(int flag) {
 		// Basic check whether a possibly wrong flag has been set
-		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
-			return false;		
-		return APIFunctions.PRIVACY_USERAPP_allowSensorType(this.ID, flag);
+		return ((BASE_PERMISSION_CHECK_FLAG & flag) == Constants.BASE_PERMISSION) &&
+                APIFunctions.PRIVACY_USERAPP_allowSensorType(this.ID, flag);
 	}
 
 	/**
@@ -196,9 +194,8 @@ public class PUserApp implements android.os.Parcelable {
 	 * @return true if the permission is granted
 	 */
 	public boolean sensorTypeGranted(int flag) {
-		if ((BASE_PERMISSION_CHECK_FLAG & flag) != Constants.BASE_PERMISSION)
-			return false;		
-		return APIFunctions.PRIVACY_USERAPP_sensorTypeGranted(this.ID, flag);
+		return ((BASE_PERMISSION_CHECK_FLAG & flag) == Constants.BASE_PERMISSION) &&
+                APIFunctions.PRIVACY_USERAPP_sensorTypeGranted(this.ID, flag);
 	}
 
 	/**
