@@ -264,6 +264,26 @@ public class Sensor implements Externalizable {
     }
 
     /**
+     * Returns the given number of the newest SensorData of the Sensor.
+     * @param numberOfValues    the number of SensorData to be returned
+     * @return  the newest SensorData of the Sensor
+     */
+    public synchronized Vector<SensorData> getSensorData(int numberOfValues) {
+        Vector<SensorData> returnData = new Vector<SensorData>();
+        if (rawData.size() < numberOfValues) {
+            SensorDataDeSerializer deSerializer =
+                    new SensorDataDeSerializer(sensorID, returnData, numberOfValues - rawData.size());
+            SensorDataDeSerializer.jobFinsihed(deSerializer.work());
+            returnData.addAll(rawData);
+        } else {
+            for (int i = rawData.size() - numberOfValues; i < rawData.size(); i++) {
+                returnData.add(rawData.get(i));
+            }
+        }
+        return returnData;
+    }
+
+    /**
      * sets the rawDataMeasurementSystem [e.g. METRICAL] and the
      * rawDataMeasurementUnit [e.g. KILO] of the Sensor
      *
