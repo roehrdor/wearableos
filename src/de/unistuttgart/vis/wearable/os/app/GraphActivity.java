@@ -42,10 +42,13 @@ public class GraphActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-        //TODO wird nicht ausgelöst/ bzw callback deregistrieren
-		if (chartUpdateThread != null)
-			chartUpdateThread.interrupt();
-
 		super.onDestroy();
 	}
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (chartUpdateThread != null)
+            chartUpdateThread.interrupt();
+    }
 }
