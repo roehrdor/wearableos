@@ -49,7 +49,6 @@ class APIBinder extends IGarmentAPI.Stub {
 	@Override
 	public void registerCallback(String app, IGarmentCallback callback, int flag)
 			throws android.os.RemoteException {
-        android.util.Log.d("orDEBUG", "APIBINDER - register callback " + callback);
 		if (callback != null) {
 			de.unistuttgart.vis.wearable.os.service.GarmentOSService.mCallbacks.register(new CallbackNode(
 					android.os.Binder.getCallingPid(), android.os.Binder

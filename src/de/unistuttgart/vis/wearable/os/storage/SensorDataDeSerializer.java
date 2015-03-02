@@ -195,7 +195,6 @@ public class SensorDataDeSerializer implements Runnable {
 			//
 			file = new java.io.File(this.context.getFilesDir(), String.valueOf(sensorID));
 			if(!file.exists()) {
-				android.util.Log.d("orDEBUG", "File does not exist");
 				return;
 			}
 			
@@ -210,7 +209,6 @@ public class SensorDataDeSerializer implements Runnable {
 			currentFileLength = (int)file.length();			
 			raf.seek(4);
 			dataDimension = raf.readInt();
-			android.util.Log.d("orDEBUG", "Open file, length " + currentFileLength + " " +dataDimension);
 			numberOfDataSetsInFile = (currentFileLength - 8) / ((dataDimension + 1) * 4); 
 			
 			
@@ -324,7 +322,6 @@ public class SensorDataDeSerializer implements Runnable {
 			//
 			raf.close();
 		} catch (java.io.IOException ioe) {
-			android.util.Log.d("orDEBUG", "Exception " + ioe.getLocalizedMessage());
 		}
 		
 		//
