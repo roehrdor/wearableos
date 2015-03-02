@@ -62,16 +62,15 @@ public class SensorDataDeSerializer implements Runnable {
 	 *            will be thrown
 	 * @throws IllegalArgumentException if less than one element shall be read
 	 */
-	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead, 
-									android.content.Context context) {
+	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead) {
 		if(noDatasetsToRead < 1)
 			throw new IllegalArgumentException("Reading less than 1 element is not allowed");
 			
 		this.sensorData = sensorData;
 		this.sensorID = sensorID;
 		this.noDatasetsToRead = noDatasetsToRead;
-		this.context = context;
 		this.jobFlag = LATEST_DATA;
+        this.context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
 	}
 	
 	/**
