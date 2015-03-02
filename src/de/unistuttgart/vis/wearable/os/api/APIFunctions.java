@@ -38,6 +38,17 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static void unregisterCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().unregisterCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 	// =============================================================================
 	//
 	// Public SDK Functions
