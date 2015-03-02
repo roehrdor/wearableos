@@ -17,6 +17,7 @@ public class GraphActivity extends Activity {
 
 	private LinearLayout chart;
 	private Thread chartUpdateThread;
+    private final int NUMBER_OF_VALUES = 300;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +33,16 @@ public class GraphActivity extends Activity {
 				.getInt("sensorId"));
 
 		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
-				sensor, this);
+				sensor, this, NUMBER_OF_VALUES);
 		chart.addView(tuple.getChart());
+        //TODO callback
 		chartUpdateThread = tuple.getThread();
 		chartUpdateThread.start();
 	}
 
 	@Override
 	protected void onDestroy() {
+        //TODO wird nicht ausgelöst/ bzw callback deregistrieren
 		if (chartUpdateThread != null)
 			chartUpdateThread.interrupt();
 
