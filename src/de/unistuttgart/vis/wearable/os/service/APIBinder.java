@@ -9,6 +9,8 @@ package de.unistuttgart.vis.wearable.os.service;
 
 import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.api.*;
+import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
+import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
@@ -102,6 +104,9 @@ class APIBinder extends IGarmentAPI.Stub {
 	//
 	@Override
 	public boolean SENSORS_SENSOR_isEnabled(String app, int sid) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return false;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -112,6 +117,9 @@ class APIBinder extends IGarmentAPI.Stub {
 	@Override
 	public String SENSORS_SENSOR_getDisplayedSensorName(String app, int sid)
 			throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return null;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -121,6 +129,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
 	@Override
 	public int SENSORS_SENSOR_getSampleRate(String app, int sid) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Constants.ILLEGAL_VALUE;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -130,6 +141,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
 	@Override
 	public int SENSORS_SENSOR_getSavePeriod(String app, int sid) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Constants.ILLEGAL_VALUE;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -139,6 +153,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
 	@Override
 	public float SENSORS_SENSOR_getSmoothness(String app, int sid) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Utils.getFloatFromIntByte(Constants.ILLEGAL_VALUE);
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -148,6 +165,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
 	@Override
 	public int SENSORS_SENSOR_getSensorType(String app, int sid) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Constants.ILLEGAL_VALUE;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -159,6 +179,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
 	@Override
 	public int SENSORS_SENSOR_getGraphType(String app, int sid) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Constants.ILLEGAL_VALUE;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -171,6 +194,9 @@ class APIBinder extends IGarmentAPI.Stub {
 	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(String app, int sid)
 			throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Constants.ILLEGAL_VALUE;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -183,6 +209,9 @@ class APIBinder extends IGarmentAPI.Stub {
 	@Override
 	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(String app, int sid)
 			throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return Constants.ILLEGAL_VALUE;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -194,6 +223,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
     @Override
     public PSensorData SENSORS_SENSOR_getRawData(String app, int sid) {
+        if(checkPermissionDenied(app, sid))
+            return null;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -203,6 +235,9 @@ class APIBinder extends IGarmentAPI.Stub {
 
     @Override
     public PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return null;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -212,10 +247,38 @@ class APIBinder extends IGarmentAPI.Stub {
 
     @Override
     public PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, int start, int end) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return null;
+
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
         return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataN(String app, int sid, int numberOfValues) throws RemoteException {
+        if(checkPermissionDenied(app, sid))
+            return null;
+
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        //TODO
+        return null;
+    }
+
+    /**
+     * Check whether the given app has the permission to access the given sensor
+     *
+     * @param app      the app
+     * @param sensorID the sensor id
+     * @return true if the permission is denied
+     */
+    protected static boolean checkPermissionDenied(String app, int sensorID) {
+        UserApp userApp = PrivacyManager.instance.getApp(app);
+        return userApp == null || userApp.sensorProhibited(sensorID);
     }
 }

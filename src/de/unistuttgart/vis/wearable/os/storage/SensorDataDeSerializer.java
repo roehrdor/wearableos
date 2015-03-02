@@ -62,16 +62,15 @@ public class SensorDataDeSerializer implements Runnable {
 	 *            will be thrown
 	 * @throws IllegalArgumentException if less than one element shall be read
 	 */
-	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead, 
-									android.content.Context context) {
+	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead) {
 		if(noDatasetsToRead < 1)
 			throw new IllegalArgumentException("Reading less than 1 element is not allowed");
 			
 		this.sensorData = sensorData;
 		this.sensorID = sensorID;
 		this.noDatasetsToRead = noDatasetsToRead;
-		this.context = context;
 		this.jobFlag = LATEST_DATA;
+        this.context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
 	}
 	
 	/**
@@ -186,9 +185,9 @@ public class SensorDataDeSerializer implements Runnable {
 	@Override
 	public void run() {
 		try {			
-			int currentFileLength = 0;
-			int numberOfDataSetsInFile = 0;
-			int dataDimension = 0;
+			int currentFileLength;
+			int numberOfDataSetsInFile;
+			int dataDimension;
 			int numberOfReadingIterations = 0;
 			
 			//
@@ -332,7 +331,7 @@ public class SensorDataDeSerializer implements Runnable {
 		// Remove the id to signal the job is finsihed
 		//
 		synchronized (activeWorkers) {
-			activeWorkers.remove((Long)threadID);
+			activeWorkers.remove(threadID);
 		}
 	}
 	
@@ -357,7 +356,7 @@ public class SensorDataDeSerializer implements Runnable {
 	private static int searchNotOlder(java.io.RandomAccessFile raf, int value, int offset, int fileSize, int chunkSize) throws java.io.IOException {		
 		int currentPos = offset - chunkSize;
 		int currentValue = 0;
-		int max = 0;
+		int max;
 		
 		raf.seek(fileSize-chunkSize);
 		max = raf.readInt();
@@ -394,13 +393,11 @@ public class SensorDataDeSerializer implements Runnable {
 	private static int searchNotYounger(java.io.RandomAccessFile raf, int value, int offset, int fileSize, int chunkSize) throws java.io.IOException {
 		int currentPos = fileSize - chunkSize;
 		int currentValue = Integer.MAX_VALUE;
-		int min = 0;
 		
 		raf.seek(offset);
-		min = raf.readInt();
 		
 		// There is no data not younger than the given one
-		if(min > value)
+		if(raf.readInt() > value)
 			return 0;
 		
 		while(currentValue > value) {

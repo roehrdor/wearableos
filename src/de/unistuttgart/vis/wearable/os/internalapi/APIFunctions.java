@@ -489,4 +489,14 @@ public class APIFunctions {
         }
         throw new RuntimeException("Connection failed");
     }
+
+    public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataN(sid, numberOfValues);
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 }

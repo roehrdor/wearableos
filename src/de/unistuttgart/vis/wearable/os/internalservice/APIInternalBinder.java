@@ -83,11 +83,11 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     @Override
     public PSensor[] API_getAllSensorsByType(int sensorType) {
         java.util.Collection<Sensor> sensors = SensorManager.getAllSensors(SensorType.values()[sensorType]);
-        PSensor[] psensors = new PSensor[sensors.size()];
+        PSensor[] pSensors = new PSensor[sensors.size()];
         int i = -1;
         for(Sensor s : sensors)
-            psensors[++i] = s.toParcelable();
-        return psensors;
+            pSensors[++i] = s.toParcelable();
+        return pSensors;
     }
 
     @Override
@@ -383,5 +383,15 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return null;
         return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        //TODO
+        return null;
     }
 }
