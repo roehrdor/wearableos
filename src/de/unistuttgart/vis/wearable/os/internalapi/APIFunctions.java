@@ -7,10 +7,12 @@
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
+import android.hardware.Sensor;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
  * <p>
@@ -237,6 +239,31 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");
 	}
+
+    public static int PRIVACY_USERAPP_getDefaultSensor(int oid, SensorType sensorType) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return Constants.ILLEGAL_VALUE;
+                APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_getDefaultSensor(oid, sensorType.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void PRIVACY_USERAPP_setDefaultSensor(int oid, SensorType sensorType, int sensorID) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return;
+                APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_setDefaultSensor(oid, sensorType.ordinal(), sensorID);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 	
 	
 	// =====================================================================

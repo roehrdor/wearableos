@@ -3,11 +3,12 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
@@ -70,6 +71,23 @@ public class PUserApp implements android.os.Parcelable {
 	public String getName() {
 		return this.name;
 	}
+
+    /**
+     * returns the sensorID of the standard sensor for the given SensorType
+     * @param sensorType the SensorType you want the default sensorID from
+     * @return the sensorID of the default sensor for the given sensorType
+     */
+    public int getDefaultSensor(SensorType sensorType) {
+        return APIFunctions.PRIVACY_USERAPP_getDefaultSensor(this.ID, sensorType);
+    }
+
+    /**
+     * sets the default sensor of the given SensorType to the given sensorID
+     * @param sensorType the sensorType to set
+     */
+    public void setDefaultSensor(SensorType sensorType, int sensorID) {
+        APIFunctions.PRIVACY_USERAPP_setDefaultSensor(this.ID, sensorType, sensorID);
+    }
 
 	/**
 	 * Check whether the current user settings prohibit the use of the given
