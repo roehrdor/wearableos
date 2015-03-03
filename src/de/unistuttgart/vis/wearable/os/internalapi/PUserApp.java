@@ -77,8 +77,13 @@ public class PUserApp implements android.os.Parcelable {
      * @param sensorType the SensorType you want the default sensorID from
      * @return the sensorID of the default sensor for the given sensorType
      */
-    public int getDefaultSensor(SensorType sensorType) {
+    public int getDefaultSensorID(SensorType sensorType) {
         return APIFunctions.PRIVACY_USERAPP_getDefaultSensor(this.ID, sensorType);
+    }
+
+    public PSensor getDefaultSensor(SensorType sensorType) {
+        int sensorID = APIFunctions.PRIVACY_USERAPP_getDefaultSensor(this.ID, sensorType);
+        return sensorID == Constants.ILLEGAL_VALUE ? null : APIFunctions.API_getSensorById(sensorID);
     }
 
     /**
