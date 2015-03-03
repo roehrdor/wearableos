@@ -3,14 +3,16 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
+import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
  * <p>
@@ -51,6 +53,43 @@ public class APIFunctions {
 	// only be done by using the provided Settings Application.
 	//
 	// =============================================================================
+
+    public static void registerCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().registerCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void unregisterCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().unregisterCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static SensorType[] getAvailableSensorTypes() {
+        if(APIHandle.isServiceBound()) {
+            try {
+                int[] sensorTypes = APIHandle.getGarmentAPIHandle().API_getSensorTypes();
+                SensorType[] sensorTypesO = new SensorType[sensorTypes.length];
+                int i = -1;
+                for(int sensorType : sensorTypes)
+                    sensorTypesO[++i] = SensorType.values()[sensorType];
+                return sensorTypesO;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 
     public static void addNewSensor(int sampleRate, int savePeriod, int smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
@@ -113,6 +152,18 @@ public class APIFunctions {
         if (APIHandle.isInternalServiceBound()) {
             try {
                 return APIHandle.getGarmentInternalAPIHandle().API_getAllSensors();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor[] getAllSensors(SensorType sensorType) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return null;
+                return APIHandle.getGarmentInternalAPIHandle().API_getAllSensorsByType(sensorType.ordinal());
             } catch (android.os.RemoteException e) {
             }
         }
@@ -225,6 +276,43 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");
 	}
+
+    public static int PRIVACY_USERAPP_getDefaultSensor(int oid, SensorType sensorType) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return Constants.ILLEGAL_VALUE;
+                return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_getDefaultSensor(oid, sensorType.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor PRIVACY_USERAPP_getDefaultSensorO(int oid, SensorType sensorType) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return null;
+                return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_getDefaultSensorO(oid, sensorType.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void PRIVACY_USERAPP_setDefaultSensor(int oid, SensorType sensorType, int sensorID) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return;
+                APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_setDefaultSensor(oid, sensorType.ordinal(), sensorID);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 	
 	
 	// =====================================================================
@@ -446,6 +534,16 @@ public class APIFunctions {
             try {
                 return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataII(sid, start, end);
             } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataN(sid, numberOfValues);
+            } catch(android.os.RemoteException e) {
             }
         }
         throw new RuntimeException("Connection failed");

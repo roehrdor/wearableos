@@ -26,6 +26,7 @@ interface IGarmentInternalAPI {
 
 	String[]    API_getSensorNames();
 	PSensor[]   API_getAllSensors();
+	PSensor[]   API_getAllSensorsByType(int sensorType);
 	PSensor     API_getSensorById(int id);
 	
 	
@@ -40,7 +41,10 @@ interface IGarmentInternalAPI {
 	boolean 	PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag);
 	void 		PRIVACY_USERAPP_grantActivityRecognition(int oid);
 	void 		PRIVACY_USERAPP_denyActivityRecognition(int oid);
-	boolean		PRIVACY_USERAPP_activityRecognitionGranted(int oid);	
+	boolean		PRIVACY_USERAPP_activityRecognitionGranted(int oid);
+	int         PRIVACY_USERAPP_getDefaultSensor(int oid, int sensorType);
+	PSensor     PRIVACY_USERAPP_getDefaultSensorO(int oid, int sensorType);
+	void        PRIVACY_USERAPP_setDefaultSensor(int oid, int sensorType, int sensorID);
 	
 	
 	// 
@@ -67,4 +71,5 @@ interface IGarmentInternalAPI {
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
 	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond);
 	PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end);
+	PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues);
 }

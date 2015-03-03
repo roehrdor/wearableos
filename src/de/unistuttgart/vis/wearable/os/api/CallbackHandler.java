@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.api;
 
+import android.util.Log;
 import de.unistuttgart.vis.wearable.os.service.CallbackNode;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import android.os.Message;
@@ -76,24 +77,6 @@ public class CallbackHandler extends android.os.Handler {
 
 				// finish broadcasts
 				mCallbacks.finishBroadcast();
-				break;
-			}
-
-			//
-			// Does exist only for testing purpose
-			//
-			case Constants.CALLBACK_DEBUG_VALUE: {
-				int value = ++mValue;
-				final int N = mCallbacks.beginBroadcast();
-				for (int i = 0; i != N; ++i) {
-					try {
-						CallBackObject cbo = new CallBackObject(value);
-						mCallbacks.getBroadcastItem(i).getCallbackHandle().callback(cbo);
-					} catch (android.os.RemoteException e) {
-					}
-				}
-				mCallbacks.finishBroadcast();
-				sendEmptyMessageDelayed(Constants.CALLBACK_DEBUG_VALUE, 1000);
 				break;
 			}
 			default:

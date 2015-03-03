@@ -136,7 +136,7 @@ public class InternalSensors implements SensorEventListener {
     }
 
     /**
-     * Saves the given senors (from the storage) to the Sensor objects in this calss,
+     * Saves the given senors (from the storage) to the Sensor objects in this class,
      * depending on the SensorType of  each sensor
      */
     private void getInternalSensorsFromStorage(Vector<Sensor> internalSensorsFromDB) {

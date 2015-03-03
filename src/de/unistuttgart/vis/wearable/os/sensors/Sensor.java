@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ *
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.sensors;
 
 import java.io.Externalizable;
@@ -7,9 +14,14 @@ import java.io.ObjectOutput;
 import java.util.Date;
 import java.util.Vector;
 
+import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
+import de.unistuttgart.vis.wearable.os.api.CallBackObject;
+import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
+import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.sensorDriver.SensorDriver;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
@@ -193,16 +205,10 @@ public class Sensor implements Externalizable {
         if (!isEnabled) {
             return;
         }
-        // TODO needed?
-//        if (isInternalSensor
-//                && rawData.size() > 0
-//                && sensorData.getDate().getTime() < (rawData
-//                .get(rawData.size() - 1).getDate()
-//                .getTime() + 1000 / (sampleRate - 1))) {
-//            return;
-//        }
 
         rawData.add(sensorData);
+
+        GarmentOSService.callback(CallbackFlags.VALUE_CHANGED, new ValueChangedCallback(sensorData.getUnixDate(), sensorData.getData()));
 
         if (rawData.size() > savePeriod) {
             SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
@@ -269,6 +275,26 @@ public class Sensor implements Externalizable {
                 data.add(sensorData);
             }
         }
+    }
+
+    /**
+     * Returns the given number of the newest SensorData of the Sensor.
+     * @param numberOfValues    the number of SensorData to be returned
+     * @return  the newest SensorData of the Sensor
+     */
+    public synchronized Vector<SensorData> getRawData(int numberOfValues) {
+        Vector<SensorData> returnData = new Vector<SensorData>();
+        if (rawData.size() < numberOfValues) {
+            SensorDataDeSerializer deSerializer =
+                    new SensorDataDeSerializer(sensorID, returnData, numberOfValues - rawData.size());
+            SensorDataDeSerializer.jobFinsihed(deSerializer.work());
+            returnData.addAll(rawData);
+        } else {
+            for (int i = rawData.size() - numberOfValues; i < rawData.size(); i++) {
+                returnData.add(rawData.get(i));
+            }
+        }
+        return returnData;
     }
 
     /**
@@ -409,7 +435,6 @@ public class Sensor implements Externalizable {
     public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
         this.isInternalSensor = input.readBoolean();
         this.isEnabled = input.readBoolean();
-        android.util.Log.d("orDEBUG", "READ IN SENSOR " + this.isEnabled());
         this.sensorID = input.readInt();
         this.bluetoothID = input.readUTF();
         this.sampleRate = input.readInt();

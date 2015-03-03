@@ -56,22 +56,23 @@
             android:layout_margin="10dp"
             android:background="#606060"
             android:drawableLeft="@drawable/export_db"
-            android:onClick="exportDB"
-            android:text="@string/btn_exportDB"
+            android:onClick="export"
+            android:text="@string/btn_local"
             android:textColor="#FFFFFF"
             android:textSize="25sp" />
-
-        <Button
-            android:id="@+id/Button05"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="#606060"
-            android:drawableLeft="@drawable/db_settings"
-            android:onClick="changeToDBSettingsMenu"
-            android:text="@string/btn_DbSettings"
-            android:textColor="#FFFFFF"
-            android:textSize="25sp" />
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
+                android:layout_weight="1.23" android:weightSum="1">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/encrypt"
+                      android:id="@+id/textView9"
+                      android:layout_gravity="center" android:layout_weight="0.94" android:layout_marginLeft="10dp"
+                      android:layout_marginTop="5dp"/>
+            <Switch android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/switch5"
+                    android:gravity="right" android:layout_marginTop="5dp" android:layout_gravity="center"/>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

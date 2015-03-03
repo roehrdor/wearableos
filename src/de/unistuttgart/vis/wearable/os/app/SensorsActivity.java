@@ -25,26 +25,61 @@ import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 
 public class SensorsActivity extends Activity {
 
-    private class SensorListAdapter extends ArrayAdapter<String> {
+
+
+    PSensor[] sensors;
+//    private String[] sensorNames;
+//    private Float[] smoothness;
+//    private Integer[] powerOption;
+
+//    Integer[] imageId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sensorlist);
+
+        ListView listView = (ListView)findViewById(R.id.listView1);
+        sensors = APIFunctions.API_getAllSensors();
+//        int numberOfSensors = sensors.length;
+
+//        if(sensors != null) {
+//
+//            this.sensorNames = new String[numberOfSensors];
+//            this.smoothness = new Float[numberOfSensors];
+//            this.powerOption = new Integer[numberOfSensors];
+//            this.imageId = new Integer[numberOfSensors];
+//
+//            int count = 0;
+//            for(PSensor sensor : sensors) {
+//                this.sensorNames[count] = sensor.getDisplayedSensorName();
+//                this.smoothness[count] = sensor.getSmoothness();
+//                this.imageId[count] = sensor.getSensorType().getIconID();
+//                int powerOption = (int)(sensor.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FACTOR);
+//                powerOption = powerOption == 0 ? 1 : powerOption;
+//                this.powerOption[count++] = powerOption;
+//            }
+//        }
+
+        listViewOptions(listView);
+    }
+
+    private class SensorListAdapter extends ArrayAdapter<PSensor> {
 
         private final Activity context;
-        private final String[] sensorNames;
-        private final Integer[] imageId;
+        private final PSensor[] sensors;
         private Switch mySwitch;
 
-        public SensorListAdapter(Activity context, String[] sensorNames,
-                                 Integer[] imageId) {
-            super(context, R.layout.custom_list_layout, sensorNames);
+        public SensorListAdapter(Activity context, PSensor[] sensors) {
+            super(context, R.layout.custom_list_layout, sensors);
             this.context = context;
-            this.sensorNames = sensorNames;
-            this.imageId = imageId;
+            this.sensors = sensors;
         }
 
         @Override
         public View getView(final int position, View view, ViewGroup parent) {
+            final PSensor sensor = sensors[position];
             LayoutInflater inflater = context.getLayoutInflater();
-            // LinearLayout sensorsLayout =
-            // inflater.inflate(R.layout.custom_list_layout, null, true);
             LinearLayout sensorsLayout = (LinearLayout) inflater.inflate(
                     R.layout.custom_list_layout, parent, false);
             TextView txtTitle = (TextView) sensorsLayout.findViewById(R.id.txt);
@@ -54,27 +89,26 @@ public class SensorsActivity extends Activity {
                     .findViewById(R.id.txt3);
             ImageView imageView = (ImageView) sensorsLayout
                     .findViewById(R.id.img);
-            txtTitle.setText(sensorNames[position]);
+            txtTitle.setText(sensor.getDisplayedSensorName());
 
-            subTitle1.setText(String.format("smoothness: %.2f",
-                    smoothness[position]));
-            subTitle2.setText("power options: " + powerOption[position]);
+            subTitle1.setText("smoothness: " + (int)(sensor.getSmoothness() * 100));
+            int tmp = (int)(sensor.getSavePeriod() / SensorDetailActivity.SAVE_PERIOD_FACTOR);
+            subTitle2.setText("power options: " + String.valueOf(tmp));
 
             mySwitch = (Switch) sensorsLayout.findViewById(R.id.switch3);
 
             if(sensors != null) {
-                mySwitch.setChecked(sensors[position].isEnabled());
+                mySwitch.setChecked(sensor.isEnabled());
                 mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView,
                                                  boolean isChecked) {
-                        sensors[position].setEnabled(isChecked);
+                        sensor.setEnabled(isChecked);
                     }
                 });
             }
 
-            if (position < imageId.length)
-                imageView.setImageResource(imageId[position]);
+            imageView.setImageResource(sensor.getSensorType().getIconID());
 
             // Workaround for on item click listener working with switch object
             sensorsLayout
@@ -82,43 +116,6 @@ public class SensorsActivity extends Activity {
             return sensorsLayout;
 
         }
-    }
-
-    PSensor[] sensors;
-    private String[] sensorNames;
-    private Float[] smoothness;
-    private Integer[] powerOption;
-
-    Integer[] imageId;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sensorlist);
-
-        ListView listView = (ListView)findViewById(R.id.listView1);
-        sensors = APIFunctions.API_getAllSensors();
-        int numberOfSensors = sensors.length;
-
-        if(sensors != null) {
-
-            this.sensorNames = new String[numberOfSensors];
-            this.smoothness = new Float[numberOfSensors];
-            this.powerOption = new Integer[numberOfSensors];
-            this.imageId = new Integer[numberOfSensors];
-
-            int count = 0;
-            for(PSensor sensor : sensors) {
-                this.sensorNames[count] = sensor.getDisplayedSensorName();
-                this.smoothness[count] = sensor.getSmoothness();
-                this.imageId[count] = R.drawable.speed;
-                int powerOption = (int)(sensor.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FACTOR);
-                powerOption = powerOption == 0 ? 1 : powerOption;
-                this.powerOption[count++] = powerOption;
-            }
-        }
-
-        listViewOptions(listView);
     }
 
     @Override
@@ -138,7 +135,7 @@ public class SensorsActivity extends Activity {
         });
 
         @SuppressWarnings("rawtypes")
-        ArrayAdapter adapter = new SensorListAdapter(this, sensorNames, imageId);
+        ArrayAdapter adapter = new SensorListAdapter(this, sensors);
         listView.setAdapter(adapter);
     }
 
@@ -153,4 +150,6 @@ public class SensorsActivity extends Activity {
         Intent intent = new Intent(this, AddSensorActivity.class);
         startActivity(intent);
     }
+
+
 }

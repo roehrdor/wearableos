@@ -11,34 +11,10 @@
         android:layout_margin="10dp"
         android:layout_marginTop="24dp"
         android:background="#606060"
-        android:onClick="uploadArchive"
+        android:onClick="startImportExport"
         android:padding="20dp"
         android:text="@string/btn_uploadDropbox"
         android:textColor="#FFFFFF"
         android:textSize="25sp" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_marginTop="24dp"
-        android:background="#606060"
-        android:onClick="downloadArchive"
-        android:padding="20dp"
-        android:text="@string/btn_downloadDropbox"
-        android:clickable="false"
-        android:visibility="gone"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp" android:enabled="false"/>
-    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
-                  android:layout_height="wrap_content" android:weightSum="1" android:paddingTop="50dp"
-                  android:paddingLeft="15dp" android:layout_gravity="center_horizontal">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                  android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/encrypt"
-                  android:id="@+id/textView7" android:layout_weight="0.80"/>
-        <Switch android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/switch2"
-                android:layout_gravity="right" android:gravity="right" android:checked="false"/>
-    </LinearLayout>
 
 </LinearLayout>

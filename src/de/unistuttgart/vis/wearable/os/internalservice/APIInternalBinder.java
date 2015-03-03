@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalservice;
 
@@ -81,6 +81,16 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
+    public PSensor[] API_getAllSensorsByType(int sensorType) {
+        java.util.Collection<Sensor> sensors = SensorManager.getAllSensors(SensorType.values()[sensorType]);
+        PSensor[] pSensors = new PSensor[sensors.size()];
+        int i = -1;
+        for(Sensor s : sensors)
+            pSensors[++i] = s.toParcelable();
+        return pSensors;
+    }
+
+    @Override
     public PSensor API_getSensorById(int id) throws RemoteException {
         return SensorManager.getSensorByID(id).toParcelable();
     }
@@ -96,56 +106,91 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	@Override
 	public boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).sensorProhibited(id);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp == null || userApp.sensorProhibited(id);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_grantPermission(int oid, int id)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).grantPermission(id);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp != null && userApp.grantPermission(id);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_revokePermission(int oid, int id)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).revokePermission(id);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp != null && userApp.revokePermission(id);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_denySensorType(int oid, int flag)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).denySensorType(flag);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp != null && userApp.denySensorType(flag);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_allowSensorType(int oid, int flag)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).allowSensorType(flag);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp != null && userApp.allowSensorType(flag);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).sensorTypeGranted(flag);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp != null && userApp.sensorTypeGranted(flag);
 	}
 
 	@Override
 	public void PRIVACY_USERAPP_grantActivityRecognition(int oid)
 			throws RemoteException {
-		PrivacyManager.instance.getApp(oid).grantActivityRecognition();
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.grantActivityRecognition();
 	}
 
 	@Override
 	public void PRIVACY_USERAPP_denyActivityRecognition(int oid)
 			throws RemoteException {
-		PrivacyManager.instance.getApp(oid).denyActivityRecognition();
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.denyActivityRecognition();
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_activityRecognitionGranted(int oid)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).activityRecognitionGranted();
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        return userApp != null && userApp.activityRecognitionGranted();
 	}
+
+    @Override
+    public int PRIVACY_USERAPP_getDefaultSensor(int oid, int sensorType) throws RemoteException {
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.getDefaultSensor(SensorType.values()[sensorType]);
+        return Constants.ILLEGAL_VALUE;
+    }
+
+    @Override
+    public PSensor PRIVACY_USERAPP_getDefaultSensorO(int oid, int sensorType) throws RemoteException {
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        int sensorID;
+        if(userApp != null && (sensorID = userApp.getDefaultSensor(SensorType.values()[sensorType])) != 0)
+            return SensorManager.getSensorByID(sensorID).toParcelable();
+        return null;
+    }
+
+    @Override
+    public void PRIVACY_USERAPP_setDefaultSensor(int oid, int sensorType, int sensorID) throws RemoteException {
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.setDefaultSensor(SensorType.values()[sensorType], sensorID);
+    }
 
 	
 	// =====================================================================
@@ -160,9 +205,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return false;
-        return sensor.isEnabled();
+        return sensor != null && sensor.isEnabled();
 	}
 
 	@Override
@@ -363,5 +406,14 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return null;
         return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+    }
+
+    @Override
+    public PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return null;
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues).clone());
     }
 }

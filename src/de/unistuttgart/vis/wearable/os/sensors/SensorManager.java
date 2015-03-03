@@ -1,4 +1,14 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ *
+ * (c) GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.sensors;
+
+import java.util.Collection;
+import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 
@@ -41,7 +51,7 @@ public final class SensorManager {
      *
      * @param sensor the sensor to add to the system
      */
-    protected static void addNewSensor(Sensor sensor) {
+    public static void addNewSensor(Sensor sensor) {
         allSensors.put(sensor.getSensorID(), sensor);
     }
 
@@ -85,5 +95,21 @@ public final class SensorManager {
      */
     public static java.util.Collection<Sensor> getAllSensors () {
         return allSensors.values();
+    }
+
+    /**
+     * Return a collection with all the registered Sensors with thge given sensorTypeby GarmentOS.
+     *
+     * @return a collection containing all sensors with the given SensorType known by GarmentOS
+     */
+    public static java.util.Collection<Sensor> getAllSensors (SensorType sensorType) {
+        java.util.Map<Integer, Sensor> sensorsToReturn =
+                new java.util.HashMap<Integer, Sensor>();
+        for (Sensor sensor : allSensors.values()) {
+            if (sensor.getSensorType() == sensorType) {
+                sensorsToReturn.put(sensor.getSensorID(), sensor);
+            }
+        }
+        return sensorsToReturn.values();
     }
 }

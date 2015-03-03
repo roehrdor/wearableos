@@ -9,14 +9,13 @@ package de.unistuttgart.vis.wearable.os.cloud;
 
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -27,8 +26,12 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-
+import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
+import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
+import de.unistuttgart.vis.wearable.os.sensors.Sensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
@@ -83,6 +86,195 @@ public class Archiver {
     }
 
     /**
+     * Merge the two given files
+     *
+     * @param existent    the already existent base file, the result file will have the exact same name
+     * @param dataToMerge the new data file to be merged
+     * @return true if the merge process has been successfully done, false otherwise
+     */
+    protected static boolean mergeSensorDataFiles(File existent, File dataToMerge) {
+        RandomAccessFile existentFileRAF = null;
+        RandomAccessFile dataToMergeFileRAF = null;
+        RandomAccessFile destinationRAF = null;
+        File destination;
+
+        //
+        // Local attributes used to store chunk sizes, dates and data
+        //
+        long existentFileSize;
+        long mergeFileSize;
+        int latestMergeValueTimeStamp;
+        int latestExistentValueTimeStamp;
+        int dimension;
+        int dataChunkSize;
+        int currentMergeTime;
+        int currentExistentTime;
+        byte[] buffer;
+        boolean returnValue = true;
+
+        //
+        // Make sure the given parameters are valid and the file do really exist
+        //
+        if(existent == null || dataToMerge == null || !existent.exists() || !dataToMerge.exists()) {
+            return false;
+        }
+
+        try {
+            //
+            // Create a new File containing data from both the files, therefore move the
+            // existent file so we can write to the destination file
+            //
+            destination = existent;
+            existent = new File(destination + ".old");
+            if (!destination.renameTo(existent)) {
+                return false;
+            }
+
+            //
+            // Random access file handles for all our three files
+            //
+            destinationRAF = new RandomAccessFile(destination, "rw");
+            existentFileRAF = new RandomAccessFile(existent, "r");
+            dataToMergeFileRAF = new RandomAccessFile(dataToMerge, "r");
+            existentFileSize = existentFileRAF.length();
+            mergeFileSize = dataToMergeFileRAF.length();
+
+            //
+            // Read the the time stamps from the file that needs to be merged
+            //
+            latestMergeValueTimeStamp = dataToMergeFileRAF.readInt();
+            dimension = dataToMergeFileRAF.readInt();
+            dataChunkSize = dimension * 4;
+            buffer = new byte[dataChunkSize];
+
+            //
+            // Read the time stamps from the existent file we want the other one to merge to
+            //
+            latestExistentValueTimeStamp = existentFileRAF.readInt();
+            if(dimension != existentFileRAF.readInt()) {
+                // Files can not be merged since the dimension does not equal
+                return false;
+            }
+
+            //
+            // Write the file header consisting of the latest modification date
+            // and the dimension of the sensor
+            //
+            destinationRAF.writeInt(latestExistentValueTimeStamp > latestMergeValueTimeStamp ?
+                    latestExistentValueTimeStamp : latestMergeValueTimeStamp);
+            destinationRAF.writeInt(dimension);
+
+            //
+            // Seek to the correct positions in two existing files
+            //
+            existentFileRAF.seek(8);
+            dataToMergeFileRAF.seek(8);
+
+            // ----------------------------------------------------------------------
+
+            //
+            // Step 1
+            // Merge the data fields that are contained in both files
+            // This steps inserts all the data that has been recorded before and and in
+            // the time the data has been recorded to the base file
+            //
+            while(existentFileRAF.getFilePointer() < existentFileSize) {
+                // read the current time from the base file
+                currentExistentTime = existentFileRAF.readInt();
+
+                // check whether we can read a time stamp from the new merge file
+                if(dataToMergeFileRAF.getFilePointer() < mergeFileSize) {
+                    //
+                    // Check for all the older data fields
+                    //
+                    while((currentMergeTime = dataToMergeFileRAF.readInt()) < currentExistentTime) {
+                        dataToMergeFileRAF.read(buffer);
+
+                        // now that we have the time, before the initial date we can write the time and data
+                        // to the new destination file
+                        destinationRAF.writeInt(currentMergeTime);
+                        destinationRAF.write(buffer);
+                    }
+
+                    // set the file pointer 4 bytes back to allow reading the date again
+                    dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() - 4);
+
+                    //
+                    // Advance so we do not duplicate data
+                    //
+                    while(dataToMergeFileRAF.readInt() <= currentExistentTime) {
+                        dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() + dataChunkSize);
+                    }
+
+                    // set the file pointer 4 bytes back to allow reading the date again
+                    dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() - 4);
+                }
+
+                // read the data from the base file
+                existentFileRAF.read(buffer);
+
+                // write the date and the data to the destination file
+                destinationRAF.writeInt(currentExistentTime);
+                destinationRAF.write(buffer);
+            }
+
+            // ----------------------------------------------------------------------
+
+            //
+            // Step 2
+            // So we still need to add all the data that has been recorded after all the records from
+            // the base file
+            //
+            while(dataToMergeFileRAF.getFilePointer() < mergeFileSize) {
+                currentMergeTime = dataToMergeFileRAF.readInt();
+                dataToMergeFileRAF.read(buffer);
+
+                // now that we have the time, before the initial date we can write the time and data
+                // to the new destination file
+                destinationRAF.writeInt(currentMergeTime);
+                destinationRAF.write(buffer);
+            }
+
+            //
+            // Close all the file handles
+            //
+            dataToMergeFileRAF.close();
+            existentFileRAF.close();
+            destinationRAF.close();
+
+            if(!existent.delete()) {
+                return false;
+            }
+
+            returnValue = true;
+        } catch(IOException ioe) {
+            returnValue = false;
+        } finally {
+            //
+            // Make sure we close the file handles
+            //
+            if(existentFileRAF != null)
+                try {existentFileRAF.close();} catch(IOException ioe) {Log.i("GarmentOS", "Archiver:mergeSensorDataFiles() - IOE:efRAF");}
+            if(dataToMergeFileRAF != null)
+                try {dataToMergeFileRAF.close();} catch(IOException ioe) {Log.i("GarmentOS", "Archiver:mergeSensorDataFiles() - IOE:dmRAF");}
+            if(destinationRAF != null)
+                try {destinationRAF.close();} catch(IOException ioe) {Log.i("GarmentOS", "Archiver:mergeSensorDataFiles() - IOE:deRAF");}
+
+            //
+            // Try to delete the base file
+            //
+            if(!existent.delete()) {
+                returnValue = false;
+            }
+        }
+
+        //
+        // Finally return with the stored result
+        //
+        return returnValue;
+    }
+
+    /**
      * Unpack the packed archive file and merge the files as far as possible
      *
      * @param inputFile the input file to unpack
@@ -95,7 +287,93 @@ public class Archiver {
         }
         Properties.FILE_STATUS_FIELDS_LOCK.unlock();
 
-        // TODO here
+        final int BUFFER = 2048;
+
+        try {
+            BufferedOutputStream outputStream;
+            FileInputStream fileInputStream = new FileInputStream(inputFile);
+            ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(fileInputStream));
+            ZipEntry zipEntry;
+
+            //
+            // Iterate through the zip input file stream and extract all these files
+            //
+            while((zipEntry = zipInputStream.getNextEntry()) != null) {
+                byte data[] = new byte[BUFFER];
+                String name = zipEntry.getName();
+
+                File outputFile = new File(name);
+                FileOutputStream fileOutputStream;
+                boolean merge;
+
+                //
+                // In case the file does not already exist we can easily extract it
+                //
+                if((merge = outputFile.exists())) {
+                    fileOutputStream = new FileOutputStream(outputFile);
+                }
+
+                //
+                // Otherwise we need to merge the extracted with the already existent file
+                //
+                else {
+                    outputFile = new File(name + ".me");
+                    fileOutputStream = new FileOutputStream(outputFile);
+                }
+
+                outputStream = new BufferedOutputStream(fileOutputStream, BUFFER);
+                while(zipInputStream.read(data, 0, BUFFER) != -1)
+                    outputStream.write(data, 0, BUFFER);
+                outputStream.flush();
+                outputStream.close();
+
+                //
+                // If we need to merge these files do it now
+                //
+                if(merge) {
+                    if(name.equals(SettingsStorage.FILE_NAME_APPS)) {
+                        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(outputFile));
+                        Map<String, UserApp> apps = (Map<String, UserApp>)ois.readObject();
+                        if(apps != null) {
+                            //
+                            // Insert all apps that are not yet registered
+                            //
+                            for(String s : apps.keySet()) {
+                                if(PrivacyManager.instance.getApp(s) == null)
+                                    PrivacyManager.instance.addApp(apps.get(s));
+                            }
+                        }
+                        ois.close();
+                    } else if(name.equals(SettingsStorage.FILE_NAME_SENSOR)) {
+                        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(outputFile));
+                        Map<Integer, Sensor> sensors = (Map<Integer, Sensor>)ois.readObject();
+                        if(sensors != null) {
+                            //
+                            // Add all sensors that are yet unknown to the system
+                            //
+                            for(int id : sensors.keySet()) {
+                                if(SensorManager.getSensorByID(id) == null)
+                                    SensorManager.addNewSensor(sensors.get(id));
+                            }
+                        }
+                        ois.close();
+                    } else {
+                        mergeSensorDataFiles(new File(zipEntry.getName()), outputFile);
+                    }
+
+                    // finally delete the file
+                    if(!outputFile.delete()) {
+                        Log.w("GarmentOS", "Archiver:unpackArchiveFile() - File can not be deleted");
+                    }
+                }
+
+                zipInputStream.close();
+            }
+        } catch(IOException ioe) {
+            Log.i("GarmentOS", "Archiver:unpackArchiveFile() - IOE");
+        } catch(ClassNotFoundException cnfe) {
+            Log.i("GarmentOS", "Archiver:unpackArchiveFile() - CNFE");
+        }
 
         Properties.FILE_ARCHIVING.set(false);
     }
@@ -141,7 +419,9 @@ public class Archiver {
                     fis = new FileInputStream(f);
 
                     // Make the path to the file relative
-                    String zippedName = f.getCanonicalPath().substring(Properties.storageDirectory.getCanonicalPath().length() + 1, f.getCanonicalPath().length());
+                    String zippedName = f.getCanonicalPath().substring(
+                            Properties.storageDirectory.getCanonicalPath().length() + 1,
+                            f.getCanonicalPath().length());
 
                     // Create a new zip entry with the relative name
                     ZipEntry zipEntry = new ZipEntry(zippedName);
@@ -164,9 +444,6 @@ public class Archiver {
             zos.close();
             fos.close();
         } catch (IOException ioe) {
-            Log.e("GarmentOS", "Could not create compressed archive");
-            Log.e("orDEBUG", ioe.getMessage());
-            Log.e("orDEBUG", ioe.getLocalizedMessage());
         }
 
         //
@@ -229,6 +506,7 @@ public class Archiver {
                 cipher.init(Cipher.DECRYPT_MODE, key, pbeParamSpec);
             }
         } catch(GeneralSecurityException gse) {
+            Log.i("GarmentOS", "Archiver:makeCipher() - GSE");
         }
         return cipher;
     }
@@ -278,7 +556,10 @@ public class Archiver {
             outStream.write(encData);
             outStream.close();
         } catch (GeneralSecurityException gse) {
-        } catch (IOException e) {}
+            Log.i("GarmentOS", "Archiver:encryptFile() - GSE");
+        } catch (IOException IOE) {
+            Log.i("GarmentOS", "Archiver:encryptFile() - IOE");
+        }
     }
 
     /**
@@ -321,7 +602,9 @@ public class Archiver {
             target.write(decData);
             target.close();
         } catch (GeneralSecurityException gse) {
-        } catch (IOException e) {
+            Log.i("GarmentOS", "Archiver:decryptFile() - GSE");
+        } catch (IOException IOE) {
+            Log.i("GarmentOS", "Archiver:decryptFile() - IOE");
         }
     }
 }

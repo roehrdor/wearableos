@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ *
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.parcel;
 
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
@@ -217,6 +224,21 @@ public class PSensor {
             return null;
     }
 
+    /**
+     * Get the last numberOfValues Sensor data
+     *
+     * @param numberOfValues the number of values we want to get
+     * @return the values
+     */
+    public java.util.Vector<SensorData> getRawData(int numberOfValues) {
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataN(this.ID, numberOfValues);
+        if(pd != null) {
+            this.rawData = pd.toSensorDataList();
+            return this.rawData;
+        } else
+            return null;
+    }
+
 
     // =====================================================================
     //
@@ -309,5 +331,10 @@ public class PSensor {
         else
             this.displayedMeasurementSystem = MeasurementSystems.values()[ordinal];
         return displayedMeasurementSystem;
+    }
+
+    @Override
+    public String toString() {
+        return this.displayedSensorName;
     }
 }

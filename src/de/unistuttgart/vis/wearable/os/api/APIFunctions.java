@@ -8,6 +8,7 @@
 package de.unistuttgart.vis.wearable.os.api;
 
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
 /**
  * This class provides of all the available function that can be called from any
@@ -26,6 +27,43 @@ public class APIFunctions {
 		return 0xFFFFFFFFFFl;
 	}
 
+    public static SensorType[] getAvailableSensorTypes() {
+        if(APIHandle.isServiceBound()) {
+            try {
+                int[] sensorTypes = APIHandle.getGarmentAPIHandle().API_getSensorTypes();
+                SensorType[] sensorTypesO = new SensorType[sensorTypes.length];
+                int i = -1;
+                for(int sensorType : sensorTypes)
+                    sensorTypesO[++i] = SensorType.values()[sensorType];
+                return sensorTypesO;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void registerCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().registerCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void unregisterCallback(IGarmentCallback callback, int cause) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                APIHandle.getGarmentAPIHandle().unregisterCallback(APIHandle.getAppPackageID(), callback, cause);
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 	// =============================================================================
 	//
 	// Public SDK Functions
@@ -37,6 +75,18 @@ public class APIFunctions {
         if (APIHandle.isServiceBound()) {
             try {
                 return APIHandle.getGarmentAPIHandle().API_getAllSensors(APIHandle.getAppPackageID());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor[] getAllSensors(SensorType sensorType) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return null;
+                return APIHandle.getGarmentAPIHandle().API_getAllSensorsByType(sensorType.ordinal());
             } catch (android.os.RemoteException e) {
             }
         }
@@ -174,6 +224,16 @@ public class APIFunctions {
             try {
                 return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawDataII(APIHandle.getAppPackageID(), sid, start, end);
             } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawDataN(APIHandle.getAppPackageID(), sid, numberOfValues);
+            } catch(android.os.RemoteException e) {
             }
         }
         throw new RuntimeException("Connection failed");

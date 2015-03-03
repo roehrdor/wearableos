@@ -1,5 +1,6 @@
 package de.unistuttgart.vis.wearable.os.privacy;
 
+import android.util.Log;
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 
 /**
@@ -38,13 +39,26 @@ public class PrivacyManager {
 	 *            the name of the new app
 	 */
 	public void registerNewApp(String name) {
-		if (!this.apps.containsKey(name)) {
+        Log.d("orDEBUG", "PrivacyManager:registerNewApp() - got a new app " + name);
+        if (!this.apps.containsKey(name)) {
 			UserApp ua = new UserApp(name, name.hashCode());
 			this.apps.put(name, ua);
 			this.spapps.put(name.hashCode(), ua);
 		}
 		this.save();
 	}
+
+    /**
+     * Add an existing app e.g. from a read file
+     *
+     * @param app the app to be added
+     */
+    public void addApp(UserApp app) {
+        if (!this.apps.containsKey(app.getName())) {
+            this.apps.put(app.getName(), app);
+        }
+        this.save();
+    }
 
 	/**
 	 * Save the current settings to file
@@ -92,8 +106,8 @@ public class PrivacyManager {
 	 * @return all the user applications
 	 */
 	public UserApp[] getAllApps() {
-		UserApp[] ua = new UserApp[this.apps.keySet().size()];
-		this.apps.keySet().toArray(ua);
+		UserApp[] ua = new UserApp[this.apps.values().size()];
+		this.apps.values().toArray(ua);
 		return ua;
 	}
 

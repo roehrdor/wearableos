@@ -19,7 +19,7 @@ public class GraphModule extends PopupModule2 {
 		super(context, attrs);
 
 		chart = new LinearLayout(context);
-		fillChart();
+//		fillChart();
 
 		super.createLayout(context, chart, R.drawable.graph, "Graphs");
 	}
@@ -28,11 +28,11 @@ public class GraphModule extends PopupModule2 {
 
 	
 
-		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
-				 null, getContext());
-		chart.addView(tuple.getChart());
-		chartUpdateThread = tuple.getThread();
-		chartUpdateThread.start();
+//		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
+//				 null, getContext());
+//		chart.addView(tuple.getChart());
+//		chartUpdateThread = tuple.getThread();
+//		chartUpdateThread.start();
 	}
 
 }

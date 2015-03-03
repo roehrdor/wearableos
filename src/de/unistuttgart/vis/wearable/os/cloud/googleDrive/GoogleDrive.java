@@ -39,6 +39,8 @@ public class GoogleDrive extends Activity implements
     private static char mode = 'n';
     private static String password ="";
     private Switch switchUseEncryption = null;
+    private Button button = null;
+    private boolean isExport = true;
     /**
      * Google API client, luckily it only stores the local information about the
      * state of the Google Drive online, so every time a change is made online,
@@ -100,21 +102,12 @@ public class GoogleDrive extends Activity implements
     }
 
     /**
-     * Method to initiate the download process, as no easy to use method is
-     * provided via the api, the later implementation has to be done reading
-     * from the contents of the DriveFile stored online via an InputStream to
-     * the database file at the desired local directory represented by an
-     * Outputstream TODO
-     */
-    public void downloadArchive(View view) {
-        setMode('d');
-        signInToGoogleDrive();
+     * Method to initiate the download or upload process
+         **/
+     public void startImportExport(View view) {
 
-    }
+         setMode(isExport?'u':'d');
 
-    public void uploadArchive(View view) {
-
-            setMode('u');
             signInToGoogleDrive();
 
 
@@ -155,35 +148,12 @@ public class GoogleDrive extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google_drive);
-        switchUseEncryption = (Switch)findViewById(R.id.switch2);
-        switchUseEncryption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(GoogleDrive.this);
-
-                    alert.setTitle("Please enter password:");
-                    final EditText input = new EditText(GoogleDrive.this);
-                    alert.setView(input);
-
-                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            password = input.getText().toString();
-                        }
-                    });
-
-                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            buttonView.setChecked(false);
-                            password="";
-                            return;
-                        }
-                    });
-                    alert.setCancelable(false);
-                    alert.show();
-                }
-            }
-        });
+        button = (Button) findViewById(R.id.button1);
+        if(!getIntent().getBooleanExtra("isExport",false)) {
+            button.setText("Import SensorData");
+            isExport = false;
+        }
+        password=getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
 
         context = this;
 

@@ -7,28 +7,18 @@ package de.unistuttgart.vis.wearable.os.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 
-public class ExportDbActivity extends Activity {
+public class ImportExportArchiveActivity extends Activity {
 
     private File currentDir;
     private List<String> folders;
@@ -37,13 +27,24 @@ public class ExportDbActivity extends Activity {
     private String currentFilePath;
     private Button btnSave;
     private TextView text;
+    private boolean isExport = true;
+    private boolean archiveExists = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export_db);
+
         text = (TextView) findViewById(R.id.textView1);
+
         btnSave = (Button) findViewById(R.id.button1);
+        isExport = getIntent().getBooleanExtra("isExport", false);
+        if (!isExport) {
+            btnSave.setText("Import");
+            text.setText(getResources().getString(R.string.textView_text_no_archive_for_import));
+        }
+
         btnSave.setEnabled(false);
         currentDir = new File("/mnt/");
         folders = fill(currentDir);
@@ -81,18 +82,12 @@ public class ExportDbActivity extends Activity {
 
     /**
      * Returns a list of all folders in the current folder and checks if write
-     * access is provided for the current folder
+     * access is provided for the current folder if exporting and checks for
+     * the appropriate archive file when importing
      */
     private List<String> fill(File f) {
         File[] dirs = f.listFiles();
         currentFilePath = f.getAbsolutePath();
-        if (f.canWrite() && f.canRead()) {
-            btnSave.setEnabled(true);
-            text.setVisibility(View.INVISIBLE);
-        } else {
-            btnSave.setEnabled(false);
-            text.setVisibility(View.VISIBLE);
-        }
         this.setTitle("Current Folder: " + f.getName());
         List<String> dir = new ArrayList<String>();
         try {
@@ -104,44 +99,56 @@ public class ExportDbActivity extends Activity {
 
         }
         Collections.sort(dir);
-        if (!f.getName().equalsIgnoreCase("mnt"))
+        if (!f.getName().equalsIgnoreCase("mnt")) {
             dir.add(0, "Parent Directory");
+        }
+        if (isExport) {
+            if (f.canWrite() && f.canRead()) {
+                btnSave.setEnabled(true);
+                text.setVisibility(View.INVISIBLE);
+            } else {
+                btnSave.setEnabled(false);
+                text.setVisibility(View.VISIBLE);
+            }
+
+
+        }
+        if (!isExport) {
+            archiveExists = false;
+            if (f.canRead()) {
+                for (File currentFile : f.listFiles()) {
+                    if (currentFile.canRead() && currentFile.isFile() && currentFile.getName().equals("gos_sensors.zip")) {
+                        archiveExists = true;
+                        break;
+                    }
+                }
+            }
+            if (archiveExists) {
+                btnSave.setEnabled(true);
+                text.setVisibility(View.INVISIBLE);
+            }
+            if (!archiveExists) {
+                btnSave.setEnabled(false);
+                text.setVisibility(View.VISIBLE);
+            }
+        }
+
         return dir;
-
     }
 
-    public void saveDB(View view) {
-//        String dbPath = getBaseContext().getDatabasePath(
-//                DataBaseHelper.getDbName()).getAbsolutePath();
-//        File dbfile = new File(dbPath);
-//        File newFile = new File(currentFilePath + File.separator
-//                + DataBaseHelper.getDbName());
-//        InputStream is = null;
-//        OutputStream os = null;
-//        try {
-//            is = new FileInputStream(dbfile);
-//            os = new FileOutputStream(newFile);
-//            byte[] buffer = new byte[1024];
-//            int length;
-//            while ((length = is.read(buffer)) > 0) {
-//                os.write(buffer, 0, length);
-//            }
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                is.close();
-//                os.close();
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//            Toast.makeText(getBaseContext(), "Database export finished",
-//                    Toast.LENGTH_SHORT).show();
-//        }
-
+    public void saveSensorArchive(View view) {
+        if (isExport) {
+            File tmp = new File(currentFilePath + File.separator + "gos_sensors.zip");
+            if (getIntent().getBooleanExtra("encrypted", false)) {
+                Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"), tmp);
+            } else {
+                Archiver.createArchiveFile(tmp);
+            }
+            Toast.makeText(getBaseContext(), "Archive export finished",
+                    Toast.LENGTH_SHORT).show();
+            onBackPressed();
+        } else{
+            // TODO Handle import
+        }
     }
-
 }
-

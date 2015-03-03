@@ -13,11 +13,16 @@ import de.unistuttgart.vis.wearable.os.api.PSensorData;
 
 interface IGarmentAPI {
 	long currentTime();
-	
+
+	void registerNewApp(String app);
+
 	void registerCallback(String app, IGarmentCallback callback, int ID);
 	void unregisterCallback(String app, IGarmentCallback callback, int ID);
 
+	int[]       API_getSensorTypes();
+
 	PSensor[]   API_getAllSensors(String app);
+	PSensor[]   API_getAllSensorsByType(int sensorType);
     PSensor     API_getSensorById(String app, int id);
 	
 	// 
@@ -35,4 +40,5 @@ interface IGarmentAPI {
 	PSensorData SENSORS_SENSOR_getRawData(String app, int sid);
     PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, int time, boolean plusMinusOneSecond);
     PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, int start, int end);
+    PSensorData SENSORS_SENSOR_getRawDataN(String app, int sid, int numberOfValues);
 }
