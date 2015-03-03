@@ -62,7 +62,7 @@ public class APIHandle extends android.app.Application {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			garmentAPIHandle = IGarmentAPI.Stub.asInterface(service);
             try {
-                garmentAPIHandle.registerNewApp(appPackageID);
+                garmentAPIHandle.registerApp(appPackageID);
             } catch(RemoteException e) {
             }
 		}
@@ -169,8 +169,5 @@ public class APIHandle extends android.app.Application {
 			serviceInternalBound = bindService(Utils.explicitFromImplicit(getApplicationContext(), garmentInternalAPIIntent), 
 									serviceInternalConnection, android.content.Context.BIND_AUTO_CREATE);
 		}
-		
-	};
-	
-	
+	}
 }
