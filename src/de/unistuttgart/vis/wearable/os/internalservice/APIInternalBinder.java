@@ -107,54 +107,42 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-            return userApp.sensorProhibited(id);
-        return true;
+        return userApp == null || userApp.sensorProhibited(id);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_grantPermission(int oid, int id)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-            return userApp.grantPermission(id);
-        return false;
+        return userApp != null && userApp.grantPermission(id);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_revokePermission(int oid, int id)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-            return userApp.revokePermission(id);
-        return false;
+        return userApp != null && userApp.revokePermission(id);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_denySensorType(int oid, int flag)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-            return userApp.denySensorType(flag);
-        return false;
+        return userApp != null && userApp.denySensorType(flag);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_allowSensorType(int oid, int flag)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-            return userApp.allowSensorType(flag);
-        return false;
+        return userApp != null && userApp.allowSensorType(flag);
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-            return userApp.sensorTypeGranted(flag);
-        return false;
+        return userApp != null && userApp.sensorTypeGranted(flag);
 	}
 
 	@Override
@@ -177,9 +165,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	public boolean PRIVACY_USERAPP_activityRecognitionGranted(int oid)
 			throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
-        if(userApp != null)
-		    return userApp.activityRecognitionGranted();
-        return false;
+        return userApp != null && userApp.activityRecognitionGranted();
 	}
 
     @Override
