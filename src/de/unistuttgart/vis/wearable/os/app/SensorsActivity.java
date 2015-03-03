@@ -29,11 +29,6 @@ public class SensorsActivity extends Activity {
 
 
     PSensor[] sensors;
-//    private String[] sensorNames;
-//    private Float[] smoothness;
-//    private Integer[] powerOption;
-
-//    Integer[] imageId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,26 +37,6 @@ public class SensorsActivity extends Activity {
 
         ListView listView = (ListView) findViewById(R.id.listView1);
         sensors = APIFunctions.API_getAllSensors();
-//        int numberOfSensors = sensors.length;
-
-//        if(sensors != null) {
-//
-//            this.sensorNames = new String[numberOfSensors];
-//            this.smoothness = new Float[numberOfSensors];
-//            this.powerOption = new Integer[numberOfSensors];
-//            this.imageId = new Integer[numberOfSensors];
-//
-//            int count = 0;
-//            for(PSensor sensor : sensors) {
-//                this.sensorNames[count] = sensor.getDisplayedSensorName();
-//                this.smoothness[count] = sensor.getSmoothness();
-//                this.imageId[count] = sensor.getSensorType().getIconID();
-//                int powerOption = (int)(sensor.getSampleRate() / SensorDetailActivity.SAMPLE_RATE_FACTOR);
-//                powerOption = powerOption == 0 ? 1 : powerOption;
-//                this.powerOption[count++] = powerOption;
-//            }
-//        }
-
         listViewOptions(listView);
     }
 
