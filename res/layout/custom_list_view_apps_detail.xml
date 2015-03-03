@@ -31,7 +31,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner_app_list_sensor_detail"
         android:layout_below="@+id/textView_app_list_name_detail"
-        android:layout_alignBottom="@+id/imageView_app_list_detail"
         android:layout_toRightOf="@+id/imageView_app_list_detail"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" />
