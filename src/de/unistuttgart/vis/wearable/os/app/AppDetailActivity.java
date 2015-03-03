@@ -33,11 +33,10 @@ public class AppDetailActivity extends Activity {
         setContentView(R.layout.activity_app_detail);
         app = getIntent().getParcelableExtra("PUserApp");
         sensorTypes = APIFunctions.getAvailableSensorTypes();
-
         ListView listView = (ListView) findViewById(R.id.listView_app_detail);
-
         ArrayAdapter adapter = new AppListAdapter();
         listView.setAdapter(adapter);
+
     }
 
     private class AppListAdapter extends ArrayAdapter<SensorType> {
@@ -56,8 +55,19 @@ public class AppDetailActivity extends Activity {
             ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView_app_list_detail);
             TextView textView = (TextView) itemView.findViewById(R.id.textView_app_list_name_detail);
             spinner = (Spinner) itemView.findViewById(R.id.spinner_app_list_sensor_detail);
-            fillSpinner(sensorTypes[position], itemView);
+            pSensors = APIFunctions.getAllSensors(sensorTypes[position]);
+            fillSpinner(sensorTypes[position]);
 
+            //Wählt den aktuell in PUserApp gespeicherten Sensor im Spinner aus
+            int i = 0;
+            if(app.getDefaultSensor(sensorTypes[position]) != null) {
+                for(PSensor pSensor : pSensors) {
+                    if(pSensor.equals(app.getDefaultSensor(sensorTypes[position]))) {
+                        spinner.setSelection(i);
+                    }
+                    i++;
+                }
+            }
             imageView.setImageResource(sensorTypes[position].getIconID());
             textView.setText(sensorTypes[position].toString());
 
@@ -65,10 +75,7 @@ public class AppDetailActivity extends Activity {
         }
     }
 
-    private void fillSpinner(final SensorType sensorType, View itemView) {
-        spinner = (Spinner) itemView.findViewById(R.id.spinner_app_list_sensor_detail);
-        pSensors = APIFunctions.getAllSensors(sensorType);
-
+    private void fillSpinner(final SensorType sensorType) {
         ArrayAdapter adapter = new ArrayAdapter(AppDetailActivity.this, android.R.layout.simple_spinner_item, pSensors);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -86,11 +93,5 @@ public class AppDetailActivity extends Activity {
 
             }
         });
-    }
-
-    @Override
-    public void onBackPressed(){
-        //App aktualisieren!
-
     }
 }
