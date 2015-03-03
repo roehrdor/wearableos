@@ -114,7 +114,7 @@ public class PSensor {
                    MeasurementUnits rawDataMeasurementUnits,
                    MeasurementSystems rawDataMeasurementSystems,
                    MeasurementUnits displayedMeasurementUnits,
-                   MeasurementSystems displayedMeasurementSystems) {
+                   MeasurementSystems displayedMeasurementSystems, boolean isInternalSensor) {
         this.ID = ID;
         this.displayedSensorName = displayedSensorName;
         this.bluetoothID = bluetoothID;
@@ -127,6 +127,7 @@ public class PSensor {
         this.rawDataMeasurementSystem = rawDataMeasurementSystems;
         this.displayedMeasurementUnit = displayedMeasurementUnits;
         this.displayedMeasurementSystem = displayedMeasurementSystems;
+        this.isInternalSensor = isInternalSensor;
     }
     //</nsdk>
 

@@ -71,10 +71,10 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
 			MeasurementUnits rawDataMeasurementUnits,
 			MeasurementSystems rawDataMeasurementSystems,
 			MeasurementUnits displayedMeasurementUnits,
-			MeasurementSystems displayedMeasurementSystems) {
+			MeasurementSystems displayedMeasurementSystems, boolean isInternalSensor) {
 	    super(ID, displayedSensorName, bluetoothID, sampleRate, savePeriod, smoothness, sensorType,
                 graphType, rawDataMeasurementUnits, rawDataMeasurementSystems,
-                displayedMeasurementUnits, displayedMeasurementSystems);
+                displayedMeasurementUnits, displayedMeasurementSystems, isInternalSensor);
 	}
 	//</nsdk>
 
