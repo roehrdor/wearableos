@@ -282,7 +282,7 @@ public class APIFunctions {
             try {
                 if(sensorType == null)
                     return Constants.ILLEGAL_VALUE;
-                APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_getDefaultSensor(oid, sensorType.ordinal());
+                return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_getDefaultSensor(oid, sensorType.ordinal());
             } catch (android.os.RemoteException e) {
             }
         }
