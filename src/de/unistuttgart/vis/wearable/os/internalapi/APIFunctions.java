@@ -289,6 +289,18 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static PSensor PRIVACY_USERAPP_getDefaultSensorO(int oid, SensorType sensorType) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(sensorType == null)
+                    return null;
+                return APIHandle.getGarmentInternalAPIHandle().PRIVACY_USERAPP_getDefaultSensorO(oid, sensorType.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
     public static void PRIVACY_USERAPP_setDefaultSensor(int oid, SensorType sensorType, int sensorID) {
         if (APIHandle.isInternalServiceBound()) {
             try {

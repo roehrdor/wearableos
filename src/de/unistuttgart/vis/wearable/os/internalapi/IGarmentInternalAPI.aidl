@@ -43,6 +43,7 @@ interface IGarmentInternalAPI {
 	void 		PRIVACY_USERAPP_denyActivityRecognition(int oid);
 	boolean		PRIVACY_USERAPP_activityRecognitionGranted(int oid);
 	int         PRIVACY_USERAPP_getDefaultSensor(int oid, int sensorType);
+	PSensor     PRIVACY_USERAPP_getDefaultSensorO(int oid, int sensorType);
 	void        PRIVACY_USERAPP_setDefaultSensor(int oid, int sensorType, int sensorID);
 	
 	
