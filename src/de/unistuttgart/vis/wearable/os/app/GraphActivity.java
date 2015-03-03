@@ -29,7 +29,7 @@ public class GraphActivity extends Activity {
 
 	private void fillChart() {
 
-		PSensor sensor = APIFunctions.API_getSensorById(getIntent().getExtras()
+		PSensor sensor = APIFunctions.getSensorById(getIntent().getExtras()
 				.getInt("sensorId"));
 
 		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
