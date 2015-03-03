@@ -106,65 +106,95 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	@Override
 	public boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).sensorProhibited(id);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.sensorProhibited(id);
+        return true;
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_grantPermission(int oid, int id)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).grantPermission(id);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.grantPermission(id);
+        return false;
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_revokePermission(int oid, int id)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).revokePermission(id);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.revokePermission(id);
+        return false;
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_denySensorType(int oid, int flag)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).denySensorType(flag);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.denySensorType(flag);
+        return false;
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_allowSensorType(int oid, int flag)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).allowSensorType(flag);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.allowSensorType(flag);
+        return false;
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).sensorTypeGranted(flag);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            return userApp.sensorTypeGranted(flag);
+        return false;
 	}
 
 	@Override
 	public void PRIVACY_USERAPP_grantActivityRecognition(int oid)
 			throws RemoteException {
-		PrivacyManager.instance.getApp(oid).grantActivityRecognition();
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.grantActivityRecognition();
 	}
 
 	@Override
 	public void PRIVACY_USERAPP_denyActivityRecognition(int oid)
 			throws RemoteException {
-		PrivacyManager.instance.getApp(oid).denyActivityRecognition();
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.denyActivityRecognition();
 	}
 
 	@Override
 	public boolean PRIVACY_USERAPP_activityRecognitionGranted(int oid)
 			throws RemoteException {
-		return PrivacyManager.instance.getApp(oid).activityRecognitionGranted();
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+		    return userApp.activityRecognitionGranted();
+        return false;
 	}
 
     @Override
     public int PRIVACY_USERAPP_getDefaultSensor(int oid, int sensorType) throws RemoteException {
-        return PrivacyManager.instance.getApp(oid).getDefaultSensor(SensorType.values()[sensorType]);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.getDefaultSensor(SensorType.values()[sensorType]);
+        return Constants.ILLEGAL_VALUE;
     }
 
     @Override
     public void PRIVACY_USERAPP_setDefaultSensor(int oid, int sensorType, int sensorID) throws RemoteException {
-        PrivacyManager.instance.getApp(oid).setDefaultSensor(SensorType.values()[sensorType], sensorID);
+        UserApp userApp = PrivacyManager.instance.getApp(oid);
+        if(userApp != null)
+            userApp.setDefaultSensor(SensorType.values()[sensorType], sensorID);
     }
 
 	
