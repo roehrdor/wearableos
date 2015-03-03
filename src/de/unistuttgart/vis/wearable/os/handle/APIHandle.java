@@ -9,6 +9,7 @@ package de.unistuttgart.vis.wearable.os.handle;
 
 import android.content.ComponentName;
 import android.os.IBinder;
+import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
@@ -59,7 +60,11 @@ public class APIHandle extends android.app.Application {
 	private static android.content.ServiceConnection serviceConnection = new android.content.ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			garmentAPIHandle = IGarmentAPI.Stub.asInterface(service);			
+			garmentAPIHandle = IGarmentAPI.Stub.asInterface(service);
+            try {
+                garmentAPIHandle.registerNewApp(appPackageID);
+            } catch(RemoteException e) {
+            }
 		}
 
 		@Override

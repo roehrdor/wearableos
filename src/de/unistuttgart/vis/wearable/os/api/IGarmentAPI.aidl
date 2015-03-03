@@ -13,7 +13,9 @@ import de.unistuttgart.vis.wearable.os.api.PSensorData;
 
 interface IGarmentAPI {
 	long currentTime();
-	
+
+	void registerNewApp(String app);
+
 	void registerCallback(String app, IGarmentCallback callback, int ID);
 	void unregisterCallback(String app, IGarmentCallback callback, int ID);
 

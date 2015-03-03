@@ -7,7 +7,9 @@
  */
 package de.unistuttgart.vis.wearable.os.service;
 
+import android.content.Intent;
 import android.os.Message;
+import android.util.Log;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
@@ -86,7 +88,8 @@ public class GarmentOSService extends android.app.Service {
 	
 	@Override
 	public android.os.IBinder onBind(android.content.Intent intent) {
-		if(IGarmentAPI.class.getName().equals(intent.getAction())) {
+        Log.d("orDEBUG", "--- THERE HAS BEEN A NEW APP ---" + intent.getAction());
+        if(IGarmentAPI.class.getName().equals(intent.getAction())) {
 			String appName = intent.getStringExtra("AppProcess");
 			PrivacyManager.instance.registerNewApp(appName);
 			return this.APIBinder;
@@ -94,8 +97,20 @@ public class GarmentOSService extends android.app.Service {
 		else
 			return null;
 	}
-	
-	@Override
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        super.onUnbind(intent);
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+        Log.d("orDEBUG", "--- REBIND THERE HAS BEEN A NEW APP ---" + intent.getAction());
+    }
+
+    @Override
 	public void onCreate() {
 		super.onCreate();		
 		mHandler.sendEmptyMessage(Constants.CALLBACK_DEBUG_VALUE);

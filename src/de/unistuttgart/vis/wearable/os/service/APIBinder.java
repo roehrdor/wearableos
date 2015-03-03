@@ -39,6 +39,11 @@ class APIBinder extends IGarmentAPI.Stub {
 		return System.currentTimeMillis();
 	}
 
+    @Override
+    public void registerNewApp(String app) throws android.os.RemoteException {
+        PrivacyManager.instance.registerNewApp(app);
+    }
+
 	/**
 	 * Register a callback handle to the kernel and save it according to its pid
 	 * and uid
