@@ -72,7 +72,9 @@ public class SensorsActivity extends Activity {
             imageView.setImageResource(sensor.getSensorType().getIconID());
 
             mySwitch = (Switch) sensorsLayout.findViewById(R.id.switch3);
+            mySwitch.setOnCheckedChangeListener(null);
             mySwitch.setChecked(sensor.isEnabled());
+
             mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,
