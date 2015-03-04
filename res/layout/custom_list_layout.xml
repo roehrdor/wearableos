@@ -39,14 +39,15 @@
         android:textSize="18sp"
         android:layout_toRightOf="@+id/img"
         android:layout_below="@+id/txt2"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
 
     <Switch
         android:id="@+id/switch3"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txt2"
-        android:layout_alignRight="@+id/txt2"
+        android:layout_below="@+id/txt3"
+        android:layout_alignRight="@+id/txt3"
         android:layout_marginBottom="10dp" />
 
 
