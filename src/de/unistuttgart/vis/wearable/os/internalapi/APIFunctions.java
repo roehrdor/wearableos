@@ -108,6 +108,17 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static void removeSensor(int sensorID) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().API_removeSensor(sensorID);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 	public static String[] getRegisteredApplications() {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
@@ -519,7 +530,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) {
+    public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond) {
         if (APIHandle.isInternalServiceBound()) {
             try {
                 return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataIB(sid, time, plusMinusOneSecond);
@@ -529,7 +540,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) {
+    public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end) {
         if (APIHandle.isInternalServiceBound()) {
             try {
                 return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataII(sid, start, end);

@@ -46,10 +46,10 @@ public class PSensorData extends de.unistuttgart.vis.wearable.os.parcel.PSensorD
             // Read the number of data sets, in case this is set to 0 there is no data to be read
             int size = source.readInt();
             if(size > 0) {
-                ret.time = new int[size];
+                ret.time = new long[size];
                 ret.dimension = source.readInt();
                 ret.data = new float[ret.dimension * ret.time.length];
-                source.readIntArray(ret.time);
+                source.readLongArray(ret.time);
                 source.readFloatArray(ret.data);
             }
             return ret;
@@ -75,7 +75,7 @@ public class PSensorData extends de.unistuttgart.vis.wearable.os.parcel.PSensorD
             // otherwise write the data
             dest.writeInt(this.time.length);
             dest.writeInt(this.dimension);
-            dest.writeIntArray(this.time);
+            dest.writeLongArray(this.time);
             dest.writeFloatArray(this.data);
         }
     }

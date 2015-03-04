@@ -139,6 +139,10 @@ public class Utils {
 		return (int) (date.getTime() / 1000L);
 	}
 
+    public static long dateToLongUnix(java.util.Date date) {
+        return date.getTime();
+    }
+
 	/**
 	 * Create a new {@link java.util.Date} object from the given unix time stamp
 	 * 
@@ -150,6 +154,10 @@ public class Utils {
 		return new java.util.Date(1000L * unixTime);
 	}
 
+    public static java.util.Date longUnixToDate(long unixTime) {
+        return new java.util.Date(unixTime);
+    }
+
 	/**
 	 * Return the current unix time stamp as integer value.
 	 * 
@@ -158,6 +166,10 @@ public class Utils {
 	public static int getCurrentUnixTimeStamp() {
 		return (int) (System.currentTimeMillis() / 1000L);
 	}
+
+    public static long getCurrentLongUnixTimeStamp() {
+        return System.currentTimeMillis();
+    }
 
 	/**
 	 * This function can be used to create an explicit intent from the given

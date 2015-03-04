@@ -636,7 +636,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) {
+    public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond) {
         if (APIHandle.isServiceBound()) {
             try {
                 return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawDataIB(APIHandle.getAppPackageID(), sid, time, plusMinusOneSecond);
@@ -646,7 +646,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) {
+    public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end) {
         if (APIHandle.isServiceBound()) {
             try {
                 return APIHandle.getGarmentAPIHandle().SENSORS_SENSOR_getRawDataII(APIHandle.getAppPackageID(), sid, start, end);

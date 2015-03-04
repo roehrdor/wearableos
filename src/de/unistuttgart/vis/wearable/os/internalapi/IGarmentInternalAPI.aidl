@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
@@ -19,6 +19,7 @@ interface IGarmentInternalAPI {
 	void        API_addNewSensor(int sampleRate, int savePeriod, int smoothness, String displayedSensorName,
 	                             int sensorType, String bluetoothID, int rawDataMeasurementSystem,
 	                             int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit);
+    void        API_removeSensor(int sensorID);
 
 	String[] 	API_getRegisteredApplications();
 	PUserApp[] 	API_getRegisteredUserApplications();
@@ -69,7 +70,7 @@ interface IGarmentInternalAPI {
 	void 		SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit);
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
-	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond);
-	PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end);
+	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond);
+	PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end);
 	PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues);
 }

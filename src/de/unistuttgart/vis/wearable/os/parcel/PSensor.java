@@ -201,7 +201,7 @@ public class PSensor {
      * @return a vector containing the data sets that meet the requirements
      */
     public java.util.Vector<SensorData> getRawData(java.util.Date time, boolean plusMinusOneSecond) {
-        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataIB(this.ID, Utils.dateToUnix(time), plusMinusOneSecond);
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataIB(this.ID, Utils.dateToLongUnix(time), plusMinusOneSecond);
         if(pd != null) {
             this.rawData = pd.toSensorDataList();
             return this.rawData;
@@ -217,7 +217,7 @@ public class PSensor {
      * @return a vector containing the data sets that meet the requirements
      */
     public java.util.Vector<SensorData> getRawData(java.util.Date begin, java.util.Date end) {
-        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataII(this.ID, Utils.dateToUnix(begin), Utils.dateToUnix(end));
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataII(this.ID, Utils.dateToLongUnix(begin), Utils.dateToLongUnix(end));
         if(pd != null) {
             this.rawData = pd.toSensorDataList();
             return this.rawData;

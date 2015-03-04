@@ -6,7 +6,7 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorData;
  * Created by Oliver on 2/11/2015.
  */
 public class PSensorData {
-    protected int time[] = null;
+    protected long time[] = null;
     protected float data[] = null;
     protected int dimension;
 
@@ -32,11 +32,11 @@ public class PSensorData {
 
         // Otherwise construct the parcelable object
         this.dimension = sensorData.get(0).getData().length;
-        this.time = new int[sensorData.size()];
+        this.time = new long[sensorData.size()];
         this.data = new float[this.dimension * this.time.length];
         int c = 0, d;
         for(SensorData sd : sensorData) {
-            this.time[c] = sd.getUnixDate();
+            this.time[c] = sd.getLongUnixDate();
             for(d = 0; d != this.dimension; ++d) {
                 this.data[c * this.dimension + d] = sd.getData()[d];
             }

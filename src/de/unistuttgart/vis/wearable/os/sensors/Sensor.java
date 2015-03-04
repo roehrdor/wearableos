@@ -14,6 +14,7 @@ import java.io.ObjectOutput;
 import java.util.Date;
 import java.util.Vector;
 
+import android.util.Log;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallBackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
@@ -208,10 +209,10 @@ public class Sensor implements Externalizable {
 
         rawData.add(sensorData);
 
-        GarmentOSService.callback(CallbackFlags.VALUE_CHANGED, new ValueChangedCallback(sensorData.getUnixDate(), sensorData.getData()));
+        GarmentOSService.callback(CallbackFlags.VALUE_CHANGED, new ValueChangedCallback(sensorData.getLongUnixDate(), sensorData.getData()));
 
         if (rawData.size() > savePeriod) {
-            SensorDataSerializer serializer = new SensorDataSerializer(sensorID, rawData);
+            new SensorDataSerializer(sensorID, rawData);
             rawData.clear();
         }
     }
@@ -254,7 +255,7 @@ public class Sensor implements Externalizable {
         } else {
             SensorDataDeSerializer deSerializer =
                     new SensorDataDeSerializer(sensorID, data,
-                            Utils.dateToUnix(begin), Utils.dateToUnix(end), 0);
+                            Utils.dateToLongUnix(begin), Utils.dateToLongUnix(end), 0);
             deSerializer.work();
             if (!end.before(firstLocallyHoldDate)) {
                 getRawData(begin, end, data);

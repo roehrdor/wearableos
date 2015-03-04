@@ -38,9 +38,14 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     @Override
     public void API_addNewSensor(int sampleRate, int savePeriod, int smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
-                                 int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) {
+                                 int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws  RemoteException{
         new Sensor(null, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
                 MeasurementUnits.values()[rawDataMeasurementUnit], MeasurementSystems.values()[displayedMeasurementSystem], MeasurementUnits.values()[displayedMeasurementUnit]);
+    }
+
+    @Override
+    public void API_removeSensor(int sensorID) throws RemoteException {
+        SensorManager.removeSensor(sensorID);
     }
 
 	@Override
@@ -391,21 +396,21 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond).clone());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(time), plusMinusOneSecond).clone());
     }
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataII(int sid, int start, int end) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(start), Utils.longUnixToDate(end)).clone());
     }
 
     @Override

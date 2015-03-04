@@ -728,7 +728,7 @@ class APIBinder extends IGarmentAPI.Stub {
      *         if the app is lacking permissions or the sensor could not be found
      */
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, int time, boolean plusMinusOneSecond) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, long time, boolean plusMinusOneSecond) throws RemoteException {
         if(checkPermissionDenied(app, sid))
             return null;
 
@@ -736,7 +736,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(time), plusMinusOneSecond).clone());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(time), plusMinusOneSecond).clone());
     }
 
     /**
@@ -751,7 +751,7 @@ class APIBinder extends IGarmentAPI.Stub {
      *         if the app is lacking permissions or the sensor could not be found
      */
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, int start, int end) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, long start, long end) throws RemoteException {
         if(checkPermissionDenied(app, sid))
             return null;
 
@@ -759,7 +759,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.unixToDate(start), Utils.unixToDate(end)).clone());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(start), Utils.longUnixToDate(end)).clone());
     }
 
     /**

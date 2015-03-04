@@ -112,4 +112,8 @@ public final class SensorManager {
         }
         return sensorsToReturn.values();
     }
+
+    public static void removeSensor(int id) {
+        allSensors.remove(id);
+    }
 }

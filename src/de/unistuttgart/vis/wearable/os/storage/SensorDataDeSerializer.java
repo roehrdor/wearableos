@@ -32,8 +32,8 @@ public class SensorDataDeSerializer implements Runnable {
 	private java.io.File file = null;
 	private java.io.RandomAccessFile raf = null;
 	
-	private int startTime = 0;
-	private int endTime = 0;
+	private long startTime = 0;
+	private long endTime = 0;
 	private int noDatasetsToRead = 0;
 	
 	private int jobFlag = 0;
@@ -92,7 +92,7 @@ public class SensorDataDeSerializer implements Runnable {
 	 * @throws IllegalArgumentException
 	 *             if noDatasetsToRead is less than 1
 	 */
-	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead, int startTime) {
+	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int noDatasetsToRead, long startTime) {
 		if(noDatasetsToRead < 1)
 			throw new IllegalArgumentException("Reading less than 1 element is not allowed");
 		this.sensorID = sensorID;
@@ -124,7 +124,7 @@ public class SensorDataDeSerializer implements Runnable {
 	 * @throws IllegalArgumentException
 	 *             if maxNumberOfValues is less than 0
 	 */
-	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, int startTime, int endTime, int maxNumberOfValues) {
+	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, long startTime, long endTime, int maxNumberOfValues) {
 		this.sensorID = sensorID;
 		this.context = GarmentOSService.getContext();
 		this.sensorData = sensorData;
@@ -181,227 +181,227 @@ public class SensorDataDeSerializer implements Runnable {
 		}
 	}
 
-	
-	@Override
-	public void run() {
-		try {			
-			int currentFileLength;
-			int numberOfDataSetsInFile;
-			int dataDimension;
-			int numberOfReadingIterations = 0;
-			
-			//
-			// If the file does not exist we can not read anything 
-			//
-			file = new java.io.File(this.context.getFilesDir(), String.valueOf(sensorID));
-			if(!file.exists()) {
-				return;
-			}
-			
-			//
-			// Otherwise open the file as RandomAccessFile
-			//
-			raf = new java.io.RandomAccessFile(file, "rw");	
-			
-			//
-			// Based on the file size compute the number of entries in the file
-			//
-			currentFileLength = (int)file.length();			
-			raf.seek(4);
-			dataDimension = raf.readInt();
-			numberOfDataSetsInFile = (currentFileLength - 8) / ((dataDimension + 1) * 4); 
-			
-			
-			//
-			// Now we have to check what working flag we have set and what we actually shall do
-			//
-			switch(jobFlag) {		
-				
-				//
-				// We want to read the latest data fields
-				//
-				case LATEST_DATA: {
-					
-					//
-					// If there are less data sets available than we want to read,
-					// we want to read them all otherwise just set up the file pointer
-					//
-					if(numberOfDataSetsInFile < noDatasetsToRead) {
-						raf.seek(8);
-						numberOfReadingIterations = numberOfDataSetsInFile;
-					} else {
-						raf.seek(currentFileLength - (noDatasetsToRead) * (dataDimension + 1) * 4);
-						numberOfReadingIterations = noDatasetsToRead;						
-					}
-					break;
-				}						
-					
-				
-				
-				//
-				// In this case we have got our time stamp to begin and a number of
-				// elements to read
-				//
-				case START_NUMBER: {
-					// The size of a dataChunk, 4 bytes per value, 1 for time,
-					// dataDimension for data
-					int chunkSize = ( dataDimension + 1 ) * 4;
-					
-					// Get the position of the start time 
-					int timePos = searchNotOlder(this.raf, this.startTime, 8, currentFileLength, chunkSize);
-					
-					// timePos as 0 indicates an error, since the first 8 byte shall never
-					// be searched by this procedure 
-					if(timePos == 0)
-						break;					
-				
-					// Set the file pointer to the correct position
-					// and set the number of reading iterations. If there are less
-					// elements left to be read than we shall read read all
-					// remaining, otherwise read the given amount of values
-					raf.seek(timePos);								
-					numberOfReadingIterations = (currentFileLength - timePos) / chunkSize;
-					numberOfReadingIterations = numberOfReadingIterations < noDatasetsToRead ? numberOfReadingIterations : noDatasetsToRead;					
-					break;
-				}
-				
-				//
-				// We want to search 
-				//
-				case START_END_LIMIT:
-				case START_END_UNLIMITED:
-				{
-					// The size of a dataChunk, 4 bytes per value, 1 for time,
-					// dataDimension for data
-					int chunkSize = ( dataDimension + 1 ) * 4;
-					
-					// Get the position of the start time and check for illegal return value
-					int timePos = searchNotOlder(this.raf, this.startTime, 8, currentFileLength, chunkSize);
-					if(timePos == 0)
-						break;
-					
-					// Now search for the latest data that is older than the end
-					// time and check for illegal return
-					int upperTimePos = searchNotYounger(this.raf, this.endTime, 8, currentFileLength, chunkSize);					
-					if(upperTimePos == 0)
-						break;
-					
-					raf.seek(timePos);
-					
-					int noElements = (upperTimePos - timePos) / chunkSize + 1;
-					if(noElements < 0)
-						break;
-					
-					if(jobFlag == START_END_LIMIT)
-						numberOfReadingIterations = noElements > this.noDatasetsToRead ? this.noDatasetsToRead : noElements;				
-					else
-						numberOfReadingIterations = noElements;
-					
-					
-					break;
-				}
 
-			}
-			
-			//
-			// Now that we have set the random access file pointer and the
-			// number of reading iterations we can read the data from the file
-			//
-			while(--numberOfReadingIterations >= 0) {
-				float f[] = new float[dataDimension];
-				int date = raf.readInt();
-				for(int i = 0; i != dataDimension; ++i) {
-					f[i] = raf.readFloat();
-				}						
-				sensorData.add(new SensorData(f, date));
-			}
-			
-			
-			//
-			// Close the file
-			//
-			raf.close();
-		} catch (java.io.IOException ioe) {
-		}
-		
-		//
-		// Remove the id to signal the job is finsihed
-		//
-		synchronized (activeWorkers) {
-			activeWorkers.remove(threadID);
-		}
-	}
-	
-	
-	/**
-	 * Search in the given file for the latest time stamp that is not older than
-	 * the given one 
-	 * 
-	 * @param raf
-	 *            the file to search the time stamp in
-	 * @param value
-	 *            the time to search for
-	 * @param offset
-	 *            the offset from the beginning of the file
-	 * @param fileSize
-	 *            the total file size
-	 * @param chunkSize
-	 *            the chunk size
-	 * @return the file pointer
-	 * @throws java.io.IOException
-	 */
-	private static int searchNotOlder(java.io.RandomAccessFile raf, int value, int offset, int fileSize, int chunkSize) throws java.io.IOException {		
-		int currentPos = offset - chunkSize;
-		int currentValue = 0;
-		int max;
-		
-		raf.seek(fileSize-chunkSize);
-		max = raf.readInt();
-		
-		// There is no data not older than the given value
-		if(max < value)
-			return 0;
-		
-		while(currentValue < value) {
-			raf.seek(currentPos += chunkSize);
-			currentValue = raf.readInt();
-		}
-		
-		return currentPos;
-	}
-	
-	/**
-	 * Search in the given file for the newest time stamp that is older than the
-	 * given one
-	 * 
-	 * @param raf
-	 *            the file to search the time stamp in
-	 * @param value
-	 *            the time to search for
-	 * @param offset
-	 *            the offset from the beginning of the file
-	 * @param fileSize
-	 *            the total file size
-	 * @param chunkSize
-	 *            the chunk size
-	 * @return the file pointer
-	 * @throws java.io.IOException
-	 */
-	private static int searchNotYounger(java.io.RandomAccessFile raf, int value, int offset, int fileSize, int chunkSize) throws java.io.IOException {
-		int currentPos = fileSize - chunkSize;
-		int currentValue = Integer.MAX_VALUE;
-		
-		raf.seek(offset);
-		
-		// There is no data not younger than the given one
-		if(raf.readInt() > value)
-			return 0;
-		
-		while(currentValue > value) {
-			raf.seek(currentPos -= chunkSize);
-			currentValue = raf.readInt();
-		}
-		
-		return currentPos;
-	}	
+    @Override
+    public void run() {
+        try {
+            int currentFileLength;
+            int numberOfDataSetsInFile;
+            int dataDimension;
+            int numberOfReadingIterations = 0;
+
+            //
+            // If the file does not exist we can not read anything
+            //
+            file = new java.io.File(this.context.getFilesDir(), String.valueOf(sensorID));
+            if(!file.exists()) {
+                return;
+            }
+
+            //
+            // Otherwise open the file as RandomAccessFile
+            //
+            raf = new java.io.RandomAccessFile(file, "rw");
+
+            //
+            // Based on the file size compute the number of entries in the file
+            //
+            currentFileLength = (int)file.length();
+            raf.seek(8);
+            dataDimension = raf.readInt();
+            numberOfDataSetsInFile = (currentFileLength - 12) / ((dataDimension + 1) * 4);
+
+
+            //
+            // Now we have to check what working flag we have set and what we actually shall do
+            //
+            switch(jobFlag) {
+
+                //
+                // We want to read the latest data fields
+                //
+                case LATEST_DATA: {
+
+                    //
+                    // If there are less data sets available than we want to read,
+                    // we want to read them all otherwise just set up the file pointer
+                    //
+                    if(numberOfDataSetsInFile < noDatasetsToRead) {
+                        raf.seek(12);
+                        numberOfReadingIterations = numberOfDataSetsInFile;
+                    } else {
+                        raf.seek(currentFileLength - (noDatasetsToRead) * (dataDimension + 2) * 4);
+                        numberOfReadingIterations = noDatasetsToRead;
+                    }
+                    break;
+                }
+
+
+
+                //
+                // In this case we have got our time stamp to begin and a number of
+                // elements to read
+                //
+                case START_NUMBER: {
+                    // The size of a dataChunk, 4 bytes per value, 1 for time,
+                    // dataDimension for data
+                    int chunkSize = ( dataDimension + 2 ) * 4;
+
+                    // Get the position of the start time
+                    int timePos = searchNotOlder(this.raf, this.startTime, 12, currentFileLength, chunkSize);
+
+                    // timePos as 0 indicates an error, since the first 8 byte shall never
+                    // be searched by this procedure
+                    if(timePos == 0)
+                        break;
+
+                    // Set the file pointer to the correct position
+                    // and set the number of reading iterations. If there are less
+                    // elements left to be read than we shall read read all
+                    // remaining, otherwise read the given amount of values
+                    raf.seek(timePos);
+                    numberOfReadingIterations = (currentFileLength - timePos) / chunkSize;
+                    numberOfReadingIterations = numberOfReadingIterations < noDatasetsToRead ? numberOfReadingIterations : noDatasetsToRead;
+                    break;
+                }
+
+                //
+                // We want to search
+                //
+                case START_END_LIMIT:
+                case START_END_UNLIMITED:
+                {
+                    // The size of a dataChunk, 4 bytes per value, 1 for time,
+                    // dataDimension for data
+                    int chunkSize = ( dataDimension + 2 ) * 4;
+
+                    // Get the position of the start time and check for illegal return value
+                    int timePos = searchNotOlder(this.raf, this.startTime, 12, currentFileLength, chunkSize);
+                    if(timePos == 0)
+                        break;
+
+                    // Now search for the latest data that is older than the end
+                    // time and check for illegal return
+                    int upperTimePos = searchNotYounger(this.raf, this.endTime, 12, currentFileLength, chunkSize);
+                    if(upperTimePos == 0)
+                        break;
+
+                    raf.seek(timePos);
+
+                    int noElements = (upperTimePos - timePos) / chunkSize + 1;
+                    if(noElements < 0)
+                        break;
+
+                    if(jobFlag == START_END_LIMIT)
+                        numberOfReadingIterations = noElements > this.noDatasetsToRead ? this.noDatasetsToRead : noElements;
+                    else
+                        numberOfReadingIterations = noElements;
+
+
+                    break;
+                }
+
+            }
+
+            //
+            // Now that we have set the random access file pointer and the
+            // number of reading iterations we can read the data from the file
+            //
+            while(--numberOfReadingIterations >= 0) {
+                float f[] = new float[dataDimension];
+                long date = raf.readLong();
+                for(int i = 0; i != dataDimension; ++i) {
+                    f[i] = raf.readFloat();
+                }
+                sensorData.add(new SensorData(f, date));
+            }
+
+
+            //
+            // Close the file
+            //
+            raf.close();
+        } catch (java.io.IOException ioe) {
+        }
+
+        //
+        // Remove the id to signal the job is finished
+        //
+        synchronized (activeWorkers) {
+            activeWorkers.remove(threadID);
+        }
+    }
+
+
+    /**
+     * Search in the given file for the latest time stamp that is not older than
+     * the given one
+     *
+     * @param raf
+     *            the file to search the time stamp in
+     * @param value
+     *            the time to search for
+     * @param offset
+     *            the offset from the beginning of the file
+     * @param fileSize
+     *            the total file size
+     * @param chunkSize
+     *            the chunk size
+     * @return the file pointer
+     * @throws java.io.IOException
+     */
+    private static int searchNotOlder(java.io.RandomAccessFile raf, long value, int offset, int fileSize, int chunkSize) throws java.io.IOException {
+        int currentPos = offset - chunkSize;
+        long currentValue = 0;
+        long max;
+
+        raf.seek(fileSize-chunkSize);
+        max = raf.readLong();
+
+        // There is no data not older than the given value
+        if(max < value)
+            return 0;
+
+        while(currentValue < value) {
+            raf.seek(currentPos += chunkSize);
+            currentValue = raf.readLong();
+        }
+
+        return currentPos;
+    }
+
+    /**
+     * Search in the given file for the newest time stamp that is older than the
+     * given one
+     *
+     * @param raf
+     *            the file to search the time stamp in
+     * @param value
+     *            the time to search for
+     * @param offset
+     *            the offset from the beginning of the file
+     * @param fileSize
+     *            the total file size
+     * @param chunkSize
+     *            the chunk size
+     * @return the file pointer
+     * @throws java.io.IOException
+     */
+    private static int searchNotYounger(java.io.RandomAccessFile raf, long value, int offset, int fileSize, int chunkSize) throws java.io.IOException {
+        int currentPos = fileSize - chunkSize;
+        long currentValue = Long.MAX_VALUE;
+
+        raf.seek(offset);
+
+        // There is no data not younger than the given one
+        if((currentValue = raf.readLong()) > value)
+            return 0;
+
+        while(currentValue > value) {
+            raf.seek(currentPos -= chunkSize);
+            currentValue = raf.readLong();
+        }
+
+        return currentPos;
+    }
 }

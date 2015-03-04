@@ -69,8 +69,8 @@ public class SensorDataSerializer {
 
                         try {
                             long currentFileLength;
-                            int latestData = 0;
-                            int currentDate = 0;
+                            long latestData = 0;
+                            long currentDate = 0;
 
                             //
                             // Create a new file object and test whether the file already
@@ -86,7 +86,7 @@ public class SensorDataSerializer {
                                     Log.e("GarmentOS", "File does not exist, but creating it tells us it does already exist?");
                                 }
                                 raf = new java.io.RandomAccessFile(file, "rw");
-                                raf.writeInt(0);
+                                raf.writeLong(0);
                                 raf.writeInt(data.get(0).getData().length);
                             } else {
                                 raf = new java.io.RandomAccessFile(file, "rw");
@@ -102,7 +102,7 @@ public class SensorDataSerializer {
                             raf.seek(0);
                             currentFileLength = file.length();
                             if (currentFileLength != 0L) {
-                                latestData = raf.readInt();
+                                latestData = raf.readLong();
                             }
 
                             //
@@ -115,13 +115,18 @@ public class SensorDataSerializer {
                             //
                             for (SensorData sd : data) {
                                 // The data has already been inserted so we can skip it
-                                if ((currentDate = sd.getUnixDate()) < latestData)
+                                if ((currentDate = sd.getLongUnixDate()) < latestData)
                                     continue;
 
                                 // Otherwise the data has not yet been inserted, so
-                                raf.writeInt(currentDate);
-                                for (float fsd : sd.getData())
+                                raf.writeLong(currentDate);
+                                String out = "" + currentDate + " ";
+                                for (float fsd : sd.getData()) {
                                     raf.writeFloat(fsd);
+                                    out += fsd + " ";
+                                }
+
+                                Log.d("SENSORDATA5", out);
                             }
 
                             data.clear();
@@ -130,12 +135,13 @@ public class SensorDataSerializer {
                             // Write the latest date to the beginning of the file
                             //
                             raf.seek(0);
-                            raf.writeInt(currentDate);
+                            raf.writeLong(currentDate);
 
                             //
                             // Close the file
                             //
                             raf.close();
+                            Log.d("orDEBUG", "Wrote SensorData for SensorID " + id);
                         } catch (java.io.IOException ioe) {
                             Log.e("GarmentOS", "SensorDataSerializer - writing to file failed");
                         }

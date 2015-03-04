@@ -15,7 +15,7 @@ package de.unistuttgart.vis.wearable.os.sensors;
  */
 public class SensorData {
 	private float[] data;
-	private int date;
+	private long date;
     private int dimension;
 
 	/**
@@ -27,7 +27,7 @@ public class SensorData {
 	 * @param date
 	 *            the unix time stamp the data set has been created
 	 */
-	public SensorData(float[] data, int date) {
+	public SensorData(float[] data, long date) {
 		this.data = data;
 		this.date = date;
         if(data != null)
@@ -44,7 +44,7 @@ public class SensorData {
 	 *            dimension of the data set created by the sensor
 	 * 
 	 */
-	public SensorData(int date, int size, float... data) {
+	public SensorData(long date, int size, float... data) {
 		this.date = date;
 		this.data = new float[size];
 		int pos = -1;
@@ -69,7 +69,7 @@ public class SensorData {
 	 * @return the date object this data set has been taken on
 	 */
 	public java.util.Date getDate() {
-		return new java.util.Date(1000L * (long) this.date);
+		return new java.util.Date(this.date);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class SensorData {
 	 * 
 	 * @return the unix time stamp this data set has been taken on
 	 */
-	public int getUnixDate() {
+	public long getLongUnixDate() {
 		return this.date;
 	}
 

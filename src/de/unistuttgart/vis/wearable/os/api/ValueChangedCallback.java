@@ -9,7 +9,7 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorData;
  * @author roehrdor
  */
 public class ValueChangedCallback extends BaseCallbackObject {
-    public int date;
+    public long date;
     public float[] data;
 
     /**
@@ -18,7 +18,7 @@ public class ValueChangedCallback extends BaseCallbackObject {
      * @param date the date of the sensor data
      * @param data the data of the sensor data
      */
-    public ValueChangedCallback(int date, float[] data) {
+    public ValueChangedCallback(long date, float[] data) {
         this.date = date;
         this.data = data;
     }
@@ -29,7 +29,7 @@ public class ValueChangedCallback extends BaseCallbackObject {
      * @param in the parcel to read the object from
      */
     public ValueChangedCallback(Parcel in) {
-        this.date = in.readInt();
+        this.date = in.readLong();
         this.data = in.createFloatArray();
     }
 
@@ -63,7 +63,7 @@ public class ValueChangedCallback extends BaseCallbackObject {
     public void writeToParcel(Parcel dest, int flags) {
         // Signal the object being send is type of call back object
         dest.writeInt(1);
-        dest.writeInt(this.date);
+        dest.writeLong(this.date);
         dest.writeFloatArray(this.data);
     }
 }

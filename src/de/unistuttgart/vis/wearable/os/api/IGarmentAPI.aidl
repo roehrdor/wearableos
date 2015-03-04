@@ -71,7 +71,7 @@ interface IGarmentAPI {
 	int 		SENSORS_SENSOR_getDisplayedMeasurementUnit(String app, int sid);
 	int 		SENSORS_SENSOR_getDisplayedMeasurementSystem(String app, int sid);
 	PSensorData SENSORS_SENSOR_getRawData(String app, int sid);
-    PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, int time, boolean plusMinusOneSecond);
-    PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, int start, int end);
+    PSensorData SENSORS_SENSOR_getRawDataIB(String app, int sid, long time, boolean plusMinusOneSecond);
+    PSensorData SENSORS_SENSOR_getRawDataII(String app, int sid, long start, long end);
     PSensorData SENSORS_SENSOR_getRawDataN(String app, int sid, int numberOfValues);
 }
