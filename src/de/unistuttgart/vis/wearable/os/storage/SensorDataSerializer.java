@@ -120,13 +120,10 @@ public class SensorDataSerializer {
 
                                 // Otherwise the data has not yet been inserted, so
                                 raf.writeLong(currentDate);
-                                String out = "" + currentDate + " ";
                                 for (float fsd : sd.getData()) {
                                     raf.writeFloat(fsd);
-                                    out += fsd + " ";
                                 }
 
-                                Log.d("SENSORDATA5", out);
                             }
 
                             data.clear();
@@ -141,7 +138,6 @@ public class SensorDataSerializer {
                             // Close the file
                             //
                             raf.close();
-                            Log.d("orDEBUG", "Wrote SensorData for SensorID " + id);
                         } catch (java.io.IOException ioe) {
                             Log.e("GarmentOS", "SensorDataSerializer - writing to file failed");
                         }
