@@ -8,6 +8,7 @@ import android.os.RemoteException;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
@@ -111,4 +112,17 @@ public class GraphModuleSensors extends PopupModuleSensors {
 		super.onSensorChanged(selecedSensor);
 	}
 
+	
+	@Override
+	protected void OnPauseButton(State state) {
+		super.OnPauseButton(state);
+		
+		if(state == State.PAUSE && igcb != null)
+			APIFunctions.unregisterCallback(igcb, CallbackFlags.VALUE_CHANGED);
+		else if(state == State.PLAYING && sensor != null) {
+			fillChart();
+		}
+		
+		
+	}
 }

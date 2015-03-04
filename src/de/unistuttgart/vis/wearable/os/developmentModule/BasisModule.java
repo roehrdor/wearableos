@@ -18,7 +18,7 @@ import android.graphics.Color;
 
 public abstract class BasisModule extends GridLayout {
 
-	private enum State {
+	public enum State {
 		PLAYING, PAUSE
 	};
 
@@ -148,20 +148,22 @@ public abstract class BasisModule extends GridLayout {
 
 		secondButton.setOnClickListener(new View.OnClickListener() {
 
-			private State state = State.PAUSE;
+			private State state = State.PLAYING;
 
 			@Override
 			public void onClick(View view) {
-				if (state == State.PAUSE) {
+				if (state == State.PLAYING) {
 					secondButton
 							.setImageResource(android.R.drawable.ic_media_play);
-					state = State.PLAYING;
+					state = State.PAUSE;
+					
 				} else {
 					secondButton
 							.setImageResource(android.R.drawable.ic_media_pause);
-					state = State.PAUSE;
+					state = State.PLAYING;
 				}
 
+				OnPauseButton(state);
 			}
 		});
 
@@ -187,5 +189,10 @@ public abstract class BasisModule extends GridLayout {
 
 	protected abstract View getPopupContent(final Context context,
 			final PopupWindow pWindow);
+	
+
+	protected void OnPauseButton(State state) {
+		
+	}
 
 }
