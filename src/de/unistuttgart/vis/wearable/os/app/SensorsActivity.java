@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
@@ -55,9 +56,10 @@ public class SensorsActivity extends Activity {
         @Override
         public View getView(final int position, View view, ViewGroup parent) {
             final PSensor sensor = sensors[position];
-            LayoutInflater inflater = context.getLayoutInflater();
-            RelativeLayout sensorsLayout = (RelativeLayout) inflater.inflate(
-                    R.layout.custom_list_layout, parent, false);
+            View sensorsLayout = view;
+            if (sensorsLayout == null) {
+                sensorsLayout = getLayoutInflater().inflate(R.layout.custom_list_layout, parent, false);
+            }
             TextView txtTitle = (TextView) sensorsLayout.findViewById(R.id.txt);
             TextView subTitle1 = (TextView) sensorsLayout
                     .findViewById(R.id.txt2);
@@ -72,23 +74,16 @@ public class SensorsActivity extends Activity {
             subTitle2.setText("power options: " + String.valueOf(tmp));
 
             mySwitch = (Switch) sensorsLayout.findViewById(R.id.switch3);
-
-            if (sensors != null) {
-                mySwitch.setChecked(sensor.isEnabled());
-                mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView,
-                                                 boolean isChecked) {
-                        sensor.setEnabled(isChecked);
-                    }
-                });
-            }
+            mySwitch.setChecked(sensor.isEnabled());
+            mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView,
+                                             boolean isChecked) {
+                    sensor.setEnabled(isChecked);
+                }
+            });
 
             imageView.setImageResource(sensor.getSensorType().getIconID());
-
-            // Workaround for on item click listener working with switch object
-            sensorsLayout
-                    .setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
             return sensorsLayout;
 
         }
@@ -101,7 +96,10 @@ public class SensorsActivity extends Activity {
     }
 
     public void listViewOptions(ListView listView) {
-        listView.setClickable(true);
+        @SuppressWarnings("rawtypes")
+        ArrayAdapter adapter = new SensorListAdapter(this, sensors);
+        listView.setAdapter(adapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -119,9 +117,7 @@ public class SensorsActivity extends Activity {
             }
         });
 
-        @SuppressWarnings("rawtypes")
-        ArrayAdapter adapter = new SensorListAdapter(this, sensors);
-        listView.setAdapter(adapter);
+
     }
 
     public void showDialogDelete(final int position) {
