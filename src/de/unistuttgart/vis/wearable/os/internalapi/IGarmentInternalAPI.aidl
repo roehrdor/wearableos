@@ -72,5 +72,5 @@ interface IGarmentInternalAPI {
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
 	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond);
 	PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end);
-	PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues);
+	PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues, boolean fromStorage);
 }

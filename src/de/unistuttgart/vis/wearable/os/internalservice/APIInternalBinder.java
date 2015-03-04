@@ -414,11 +414,11 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues, boolean fromStorage) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues).clone());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues, fromStorage).clone());
     }
 }

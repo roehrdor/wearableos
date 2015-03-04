@@ -550,10 +550,10 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) {
+    public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues, boolean fromStorage) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataN(sid, numberOfValues);
+                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataN(sid, numberOfValues, fromStorage);
             } catch(android.os.RemoteException e) {
             }
         }
