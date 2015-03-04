@@ -86,7 +86,7 @@ public class GraphModuleSensors extends PopupModuleSensors {
 		lastUpdate = new Date().getTime();
 
 		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
-				sensor, getContext(), NUMBER_OF_VALUES);
+				sensor, getContext(), NUMBER_OF_VALUES, false);
 		chart.removeAllViews();
 		
 		View graph = tuple.getChart();
