@@ -39,7 +39,6 @@ public class GraphActivity extends Activity {
 		setContentView(R.layout.activity_graph);
 		chart = (LinearLayout) findViewById(R.id.graphLayout);
 
-        //TODO
         sensor = APIFunctions.getSensorById(getIntent().getExtras()
                 .getInt("sensorId"));
 		fillChart();
