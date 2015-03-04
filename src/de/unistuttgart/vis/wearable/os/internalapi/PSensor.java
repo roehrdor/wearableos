@@ -79,22 +79,6 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
 	}
 	//</nsdk>
 
-    /**
-     * Get the last numberOfValues Sensor data
-     *
-     * @param numberOfValues the number of values we want to get
-     * @param fromStorage specify whether we want to force a load from storage
-     * @return the values
-     */
-    public java.util.Vector<SensorData> getRawData(int numberOfValues, boolean fromStorage) {
-        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataN(this.ID, numberOfValues, fromStorage);
-        if(pd != null) {
-            this.rawData = pd.toSensorDataList();
-            return this.rawData;
-        } else
-            return null;
-    }
-
 
     // =====================================================================
 	//

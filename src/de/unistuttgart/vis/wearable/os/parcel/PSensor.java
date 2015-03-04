@@ -232,7 +232,23 @@ public class PSensor {
      * @return the values
      */
     public java.util.Vector<SensorData> getRawData(int numberOfValues) {
-        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataN(this.ID, numberOfValues);
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataN(this.ID, numberOfValues, true);
+        if(pd != null) {
+            this.rawData = pd.toSensorDataList();
+            return this.rawData;
+        } else
+            return null;
+    }
+
+    /**
+     * Get the last numberOfValues Sensor data
+     *
+     * @param numberOfValues the number of values we want to get
+     * @param fromStorage specify whether we want to force a load from storage
+     * @return the values
+     */
+    public java.util.Vector<SensorData> getRawData(int numberOfValues, boolean fromStorage) {
+        PSensorData pd = APIFunctions.SENSORS_SENSOR_getRawDataN(this.ID, numberOfValues, fromStorage);
         if(pd != null) {
             this.rawData = pd.toSensorDataList();
             return this.rawData;

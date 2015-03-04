@@ -3,12 +3,9 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  *
- * (c) GarmentOS
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.sensors;
-
-import java.util.Collection;
-import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 

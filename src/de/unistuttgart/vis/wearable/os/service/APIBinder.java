@@ -773,7 +773,7 @@ class APIBinder extends IGarmentAPI.Stub {
      *         if the app is lacking permissions or the sensor could not be found
      */
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataN(String app, int sid, int numberOfValues) throws RemoteException {
+    public PSensorData SENSORS_SENSOR_getRawDataN(String app, int sid, int numberOfValues, boolean fromStorage) throws RemoteException {
         if(checkPermissionDenied(app, sid))
             return null;
 
@@ -781,7 +781,7 @@ class APIBinder extends IGarmentAPI.Stub {
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues, true).clone());
+        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues, fromStorage).clone());
     }
 
     /**
