@@ -276,7 +276,7 @@ public class AddSensorActivity extends Activity {
            Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
                     Toast.LENGTH_SHORT).show();
        }  else {
-    	   Log.i("BT", btMac);
+//    	   Log.i("BT", btMac);
             de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, (int) smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
             
 //            if (!SensorManager.getSensorByID(100000).isEnabled()) {
