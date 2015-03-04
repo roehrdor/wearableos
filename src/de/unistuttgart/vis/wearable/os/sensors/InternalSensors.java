@@ -406,7 +406,7 @@ public class InternalSensors implements SensorEventListener {
         if (sensor.isEnabled()) {
             float[] data = new float[dimensions];
             System.arraycopy(sensorEvent.values, 0, data, 0, dimensions);
-            sensor.addRawData(new SensorData(Utils.getCurrentUnixTimeStamp(),
+            sensor.addRawData(new SensorData(Utils.getCurrentLongUnixTimeStamp(),
                     dimensions, data));
         }
     }
@@ -421,7 +421,7 @@ public class InternalSensors implements SensorEventListener {
         try {
             float[] data = {(float) location.getLatitude(), (float) location.getLongitude(),
                     location.getAccuracy(), location.getSpeed()};
-            gpsSensor.addRawData(new SensorData (data, Utils.getCurrentUnixTimeStamp()));
+            gpsSensor.addRawData(new SensorData (data, Utils.getCurrentLongUnixTimeStamp()));
             Log.d("fpDEBUG", "added GPS Data");
         } catch (Exception e) {
             e.printStackTrace();
