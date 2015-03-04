@@ -7,15 +7,12 @@
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
-import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
-
-import java.util.Vector;
 
 /**
  * Sensor object that can be used in the settings app
