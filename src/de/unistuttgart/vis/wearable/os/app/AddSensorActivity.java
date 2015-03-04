@@ -93,7 +93,6 @@ public class AddSensorActivity extends Activity {
                                                   int progress, boolean fromUser) {
                         // smoothness is between 0 and 1
                         smoothness = (float) (seekBarSmoothness.getProgress() + 1) / 100;
-                        ;
                     }
                 });
         seekBarPowerOptions
@@ -116,7 +115,6 @@ public class AddSensorActivity extends Activity {
                                                   int progress, boolean fromUser) {
                         // powerOption > 0
                         powerOption = seekBarPowerOptions.getProgress() + 1;
-
                     }
                 });
 
@@ -276,7 +274,7 @@ public class AddSensorActivity extends Activity {
             Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
                     Toast.LENGTH_SHORT).show();
         }  else {
-            de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, (int) smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
+            de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
             Intent startBT = new Intent(this, GarmentOSBluetoothService.class);
             startBT.putExtra("btDevice", btMac);
             startBT.putExtra("btId", textView.getText().toString());
