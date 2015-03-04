@@ -23,8 +23,8 @@
 
         <ImageButton
             android:id="@+id/imageButton1"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@null"
             android:layout_gravity="right|center"
             android:onClick="addSensor"
