@@ -76,7 +76,7 @@ public class Sensor implements Externalizable {
      * which is not forgiven yet.
      * Use only for external Sensors
      */
-    public Sensor(SensorDriver sensorDriver, int sampleRate, int savePeriod, int smoothness,
+    public Sensor(SensorDriver sensorDriver, int sampleRate, int savePeriod, float smoothness,
                   String displayedSensorName, SensorType sensorType, String bluetoothID,
                   MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                   MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {

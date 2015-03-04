@@ -108,5 +108,4 @@ public class PrivacyManager {
 		this.apps.values().toArray(ua);
 		return ua;
 	}
-
 }

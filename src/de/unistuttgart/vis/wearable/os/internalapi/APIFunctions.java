@@ -91,7 +91,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static void addNewSensor(int sampleRate, int savePeriod, int smoothness,
+    public static void addNewSensor(int sampleRate, int savePeriod, float smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
                              MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                              MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {

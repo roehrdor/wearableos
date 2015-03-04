@@ -36,7 +36,7 @@ import de.unistuttgart.vis.wearable.os.utils.Utils;
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 
     @Override
-    public void API_addNewSensor(int sampleRate, int savePeriod, int smoothness, String displayedSensorName,
+    public void API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
                                  int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws  RemoteException{
         new Sensor(null, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
