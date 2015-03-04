@@ -158,23 +158,52 @@ public class GraphRenderer {
 
     private static GraphData[] graphData;
     private static GraphType graphType;
-
+    private static Vector<SensorData> lastData = new Vector<SensorData>();
+    // TODO last data bug - static - multiple calls will produce wrong data
+    // Solution: Non static
+    /**
+     * creates the graph with the given number of values (see getRawData(int, boolean)
+     * @param sensor the sensor to show data from
+     * @param context the android context to show the graph in
+     * @param numberOfValuesToBeShown the number of values to show in the graph
+     * @param loadFromStorage if the data can also be from the storage or just from the memory
+     */
 	public static ChartThreadTuple createGraph(final PSensor sensor,
-			Context context, final int numberOfValuesToBeShown) {
+			Context context, final int numberOfValuesToBeShown, final boolean loadFromStorage) {
+            if (loadFromStorage) {
+                lastData = new Vector<SensorData>();
+            }
 
 		GraphDataGenerator generator = new GraphDataGenerator() {
 
 			@Override
 			public GraphData[] getData() {
-                Vector<SensorData> data = sensor.getRawData(numberOfValuesToBeShown);
+                // loead the new Data
+                Vector<SensorData> data = sensor.getRawData(numberOfValuesToBeShown, loadFromStorage);
 
-                if (data == null || data.size() == 0)
+                if (data == null) {
+                    data = new Vector<SensorData>();
+                }
+                // if needed add the needed number of data from the lastData to data
+                if ((data.size() < numberOfValuesToBeShown) && lastData.size() != 0) {
+                    int numberOfValuesToDelete = (data.size() + lastData.size() - numberOfValuesToBeShown);
+                    for (int i = 0; i < numberOfValuesToDelete; i++) {
+                        lastData.remove(0);
+                    }
+                    lastData.addAll(data);
+                    data = lastData;
+                }
+                //this data is now the lastData
+                lastData = data;
+
+                if (data.size() == 0)
                 {
                     return new GraphData[0];
                 }
 
 				int numberOfDimensions = data.get(0).getDimension();
 
+                // create the values for the graph
                 graphData = new GraphData[numberOfDimensions];
 				for (int dimension = 0; dimension < numberOfDimensions; dimension++) {
 					double[] values = new double[data.size()];

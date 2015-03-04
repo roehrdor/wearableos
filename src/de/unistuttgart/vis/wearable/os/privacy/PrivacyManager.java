@@ -1,6 +1,5 @@
 package de.unistuttgart.vis.wearable.os.privacy;
 
-import android.util.Log;
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 
 /**
@@ -39,7 +38,6 @@ public class PrivacyManager {
 	 *            the name of the new app
 	 */
 	public void registerNewApp(String name) {
-        Log.d("orDEBUG", "PrivacyManager:registerNewApp() - got a new app " + name);
         if (!this.apps.containsKey(name)) {
 			UserApp ua = new UserApp(name, name.hashCode());
 			this.apps.put(name, ua);
@@ -110,5 +108,4 @@ public class PrivacyManager {
 		this.apps.values().toArray(ua);
 		return ua;
 	}
-
 }

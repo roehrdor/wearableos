@@ -9,16 +9,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -67,25 +65,26 @@ public class SensorsActivity extends Activity {
                     .findViewById(R.id.txt3);
             ImageView imageView = (ImageView) sensorsLayout
                     .findViewById(R.id.img);
-            txtTitle.setText(sensor.getDisplayedSensorName());
 
+            txtTitle.setText(sensor.getDisplayedSensorName());
             subTitle1.setText("smoothness: " + (int) (sensor.getSmoothness() * 100));
-            int tmp = (int) (sensor.getSavePeriod() / SensorDetailActivity.SAVE_PERIOD_FACTOR);
-            subTitle2.setText("power options: " + String.valueOf(tmp));
+            subTitle2.setText("power options: " + String.valueOf(sensor.getSavePeriod() / SensorDetailActivity.SAVE_PERIOD_FACTOR));
+            imageView.setImageResource(sensor.getSensorType().getIconID());
 
             mySwitch = (Switch) sensorsLayout.findViewById(R.id.switch3);
+            mySwitch.setOnCheckedChangeListener(null);
             mySwitch.setChecked(sensor.isEnabled());
+
             mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,
                                              boolean isChecked) {
+                    Log.d("lr DEBUG", "Wieso ????????" + sensor.getDisplayedSensorName());
                     sensor.setEnabled(isChecked);
                 }
             });
 
-            imageView.setImageResource(sensor.getSensorType().getIconID());
             return sensorsLayout;
-
         }
     }
 
@@ -128,10 +127,8 @@ public class SensorsActivity extends Activity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //Sobald die Funktion deleteSensor existiert kann dieser Code einkommentiert werden
-
-                //APIFunctions.deleteSensor(sensors[position].getID());
-                //onCreate(null);
+                APIFunctions.removeSensor(sensors[position].getID());
+                onCreate(null);
                 dialog.dismiss();
                 onResume();
             }

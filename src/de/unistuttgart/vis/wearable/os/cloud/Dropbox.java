@@ -8,8 +8,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.ProgressListener;
@@ -20,6 +22,8 @@ import com.dropbox.client2.session.Session;
 import de.unistuttgart.vis.wearable.os.R;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Martin on 18.02.2015.
@@ -31,16 +35,24 @@ public class Dropbox extends Activity {
     private static final Session.AccessType ACCESS_TYPE = Session.AccessType.AUTO;
     private Context context;
     private Button button;
-    private boolean connectionEstablished = false;
     private Upload uploadTask;
     private Download downloadTask;
     private File tmp;
+    private List<String> fileList;
     private boolean finished = false;
     private FileInputStream inputStream;
     private FileOutputStream outputStream;
+    private ListView list;
+    private ArrayAdapter adapter;
+    private DropboxAPI.Entry currentEntry;
+    private String currentFilePath;
+    private String currentDir;
+    private List<String> dir;
+    private Integer[] images;
 
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
+
 
     private class Upload extends AsyncTask<Void, Long, Boolean> {
         private final ProgressDialog progressDialog;
@@ -75,7 +87,6 @@ public class Dropbox extends Activity {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            connectionEstablished = false;
                             new cancelUpload().execute(null, null, null);
                         }
                     });
@@ -106,8 +117,7 @@ public class Dropbox extends Activity {
 
                 try {
                     // set request for connectionEstablished to Dropbox
-                    request = mDBApi.putFileOverwriteRequest("/Garment-OS/"
-                                    + "gos_sensors.zip", inputStream, tmp.length(),
+                    request = mDBApi.putFileOverwriteRequest(currentDir, inputStream, tmp.length(),
                             new ProgressListener() {
 
                                 @Override
@@ -146,7 +156,6 @@ public class Dropbox extends Activity {
 
         @Override
         protected void onPostExecute(final Boolean result) {
-            connectionEstablished = false;
             tmp.delete();
             // print result
             runOnUiThread(new Runnable() {
@@ -158,10 +167,12 @@ public class Dropbox extends Activity {
                         Toast.makeText(context,
                                 "File uploaded",
                                 Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
                         Toast.makeText(context,
                                 "File upload failed",
                                 Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }
 
@@ -177,33 +188,13 @@ public class Dropbox extends Activity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            DropboxAPI.Entry data= null;
-            try {
-                 data = mDBApi.metadata("/Garment-OS/"
-                        + "gos_sensors.zip", 1, null, false, null);
-            } catch (DropboxException e) {
-                e.printStackTrace();
-            }
-            if (data==null||!data.fileName().equals("gos_sensors.zip")||data.isDeleted) {
-                runOnUiThread(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        progressDialog.dismiss();
-                        Toast.makeText(getApplicationContext(),"No SensorData available! Please first upload SensorData",Toast.LENGTH_LONG).show();
-
-                    }
-
-                });
-                return null;
-            }
             // TODO add right path
-            file = new File("tmp");
+            file = new File(Environment.getExternalStorageDirectory()+File.separator+"tmp.zip");
             outputStream = null;
             try {
                 outputStream = new FileOutputStream(file);
-                DropboxAPI.DropboxFileInfo info = mDBApi.getFile("/Garment-OS/"
-                                + "gos_sensors.zip", null,
+                DropboxAPI.DropboxFileInfo info = mDBApi.getFile(currentFilePath, null,
                         outputStream, new ProgressListener() {
 
                             @Override
@@ -250,7 +241,6 @@ public class Dropbox extends Activity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            connectionEstablished = false;
 
             // print result
             runOnUiThread(new Runnable() {
@@ -262,10 +252,12 @@ public class Dropbox extends Activity {
                         Toast.makeText(context,
                                 "File import finished",
                                 Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
                         Toast.makeText(context,
                                 "File import failed",
                                 Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }
 
@@ -308,7 +300,6 @@ public class Dropbox extends Activity {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            connectionEstablished = false;
                             new cancelDownload().execute(null, null, null);
                         }
                     });
@@ -319,56 +310,23 @@ public class Dropbox extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        images = new Integer[2];
+        images[0] = R.drawable.folder;
+        images[1] = R.drawable.file;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dropbox);
+        if (getIntent().getBooleanExtra("isExport",false)){
+            setContentView(R.layout.activity_dropbox_export);
+            button = (Button) findViewById(R.id.button1);
+        } else {
+            setContentView(R.layout.activity_dropbox_import);
+        }
         context = this.getBaseContext();
-        button = (Button) findViewById(R.id.button1);
-        if(!getIntent().getBooleanExtra("isExport",false)) {
-            button.setText("Import SensorData");
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (connectionEstablished) {
-            if (mDBApi.getSession().authenticationSuccessful()) {
-                try {
-                    // complete the authentication
-                    mDBApi.getSession().finishAuthentication();
-                    String accessToken = mDBApi.getSession()
-                            .getOAuth2AccessToken();
-
-                } catch (IllegalStateException e) {
-                }
-                // start
-                if (getIntent().getBooleanExtra("isExport",false)) {
-                    uploadTask = new Upload();
-                    uploadTask.execute(null, null, null);
-                } else {
-                    downloadTask = new Download();
-                    downloadTask.execute(null,null,null);
-                }
-            }
-
-
-        }
-        finished = false;
-    }
-
-    /**
-     * starts session for authentication on dropbox
-     *
-     * @param view
-     */
-    public void upload(View view) {
 
         if (internetAvailable()) {
             // register keys
             AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
             AndroidAuthSession session = new AndroidAuthSession(appKeys,
                     ACCESS_TYPE);
-            connectionEstablished = true;
             // start Dropbox authentication
             mDBApi = new DropboxAPI<AndroidAuthSession>(session);
             mDBApi.getSession().startOAuth2Authentication(Dropbox.this);
@@ -377,8 +335,120 @@ public class Dropbox extends Activity {
             Toast.makeText(getBaseContext(),
                     "Please activate WIFI or mobile-data connection",
                     Toast.LENGTH_SHORT).show();
+            finish();
         }
 
+    }
+
+    private void setFileList(final String path) {
+        AsyncTask<String,String,String> aTask = new AsyncTask<String,String,String>() {
+
+            @Override
+            protected String doInBackground(String... params) {
+                DropboxAPI.Entry entry = null;
+                try {
+                    entry = mDBApi.metadata(path, 1000, null, true, null);
+                    currentEntry = entry;
+                    currentDir = entry.path;
+                } catch (DropboxException e) {
+                    e.printStackTrace();
+                }
+                dir=new ArrayList<String>();
+
+                if(entry != null) {
+                    for (DropboxAPI.Entry ent : entry.contents) {
+                        if (!getIntent().getBooleanExtra("isExport", false)) {
+                            if (ent.isDir || ent.path.endsWith(".zip")) {
+                                String[] dirs = ent.path.split("/");
+                                dir.add(new String(dirs[dirs.length-1]));
+
+                            }
+                        } else {
+                            if (ent.isDir) {
+                                String[] dirs = ent.path.split("/");
+                                dir.add(new String(dirs[dirs.length-1]));
+
+                            }
+                        }
+
+                    }
+                }
+                runOnUiThread(new Runnable(){
+                    public void run() {
+                        list = (ListView) findViewById(R.id.listView1);
+                        String [] s = new String[dir.size()];
+                        s = dir.toArray(s);
+                        adapter = new StorageAdapter(Dropbox.this,s,images);
+                        list.setAdapter(adapter);
+                        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            /*
+                             * Checks if the user wants to browse the parent directory or a
+                             * child directory
+                             */
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view,
+                                                    int position, long id) {
+
+                                if (list.getItemAtPosition(position).toString().endsWith(".zip")){
+                                    finished =false;
+                                    currentFilePath = currentEntry.path + File.separator + list.getItemAtPosition(position).toString();
+                                    downloadTask = new Download();
+                                    downloadTask.execute(null,null,null);
+                                } else {
+                                    setFileList(currentEntry.path + File.separator + list.getItemAtPosition(position).toString());
+                                }
+
+                            }
+                        });
+                    }
+                });
+
+                return null;
+            }
+        };
+        aTask.execute(null, null, null);
+    }
+
+
+    @Override
+    protected void onResume() {
+       super.onResume();
+        if (mDBApi.getSession().authenticationSuccessful()) {
+            try {
+                // complete the authentication
+                mDBApi.getSession().finishAuthentication();
+                String accessToken = mDBApi.getSession()
+                        .getOAuth2AccessToken();
+                setFileList("/");
+            } catch (IllegalStateException e) {
+            }
+
+
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentEntry== null){
+            super.onBackPressed();
+        }
+        if (!currentEntry.path.equals("/")) {
+            setFileList(currentEntry.parentPath());
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
+    /**
+     * starts session for authentication on dropbox
+     *
+     * @param view
+     */
+    public void upload(View view) {
+        finished =false;
+        uploadTask = new Upload();
+        uploadTask.execute(null, null, null);
     }
 
 

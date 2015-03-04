@@ -10,6 +10,7 @@ package de.unistuttgart.vis.wearable.os.internalapi;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
@@ -79,8 +80,7 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
 	//</nsdk>
 
 
-	
-	// =====================================================================
+    // =====================================================================
 	//
 	// Getter and Setter functions	
 	// 

@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.storage;
 
+import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 
@@ -24,8 +25,7 @@ import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
  */
 public class SensorDataDeSerializer implements Runnable {
 	private int sensorID = 0;
-	private java.util.List<SensorData> sensorData;	
-	private android.content.Context context;
+	private java.util.List<SensorData> sensorData;
 	
 	private long threadID = 0;
 	
@@ -70,7 +70,6 @@ public class SensorDataDeSerializer implements Runnable {
 		this.sensorID = sensorID;
 		this.noDatasetsToRead = noDatasetsToRead;
 		this.jobFlag = LATEST_DATA;
-        this.context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
 	}
 	
 	/**
@@ -98,7 +97,6 @@ public class SensorDataDeSerializer implements Runnable {
 		this.sensorID = sensorID;
 		this.noDatasetsToRead = noDatasetsToRead;
 		this.startTime = startTime;
-		this.context = de.unistuttgart.vis.wearable.os.service.GarmentOSService.getContext();
 		this.sensorData = sensorData;
 		this.jobFlag = START_NUMBER;
 	}
@@ -126,7 +124,6 @@ public class SensorDataDeSerializer implements Runnable {
 	 */
 	public SensorDataDeSerializer(int sensorID, java.util.List<SensorData> sensorData, long startTime, long endTime, int maxNumberOfValues) {
 		this.sensorID = sensorID;
-		this.context = GarmentOSService.getContext();
 		this.sensorData = sensorData;
 		
 		if(maxNumberOfValues < 0)
@@ -193,7 +190,7 @@ public class SensorDataDeSerializer implements Runnable {
             //
             // If the file does not exist we can not read anything
             //
-            file = new java.io.File(this.context.getFilesDir(), String.valueOf(sensorID));
+            file = new java.io.File(Properties.storageDirectory, String.valueOf(sensorID));
             if(!file.exists()) {
                 return;
             }

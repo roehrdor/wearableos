@@ -36,7 +36,7 @@ import de.unistuttgart.vis.wearable.os.utils.Utils;
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 
     @Override
-    public void API_addNewSensor(int sampleRate, int savePeriod, int smoothness, String displayedSensorName,
+    public void API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
                                  int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws  RemoteException{
         new Sensor(null, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
@@ -207,13 +207,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	// Calls to Sensor, sid represents the unique ID of the object 
 	//
 	@Override
-	public boolean SENSORS_SENSOR_isEnabled(int sid) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        return sensor != null && sensor.isEnabled();
-	}
-
-	@Override
 	public void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled)
 			throws RemoteException {
         Sensor sensor;
@@ -223,17 +216,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor.setEnabled(isEnabled);
 	}
 
-	@Override
-	public String SENSORS_SENSOR_getDisplayedSensorName(int sid)
-			throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return null;
-        return sensor.getDisplayedSensorName();
-	}
-
-	@Override
+    @Override
 	public void SENSORS_SENSOR_setDisplayedSensorName(int sid,
 			String displayedSensorName) throws RemoteException {
         Sensor sensor;
@@ -241,15 +224,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return;
         sensor.setDisplayedSensorName(displayedSensorName);
-	}
-
-	@Override
-	public int SENSORS_SENSOR_getSampleRate(int sid) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        return sensor.getSampleRate();
 	}
 
 	@Override
@@ -262,16 +236,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor.setSampleRate(sampleRate);
 	}
 
-	@Override
-	public int SENSORS_SENSOR_getSavePeriod(int sid) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        return sensor.getSavePeriod();
-	}
-
-	@Override
+    @Override
 	public void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod)
 			throws RemoteException {
         Sensor sensor;
@@ -279,15 +244,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return;
         sensor.setSavePeriod(savePeriod);
-	}
-
-	@Override
-	public float SENSORS_SENSOR_getSmoothness(int sid) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        return sensor.getSmoothness();
 	}
 
 	@Override
@@ -301,17 +257,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getSensorType(int sid) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        if(sensor.getSensorType() == null)
-            return Constants.ENUMERATION_NULL;
-        return sensor.getSensorType().ordinal();
-	}
-
-	@Override
 	public void SENSORS_SENSOR_setSensorType(int sid, int sensorType)
 			throws RemoteException {
         Sensor sensor;
@@ -319,17 +264,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return;
         sensor.setSensorType(SensorType.values()[sensorType]);
-	}
-
-	@Override
-	public int SENSORS_SENSOR_getGraphType(int sid) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        if(sensor.getGraphType() == null)
-            return Constants.ENUMERATION_NULL;
-        return sensor.getGraphType().ordinal();
 	}
 
 	@Override
@@ -343,18 +277,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid)
-			throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        if(sensor.getDisplayedMeasurementUnit() == null)
-            return Constants.ENUMERATION_NULL;
-        return sensor.getDisplayedMeasurementUnit().ordinal();
-	}
-
-	@Override
 	public void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid,
 			int displayedMeasurementUnit) throws RemoteException {
         Sensor sensor;
@@ -362,18 +284,6 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return;
         sensor.setDisplayedMeasurementUnit(MeasurementUnits.values()[displayedMeasurementUnit]);
-	}
-
-	@Override
-	public int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid)
-			throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return Constants.ILLEGAL_VALUE;
-        if(sensor.getDisplayedMeasurementSystem() == null)
-            return Constants.ENUMERATION_NULL;
-        return sensor.getDisplayedMeasurementSystem().ordinal();
 	}
 
 	@Override
@@ -396,29 +306,11 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(time), plusMinusOneSecond).clone());
-    }
-
-    @Override
     public PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
             return null;
         return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(start), Utils.longUnixToDate(end)).clone());
-    }
-
-    @Override
-    public PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) throws RemoteException {
-        Sensor sensor;
-        sensor = SensorManager.getSensorByID(sid);
-        if(sensor == null)
-            return null;
-        return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(numberOfValues).clone());
     }
 }

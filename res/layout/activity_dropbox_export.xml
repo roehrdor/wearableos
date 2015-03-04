@@ -5,8 +5,17 @@
     android:layout_height="match_parent"
     android:background="#c0d6e4"
     android:orientation="vertical"
-    tools:context="${relativePackage}.${activityClass}" >
+    tools:context="${relativePackage}.${activityClass}" android:weightSum="1">
 
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_weight="1.00">
+        <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/listView1" android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
     <Button
         android:id="@+id/button1"
         android:layout_width="match_parent"
@@ -18,6 +27,6 @@
         android:padding="20dp"
         android:text="@string/btn_uploadDropbox"
         android:textColor="#FFFFFF"
-        android:textSize="25sp" />
+        android:textSize="25sp"/>
 
 </LinearLayout>

@@ -103,12 +103,12 @@ public class Archiver {
         //
         long existentFileSize;
         long mergeFileSize;
-        int latestMergeValueTimeStamp;
-        int latestExistentValueTimeStamp;
+        long latestMergeValueTimeStamp;
+        long latestExistentValueTimeStamp;
         int dimension;
         int dataChunkSize;
-        int currentMergeTime;
-        int currentExistentTime;
+        long currentMergeTime;
+        long currentExistentTime;
         byte[] buffer;
         boolean returnValue = true;
 
@@ -142,7 +142,7 @@ public class Archiver {
             //
             // Read the the time stamps from the file that needs to be merged
             //
-            latestMergeValueTimeStamp = dataToMergeFileRAF.readInt();
+            latestMergeValueTimeStamp = dataToMergeFileRAF.readLong();
             dimension = dataToMergeFileRAF.readInt();
             dataChunkSize = dimension * 4;
             buffer = new byte[dataChunkSize];
@@ -150,7 +150,7 @@ public class Archiver {
             //
             // Read the time stamps from the existent file we want the other one to merge to
             //
-            latestExistentValueTimeStamp = existentFileRAF.readInt();
+            latestExistentValueTimeStamp = existentFileRAF.readLong();
             if(dimension != existentFileRAF.readInt()) {
                 // Files can not be merged since the dimension does not equal
                 return false;
@@ -160,15 +160,15 @@ public class Archiver {
             // Write the file header consisting of the latest modification date
             // and the dimension of the sensor
             //
-            destinationRAF.writeInt(latestExistentValueTimeStamp > latestMergeValueTimeStamp ?
+            destinationRAF.writeLong(latestExistentValueTimeStamp > latestMergeValueTimeStamp ?
                     latestExistentValueTimeStamp : latestMergeValueTimeStamp);
             destinationRAF.writeInt(dimension);
 
             //
             // Seek to the correct positions in two existing files
             //
-            existentFileRAF.seek(8);
-            dataToMergeFileRAF.seek(8);
+            existentFileRAF.seek(12);
+            dataToMergeFileRAF.seek(12);
 
             // ----------------------------------------------------------------------
 
@@ -180,41 +180,41 @@ public class Archiver {
             //
             while(existentFileRAF.getFilePointer() < existentFileSize) {
                 // read the current time from the base file
-                currentExistentTime = existentFileRAF.readInt();
+                currentExistentTime = existentFileRAF.readLong();
 
                 // check whether we can read a time stamp from the new merge file
                 if(dataToMergeFileRAF.getFilePointer() < mergeFileSize) {
                     //
                     // Check for all the older data fields
                     //
-                    while((currentMergeTime = dataToMergeFileRAF.readInt()) < currentExistentTime) {
+                    while((currentMergeTime = dataToMergeFileRAF.readLong()) < currentExistentTime) {
                         dataToMergeFileRAF.read(buffer);
 
                         // now that we have the time, before the initial date we can write the time and data
                         // to the new destination file
-                        destinationRAF.writeInt(currentMergeTime);
+                        destinationRAF.writeLong(currentMergeTime);
                         destinationRAF.write(buffer);
                     }
 
                     // set the file pointer 4 bytes back to allow reading the date again
-                    dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() - 4);
+                    dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() - 8);
 
                     //
                     // Advance so we do not duplicate data
                     //
-                    while(dataToMergeFileRAF.readInt() <= currentExistentTime) {
+                    while(dataToMergeFileRAF.readLong() <= currentExistentTime) {
                         dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() + dataChunkSize);
                     }
 
                     // set the file pointer 4 bytes back to allow reading the date again
-                    dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() - 4);
+                    dataToMergeFileRAF.seek(dataToMergeFileRAF.getFilePointer() - 8);
                 }
 
                 // read the data from the base file
                 existentFileRAF.read(buffer);
 
                 // write the date and the data to the destination file
-                destinationRAF.writeInt(currentExistentTime);
+                destinationRAF.writeLong(currentExistentTime);
                 destinationRAF.write(buffer);
             }
 
@@ -226,12 +226,12 @@ public class Archiver {
             // the base file
             //
             while(dataToMergeFileRAF.getFilePointer() < mergeFileSize) {
-                currentMergeTime = dataToMergeFileRAF.readInt();
+                currentMergeTime = dataToMergeFileRAF.readLong();
                 dataToMergeFileRAF.read(buffer);
 
                 // now that we have the time, before the initial date we can write the time and data
                 // to the new destination file
-                destinationRAF.writeInt(currentMergeTime);
+                destinationRAF.writeLong(currentMergeTime);
                 destinationRAF.write(buffer);
             }
 
@@ -302,14 +302,14 @@ public class Archiver {
                 byte data[] = new byte[BUFFER];
                 String name = zipEntry.getName();
 
-                File outputFile = new File(name);
+                File outputFile = new File(Properties.storageDirectory, name);
                 FileOutputStream fileOutputStream;
                 boolean merge;
 
                 //
                 // In case the file does not already exist we can easily extract it
                 //
-                if((merge = outputFile.exists())) {
+                if(!(merge = outputFile.exists())) {
                     fileOutputStream = new FileOutputStream(outputFile);
                 }
 
@@ -317,13 +317,14 @@ public class Archiver {
                 // Otherwise we need to merge the extracted with the already existent file
                 //
                 else {
-                    outputFile = new File(name + ".me");
+                    outputFile = new File(Properties.storageDirectory, name + ".me");
                     fileOutputStream = new FileOutputStream(outputFile);
                 }
 
                 outputStream = new BufferedOutputStream(fileOutputStream, BUFFER);
-                while(zipInputStream.read(data, 0, BUFFER) != -1)
-                    outputStream.write(data, 0, BUFFER);
+                int length;
+                while((length = zipInputStream.read(data, 0, BUFFER)) != -1)
+                    outputStream.write(data, 0, length);
                 outputStream.flush();
                 outputStream.close();
 
@@ -366,9 +367,8 @@ public class Archiver {
                         Log.w("GarmentOS", "Archiver:unpackArchiveFile() - File can not be deleted");
                     }
                 }
-
-                zipInputStream.close();
             }
+            zipInputStream.close();
         } catch(IOException ioe) {
             Log.i("GarmentOS", "Archiver:unpackArchiveFile() - IOE");
         } catch(ClassNotFoundException cnfe) {

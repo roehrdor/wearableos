@@ -56,8 +56,8 @@ public class AddSensorActivity extends Activity {
     public static final int SAVE_PERIOD_FAKTOR = 125;
     public static final double SAMPLE_RATE_FAKTOR = 1.2;
     private Boolean newSensor = false;
-	private Spinner spinner4;
-	private String sensorDriver;
+    private Spinner spinner4;
+    private String sensorDriver;
 
 
     @Override
@@ -93,7 +93,6 @@ public class AddSensorActivity extends Activity {
                                                   int progress, boolean fromUser) {
                         // smoothness is between 0 and 1
                         smoothness = (float) (seekBarSmoothness.getProgress() + 1) / 100;
-                        ;
                     }
                 });
         seekBarPowerOptions
@@ -116,7 +115,6 @@ public class AddSensorActivity extends Activity {
                                                   int progress, boolean fromUser) {
                         // powerOption > 0
                         powerOption = seekBarPowerOptions.getProgress() + 1;
-
                     }
                 });
 
@@ -185,39 +183,39 @@ public class AddSensorActivity extends Activity {
             BTArrayAdapter.add(device);
         }
         spinner3.setAdapter(BTArrayAdapter);
-        
-        
+
+
         spinner3.setOnItemSelectedListener(new OnItemSelectedListener() {
 
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				btDevice = (BluetoothDevice) spinner3.getSelectedItem();
-				btMac = btDevice.getAddress();
-				
-			}
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                btDevice = (BluetoothDevice) spinner3.getSelectedItem();
+                btMac = btDevice.getAddress();
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				// TODO Auto-generated method stub
-				
-			}
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+
+            }
         });
-        
-        
+
+
         spinner4 = (Spinner) findViewById(R.id.sensorAdd_spinner_SensorDriver);
         ArrayAdapter adapter1 = new ArrayAdapter(this,
                 android.R.layout.simple_spinner_item);
         adapter1.add("LightDriver");
         adapter1.add("StepDriver");
-        
+
         spinner4.setAdapter(adapter1);
         spinner4.setOnItemSelectedListener(new OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-            	sensorDriver = (String) spinner4.getSelectedItem();
+                sensorDriver = (String) spinner4.getSelectedItem();
 
             }
 
@@ -272,37 +270,19 @@ public class AddSensorActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (textView.getText().toString().equalsIgnoreCase("New Sensor")                || textView.getText().toString().isEmpty()) {
-           Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
+        if (textView.getText().toString().equalsIgnoreCase("New Sensor") || textView.getText().toString().isEmpty()) {
+            Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
                     Toast.LENGTH_SHORT).show();
-       }  else {
-    	   Log.i("BT", btMac);
-            de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, (int) smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
-            
-//            if (!SensorManager.getSensorByID(100000).isEnabled()) {
-//                Toast.makeText(getBaseContext(),
-//                        "Sensor saved", Toast.LENGTH_SHORT)
-//                        .show();
-//            }
-//            else {
-//				Log.i("BT", "Try to create intent");
-//				Intent startBT =  new Intent(this, GarmentOSBluetoothService.class);
-//
-//				Log.i("BT1", "Try to putextra");
-//				startBT.putExtra("btDevice", btMac);
-//				startBT.putExtra("sensorId", textView.getText().toString());
-//				startBT.putExtra("btDriver", sensorDriver);
-//				Log.i("BT2", "Try to start");
-//				//startService(startBT);
-//               Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
-//
-//            }
+        }  else {
+            de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
+            Intent startBT = new Intent(this, GarmentOSBluetoothService.class);
+            startBT.putExtra("btDevice", btMac);
+            startBT.putExtra("btId", textView.getText().toString());
+            startBT.putExtra("btDriver", sensorDriver);
+            startService(startBT);
+            Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
             this.finish();
-
         }
-
-
-
     }
 
     public void goBack(View view) {

@@ -16,7 +16,7 @@ interface IGarmentInternalAPI {
 	//
 	// Internal API Function calls
 	//
-	void        API_addNewSensor(int sampleRate, int savePeriod, int smoothness, String displayedSensorName,
+	void        API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
 	                             int sensorType, String bluetoothID, int rawDataMeasurementSystem,
 	                             int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit);
     void        API_removeSensor(int sensorID);
@@ -51,26 +51,15 @@ interface IGarmentInternalAPI {
 	// 
 	// Function calls forward to Sensor object  
 	//
-	boolean 	SENSORS_SENSOR_isEnabled(int sid);
 	void 		SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled);
-	String 		SENSORS_SENSOR_getDisplayedSensorName(int sid);
 	void 		SENSORS_SENSOR_setDisplayedSensorName(int sid, String displayedSensorName);
-	int 		SENSORS_SENSOR_getSampleRate(int sid);
 	void 		SENSORS_SENSOR_setSampleRate(int sid, int sampleRate);
-	int 		SENSORS_SENSOR_getSavePeriod(int sid);
 	void 		SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod);
-	float 		SENSORS_SENSOR_getSmoothness(int sid);
 	void 		SENSORS_SENSOR_setSmoothness(int sid, float smoothness);
-	int 		SENSORS_SENSOR_getSensorType(int sid);
 	void 		SENSORS_SENSOR_setSensorType(int sid, int sensorType);
-	int 		SENSORS_SENSOR_getGraphType(int sid);
 	void 		SENSORS_SENSOR_setGraphType(int sid, int graphType);
-	int 		SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid);
-	int 		SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit);
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
-	PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond);
 	PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end);
-	PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues);
 }

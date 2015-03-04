@@ -91,7 +91,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static void addNewSensor(int sampleRate, int savePeriod, int smoothness,
+    public static void addNewSensor(int sampleRate, int savePeriod, float smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
                              MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                              MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
@@ -331,52 +331,22 @@ public class APIFunctions {
 	// Function calls forward to Sensor object  
 	//
 	// =====================================================================
-	public static boolean SENSORS_SENSOR_isEnabled(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_isEnabled(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
 	public static void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setEnabled(sid, isEnabled);
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setEnabled(sid, isEnabled);
                 return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static String SENSORS_SENSOR_getDisplayedSensorName(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedSensorName(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 
 	public static void SENSORS_SENSOR_setDisplayedSensorName(int sid, String displayedSensorName) {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setDisplayedSensorName(sid, displayedSensorName);
                 return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static int SENSORS_SENSOR_getSampleRate(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSampleRate(sid);
 			} catch (android.os.RemoteException e) {
 			}
 		}
@@ -394,31 +364,11 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");	
 	}
 
-	public static int SENSORS_SENSOR_getSavePeriod(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSavePeriod(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
 	public static void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod) {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setSavePeriod(sid, savePeriod);
                 return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static float SENSORS_SENSOR_getSmoothness(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSmoothness(sid);
 			} catch (android.os.RemoteException e) {
 			}
 		}
@@ -436,31 +386,11 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");	
 	}
 
-	public static int SENSORS_SENSOR_getSensorType(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getSensorType(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
 	public static void SENSORS_SENSOR_setSensorType(int sid, int sensorType) {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setSensorType(sid, sensorType);
                 return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static int SENSORS_SENSOR_getGraphType(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getGraphType(sid);
 			} catch (android.os.RemoteException e) {
 			}
 		}
@@ -478,31 +408,11 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");	
 	}
 
-	public static int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedMeasurementUnit(sid);
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
 	public static void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit) {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
 				APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_setDisplayedMeasurementUnit(sid, displayedMeasurementUnit);
                 return;
-			} catch (android.os.RemoteException e) {
-			}
-		}
-		throw new RuntimeException("Connection failed");	
-	}
-
-	public static int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid) {
-		if (APIHandle.isInternalServiceBound()) {
-			try {
-				return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getDisplayedMeasurementSystem(sid);
 			} catch (android.os.RemoteException e) {
 			}
 		}
@@ -520,6 +430,12 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");	
 	}
 
+    @Deprecated
+    public static boolean SENSORS_SENSOR_isEnabled(int sid) {
+        return de.unistuttgart.vis.wearable.os.api.APIFunctions.SENSORS_SENSOR_isEnabled(sid);
+    }
+
+    @Deprecated
     public static PSensorData SENSORS_SENSOR_getRawData(int sid) {
         if (APIHandle.isInternalServiceBound()) {
             try {
@@ -530,16 +446,7 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond) {
-        if (APIHandle.isInternalServiceBound()) {
-            try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataIB(sid, time, plusMinusOneSecond);
-            } catch (android.os.RemoteException e) {
-            }
-        }
-        throw new RuntimeException("Connection failed");
-    }
-
+    @Deprecated
     public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end) {
         if (APIHandle.isInternalServiceBound()) {
             try {
@@ -550,13 +457,9 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues) {
-        if(APIHandle.isServiceBound()) {
-            try {
-                return APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_getRawDataN(sid, numberOfValues);
-            } catch(android.os.RemoteException e) {
-            }
-        }
-        throw new RuntimeException("Connection failed");
+
+    @Deprecated
+    public static int SENSORS_SENSOR_getSensorType(int sid) {
+        return de.unistuttgart.vis.wearable.os.api.APIFunctions.SENSORS_SENSOR_getSensorType(sid);
     }
 }
