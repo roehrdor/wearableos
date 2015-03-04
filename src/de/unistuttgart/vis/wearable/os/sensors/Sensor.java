@@ -191,6 +191,7 @@ public class Sensor implements Externalizable {
                 // TODO: enable external sensors
             }
         } else {
+            saveSensor();
             if (isInternalSensor) {
                 InternalSensors.getInstance().disableInternalSensor(this);
             } else {
@@ -214,9 +215,16 @@ public class Sensor implements Externalizable {
         GarmentOSService.callback(CallbackFlags.VALUE_CHANGED, new ValueChangedCallback(sensorData.getLongUnixDate(), sensorData.getData()));
 
         if (rawData.size() > savePeriod) {
-            new SensorDataSerializer(sensorID, rawData);
-            rawData.clear();
+            saveSensor();
         }
+    }
+
+    /**
+     * saves the sensorData to the Storage
+     */
+    private void saveSensor() {
+        new SensorDataSerializer(sensorID, rawData);
+        rawData.clear();
     }
 
     /**
@@ -283,14 +291,16 @@ public class Sensor implements Externalizable {
     /**
      * Returns the given number of the newest SensorData of the Sensor.
      * @param numberOfValues    the number of SensorData to be returned
+     * @param loadFromStorage   true if the Data can also be from the storage and hasnt to be "live"
      * @return  the newest SensorData of the Sensor
      */
-    public synchronized Vector<SensorData> getRawData(int numberOfValues) {
+    public synchronized Vector<SensorData> getRawData(int numberOfValues, boolean loadFromStorage) {
         Vector<SensorData> returnData = new Vector<SensorData>();
-        if (rawData.size() < numberOfValues) {
+        if (loadFromStorage && rawData.size() < numberOfValues) {
             SensorDataDeSerializer deSerializer =
                     new SensorDataDeSerializer(sensorID, returnData, numberOfValues - rawData.size());
-            //TODO while (!SensorDataDeSerializer.jobFinsihed(deSerializer.work())){}
+            long id = deSerializer.work();
+            while (!SensorDataDeSerializer.jobFinsihed(id)){}
             returnData.addAll(rawData);
         } else {
             for (int i = rawData.size() - (numberOfValues - returnData.size()); i < rawData.size(); i++) {
