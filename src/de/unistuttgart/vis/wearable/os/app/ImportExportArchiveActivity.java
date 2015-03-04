@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
+import de.unistuttgart.vis.wearable.os.cloud.StorageAdapter;
 
 public class ImportExportArchiveActivity extends Activity {
 
@@ -49,8 +50,12 @@ public class ImportExportArchiveActivity extends Activity {
         currentDir = new File("/mnt/");
         folders = fill(currentDir);
         list = (ListView) findViewById(R.id.listView1);
-        adapter = new ArrayAdapter<String>(getBaseContext(),
-                android.R.layout.simple_list_item_1, folders);
+        Integer[] img = new Integer[2];
+        img[0]= R.drawable.folder;
+        img[1]= R.drawable.file;
+        String[] names = new String[folders.size()];
+        names = folders.toArray(names);
+        adapter = new StorageAdapter(ImportExportArchiveActivity.this,names,img);
         list.setAdapter(adapter);
         list.setOnItemClickListener(new OnItemClickListener() {
             /*
