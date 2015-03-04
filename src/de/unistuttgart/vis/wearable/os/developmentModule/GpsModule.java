@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class GpsModule extends PopupModule1 {
+public class GpsModule extends PopupModuleDate {
 
 	private final int NUMBER_OF_VALUES = 1;
 

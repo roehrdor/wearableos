@@ -10,12 +10,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class GraphModule extends PopupModule2 {
+public class GraphModuleActivities extends PopupModuleActivities {
 
 	private LinearLayout chart;
 	private Thread chartUpdateThread;
 
-	public GraphModule(Context context, AttributeSet attrs) {
+	public GraphModuleActivities(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
 		chart = new LinearLayout(context);

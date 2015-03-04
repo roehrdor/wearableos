@@ -6,18 +6,19 @@ import de.unistuttgart.vis.wearable.os.R;
 //import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.TextView;
 //import android.util.Log;
 //import android.widget.TextView;
 
-public class SpeedModule extends PopupModule1 {
+public class SittingModule extends PopupModuleDate {
 
 	// String sensor;
 	// private Sensor accelerometerSensor;
 
-	public SpeedModule(Context context, AttributeSet attrs) {
+	public SittingModule(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		//
-		// TextView content = new TextView(context);
+		
+		 TextView content = new TextView(context);
 		//
 		// Sensor[] sensors = APIFunctions.getSensors();
 		// if (sensors != null) {
@@ -34,7 +35,7 @@ public class SpeedModule extends PopupModule1 {
 		// }
 		// }
 
-		super.createLayout(context, content, R.drawable.speed, "Speed");
+		super.createLayout(context, content, R.drawable.sitting, "Sitting");
 	}
 
 }

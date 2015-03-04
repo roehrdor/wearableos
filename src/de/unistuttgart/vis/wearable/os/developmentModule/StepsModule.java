@@ -1,13 +1,12 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
 
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.activity.Activity;
-import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-public class StepsModule extends PopupModule1 {
+public class StepsModule extends PopupModuleDate {
 
 	public StepsModule(Context context, AttributeSet attrs) {
 		super(context, attrs);

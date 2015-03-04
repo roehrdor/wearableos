@@ -4,27 +4,21 @@ package de.unistuttgart.vis.wearable.os.app;
  * Created by Lucas on 08.02.2015.
  */
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.Looper;
-import android.os.RemoteException;
-import android.renderscript.Sampler;
-import android.util.Log;
-import android.widget.LinearLayout;
-
 import java.util.Date;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.RemoteException;
+import android.widget.LinearLayout;
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
+import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
-import de.unistuttgart.vis.wearable.os.api.APIFunctions;
-
-import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 public class GraphActivity extends Activity {
 

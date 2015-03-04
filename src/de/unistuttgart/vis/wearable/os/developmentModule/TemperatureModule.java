@@ -11,7 +11,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-public class TemperatureModule extends PopupModule1 {
+public class TemperatureModule extends PopupModuleDate {
 
 	private final int NUMBER_OF_VALUES = 1;
 

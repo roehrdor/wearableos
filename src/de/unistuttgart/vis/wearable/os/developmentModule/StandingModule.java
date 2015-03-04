@@ -5,15 +5,15 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-public class StatisticModule extends PopupModule2 {
+public class StandingModule extends PopupModuleActivities {
 
-	public StatisticModule(Context context, AttributeSet attrs) {
+	public StandingModule(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
 		TextView content = new TextView(context);
 		content.setText("100 Steps today...");
 
-		super.createLayout(context, content, R.drawable.graph, "Statistics");
+		super.createLayout(context, content, R.drawable.posture, "Standing");
 	}
 
 }

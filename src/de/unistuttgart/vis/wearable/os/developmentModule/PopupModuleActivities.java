@@ -28,16 +28,16 @@ import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public abstract class PopupModule2 extends BasisModule {
-	public PopupModule2(Context context) {
+public abstract class PopupModuleActivities extends BasisModule {
+	public PopupModuleActivities(Context context) {
 		super(context);
 	}
 
-	public PopupModule2(Context context, AttributeSet attrs, int defStyle) {
+	public PopupModuleActivities(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
-	public PopupModule2(Context context, AttributeSet attrs) {
+	public PopupModuleActivities(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
