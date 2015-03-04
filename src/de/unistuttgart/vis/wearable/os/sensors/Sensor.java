@@ -299,11 +299,15 @@ public class Sensor implements Externalizable {
         if (loadFromStorage && rawData.size() < numberOfValues) {
             SensorDataDeSerializer deSerializer =
                     new SensorDataDeSerializer(sensorID, returnData, numberOfValues - rawData.size());
+
             long id = deSerializer.work();
-            while (!SensorDataDeSerializer.jobFinsihed(id)){}
+            while (SensorDataDeSerializer.jobFinsihed(id)) {}
             returnData.addAll(rawData);
         } else {
-            for (int i = rawData.size() - (numberOfValues - returnData.size()); i < rawData.size(); i++) {
+            if (rawData.size() <= numberOfValues) {
+                return rawData;
+            }
+            for (int i = rawData.size() - numberOfValues; i < rawData.size(); i++) {
                 returnData.add(rawData.get(i));
             }
         }

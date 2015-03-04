@@ -45,7 +45,7 @@ public class GraphActivity extends Activity {
 	}
 
 	private void fillChart() {
-        fillChartImage();
+        fillChartImage(true);
 
         // register callback
         igcb = new IGarmentCallback.Stub() {
@@ -57,7 +57,7 @@ public class GraphActivity extends Activity {
                     GraphActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            fillChartImage();
+                            fillChartImage(false);
                         }
                     });
                 }
@@ -67,14 +67,14 @@ public class GraphActivity extends Activity {
 	}
 
     private long lastUpdate = 0;
-    private void fillChartImage() {
+    private void fillChartImage(boolean loadFromStorage) {
         if (lastUpdate + 100 >= new Date().getTime()) {
             return;
         }
         lastUpdate = new Date().getTime();
 
         GraphRenderer.ChartThreadTuple tuple =
-                GraphRenderer.createGraph(sensor, this, NUMBER_OF_VALUES);
+                GraphRenderer.createGraph(sensor, this, NUMBER_OF_VALUES, loadFromStorage);
         chart.removeAllViews();
         chart.addView(tuple.getChart());
     }
