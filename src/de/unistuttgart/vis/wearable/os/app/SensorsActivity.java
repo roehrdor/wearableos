@@ -132,7 +132,10 @@ public class SensorsActivity extends Activity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                //Sobald die Funktion deleteSensor existiert kann dieser Code einkommentiert werden
+
                 //APIFunctions.deleteSensor(sensors[position].getID());
+                //onCreate(null);
                 dialog.dismiss();
                 onResume();
             }
