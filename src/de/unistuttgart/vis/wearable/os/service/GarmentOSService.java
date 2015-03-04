@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.service;
 
@@ -19,7 +19,7 @@ import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 /**
- * The Garment OS Kernel Service
+ * The Garment OS Service
  * @author roehrdor
  */
 public class GarmentOSService extends android.app.Service {
@@ -88,7 +88,6 @@ public class GarmentOSService extends android.app.Service {
 	
 	@Override
 	public android.os.IBinder onBind(android.content.Intent intent) {
-        Log.d("orDEBUG", "--- THERE HAS BEEN A NEW APP ---" + intent.getAction());
         if(IGarmentAPI.class.getName().equals(intent.getAction())) {
 			String appName = intent.getStringExtra("AppProcess");
 			PrivacyManager.instance.registerNewApp(appName);
@@ -107,7 +106,6 @@ public class GarmentOSService extends android.app.Service {
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        Log.d("orDEBUG", "--- REBIND THERE HAS BEEN A NEW APP ---" + intent.getAction());
     }
 
     @Override
