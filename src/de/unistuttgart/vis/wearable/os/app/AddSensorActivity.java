@@ -230,8 +230,8 @@ public class AddSensorActivity extends Activity {
         });
     }
 
-    public void refreshBluetoothSpinner() {
-
+    public void refreshBluetoothSpinner(View view) {
+        // niy
     }
 
     public int getPosition(SensorType[] sensorTypes, SensorType sensorType) {
@@ -278,32 +278,31 @@ public class AddSensorActivity extends Activity {
        }  else {
     	   Log.i("BT", btMac);
             de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, (int) smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
-            //String[] test = de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.API_getSensorNames();
-            //Log.i("test", test[0]);
             
-            if (!SensorManager.getSensorByID(100000).isEnabled()) {
-                Toast.makeText(getBaseContext(),
-                        "Sensor saved", Toast.LENGTH_SHORT)
-                        .show();
-            }
-            else {            	
-				Log.i("BT", "Try to create intent");
-				Intent startBT =  new Intent(this, GarmentOSBluetoothService.class);
-
-				Log.i("BT1", "Try to putextra");
-				startBT.putExtra("btDevice", btMac);
-				startBT.putExtra("sensorId", textView.getText().toString());
-				startBT.putExtra("btDriver", sensorDriver);
-				Log.i("BT2", "Try to start");
-				//startService(startBT);
-               Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
-
-            }
+//            if (!SensorManager.getSensorByID(100000).isEnabled()) {
+//                Toast.makeText(getBaseContext(),
+//                        "Sensor saved", Toast.LENGTH_SHORT)
+//                        .show();
+//            }
+//            else {
+//				Log.i("BT", "Try to create intent");
+//				Intent startBT =  new Intent(this, GarmentOSBluetoothService.class);
+//
+//				Log.i("BT1", "Try to putextra");
+//				startBT.putExtra("btDevice", btMac);
+//				startBT.putExtra("sensorId", textView.getText().toString());
+//				startBT.putExtra("btDriver", sensorDriver);
+//				Log.i("BT2", "Try to start");
+//				//startService(startBT);
+//               Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
+//
+//            }
+            this.finish();
 
         }
 
 
-        this.finish();
+
     }
 
     public void goBack(View view) {

@@ -27,7 +27,7 @@
         android:textSize="25dp" />
 
     <Spinner
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_app_list_sensor_detail"
         android:layout_below="@+id/textView_app_list_name_detail"

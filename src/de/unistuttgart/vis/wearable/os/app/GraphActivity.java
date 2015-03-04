@@ -6,17 +6,31 @@ package de.unistuttgart.vis.wearable.os.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.RemoteException;
+import android.renderscript.Sampler;
+import android.util.Log;
 import android.widget.LinearLayout;
+
+import java.util.Date;
+
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
+import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
+import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
+import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 
 import de.unistuttgart.vis.wearable.os.api.PSensor;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 public class GraphActivity extends Activity {
 
 	private LinearLayout chart;
-	private Thread chartUpdateThread;
+    PSensor sensor;
+    IGarmentCallback igcb;
     private final int NUMBER_OF_VALUES = 300;
 
 	@Override
@@ -24,31 +38,50 @@ public class GraphActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_graph);
 		chart = (LinearLayout) findViewById(R.id.graphLayout);
+
+        sensor = APIFunctions.getSensorById(getIntent().getExtras()
+                .getInt("sensorId"));
 		fillChart();
 	}
 
 	private void fillChart() {
+        fillChartImage();
 
-		PSensor sensor = APIFunctions.API_getSensorById(getIntent().getExtras()
-				.getInt("sensorId"));
+        // register callback
+        igcb = new IGarmentCallback.Stub() {
+            @Override
+            public void callback(BaseCallbackObject value) throws RemoteException {
+                if (value instanceof ValueChangedCallback) {
+                    final SensorData data = ((ValueChangedCallback) value).toSensorData();
 
-		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
-				sensor, this, NUMBER_OF_VALUES);
-		chart.addView(tuple.getChart());
-        //TODO callback
-		chartUpdateThread = tuple.getThread();
-		chartUpdateThread.start();
+                    GraphActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fillChartImage();
+                        }
+                    });
+                }
+            }
+        };
+        APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
+    private long lastUpdate = 0;
+    private void fillChartImage() {
+        if (lastUpdate + 100 >= new Date().getTime()) {
+            return;
+        }
+        lastUpdate = new Date().getTime();
+
+        GraphRenderer.ChartThreadTuple tuple =
+                GraphRenderer.createGraph(sensor, this, NUMBER_OF_VALUES);
+        chart.removeAllViews();
+        chart.addView(tuple.getChart());
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (chartUpdateThread != null)
-            chartUpdateThread.interrupt();
+        APIFunctions.unregisterCallback(igcb, CallbackFlags.VALUE_CHANGED);
     }
 }

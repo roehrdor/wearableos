@@ -5,6 +5,8 @@ package de.unistuttgart.vis.wearable.os.app;
  */
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,19 +23,23 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Set;
+
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
-public class SensorDetailActivity extends Activity {
+public class SensorDetailBluetoothActivity extends Activity {
 
     private PSensor sensor;
     private SeekBar seekBarSmoothness;
     private SeekBar seekBarPowerOptions;
     private Spinner spinner;
     private Spinner spinner2;
+    private Spinner spinner3;
+    private Spinner spinner4;
     private Switch mySwitch;
     SensorType[] sensorTypes;
     MeasurementSystems[] measurementSystems;
@@ -48,12 +54,15 @@ public class SensorDetailActivity extends Activity {
     public static final int SAVE_PERIOD_FACTOR = 125;
     public static final double SAMPLE_RATE_FACTOR = 1.2;
     private boolean enabled;
+    private String sensorDriver;
+    private BluetoothDevice btDevice;
+    private String btMac;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sensor_detail);
+        setContentView(R.layout.activity_sensor_detail_bluetooth);
         mySwitch = (Switch) findViewById(R.id.sensorDetail_switch);
         buildSensorProperties();
         buildSeekBars();
@@ -62,8 +71,6 @@ public class SensorDetailActivity extends Activity {
     }
 
     public void showGraph(View view) {
-        saveValues();
-
         Intent intent = new Intent(getBaseContext(), GraphActivity.class);
         intent.putExtra("sensorId", getIntent().getIntExtra("sensorId", -1));
         startActivity(intent);
@@ -195,6 +202,64 @@ public class SensorDetailActivity extends Activity {
                 android.R.layout.simple_spinner_item, measurementSystems);
         spinner2.setAdapter(adapter3);
         spinner2.setSelection(getPosition(measurementSystems, measurementSystem));
+
+        spinner3 = (Spinner) findViewById(R.id.sensorAdd_spinner_Bluetooth);
+        BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (!myBluetoothAdapter.isEnabled()) {
+            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOnIntent, 1);
+        }
+
+        Set<BluetoothDevice> pairedDevices = myBluetoothAdapter.getBondedDevices();
+        ArrayAdapter<BluetoothDevice> BTArrayAdapter = new ArrayAdapter<BluetoothDevice>(this, android.R.layout.simple_spinner_item);
+        for (BluetoothDevice device : pairedDevices) {
+            BTArrayAdapter.add(device);
+        }
+        spinner3.setAdapter(BTArrayAdapter);
+
+
+        spinner3.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                btDevice = (BluetoothDevice) spinner3.getSelectedItem();
+                btMac = btDevice.getAddress();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+
+        spinner4 = (Spinner) findViewById(R.id.sensorAdd_spinner_SensorDriver);
+        ArrayAdapter adapter1 = new ArrayAdapter(this,
+                android.R.layout.simple_spinner_item);
+        adapter1.add("LightDriver");
+        adapter1.add("StepDriver");
+
+        spinner4.setAdapter(adapter1);
+        spinner4.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                sensorDriver = (String) spinner4.getSelectedItem();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
     }
 
     public int getPosition(SensorType[] sensorTypes, SensorType sensorType) {
@@ -223,12 +288,6 @@ public class SensorDetailActivity extends Activity {
     @Override
     public void onBackPressed() {
 
-        saveValues();
-
-        this.finish();
-    }
-
-    private void saveValues() {
         if (!(smoothness > 0) || !(powerOption > 0)) {
             Toast.makeText(getBaseContext(),
                     "Please check your SensorProperties. No null values allowed.", Toast.LENGTH_SHORT)
@@ -243,6 +302,8 @@ public class SensorDetailActivity extends Activity {
         sensor.setDisplayedMeasurementSystem(measurementSystems[spinner2.getSelectedItemPosition()]);
         sensor.setSensorType(sensorTypes[spinner.getSelectedItemPosition()]);
         sensor.setDisplayedSensorName(textView.getText().toString());
+
+        this.finish();
     }
 
     @Override

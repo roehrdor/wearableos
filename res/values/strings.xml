@@ -71,7 +71,7 @@
     <string name="buttonText_cancel">Cancel</string>
     <string name="checkBoxText_use_internal_directory">Use internal directory\n(Recommended)</string>
     <string name="OnOff">Sensor On/Off</string>
-    <string name="btn_goBack">Go Back</string>
+    <string name="btn_goBack">Cancel</string>
     <string name="har">Activity Recognition</string>
     <string name="title_activity_har">HARActivity</string>
     <string name="harSettings">Human Activity Recognition Settings</string>
