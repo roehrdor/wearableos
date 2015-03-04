@@ -72,7 +72,9 @@ public class SensorsActivity extends Activity {
             imageView.setImageResource(sensor.getSensorType().getIconID());
 
             mySwitch = (Switch) sensorsLayout.findViewById(R.id.switch3);
+            mySwitch.setOnCheckedChangeListener(null);
             mySwitch.setChecked(sensor.isEnabled());
+
             mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,
@@ -125,8 +127,6 @@ public class SensorsActivity extends Activity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //Sobald die Funktion deleteSensor existiert kann dieser Code einkommentiert werden
-
                 APIFunctions.removeSensor(sensors[position].getID());
                 onCreate(null);
                 dialog.dismiss();
