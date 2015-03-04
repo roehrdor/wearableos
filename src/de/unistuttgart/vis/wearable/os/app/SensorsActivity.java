@@ -18,9 +18,9 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
@@ -56,7 +56,7 @@ public class SensorsActivity extends Activity {
         public View getView(final int position, View view, ViewGroup parent) {
             final PSensor sensor = sensors[position];
             LayoutInflater inflater = context.getLayoutInflater();
-            LinearLayout sensorsLayout = (LinearLayout) inflater.inflate(
+            RelativeLayout sensorsLayout = (RelativeLayout) inflater.inflate(
                     R.layout.custom_list_layout, parent, false);
             TextView txtTitle = (TextView) sensorsLayout.findViewById(R.id.txt);
             TextView subTitle1 = (TextView) sensorsLayout
