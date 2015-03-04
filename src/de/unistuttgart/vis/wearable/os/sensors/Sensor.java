@@ -7,6 +7,8 @@
  */
 package de.unistuttgart.vis.wearable.os.sensors;
 
+import android.util.Log;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -287,10 +289,10 @@ public class Sensor implements Externalizable {
         if (rawData.size() < numberOfValues) {
             SensorDataDeSerializer deSerializer =
                     new SensorDataDeSerializer(sensorID, returnData, numberOfValues - rawData.size());
-            SensorDataDeSerializer.jobFinsihed(deSerializer.work());
+            //TODO while (!SensorDataDeSerializer.jobFinsihed(deSerializer.work())){}
             returnData.addAll(rawData);
         } else {
-            for (int i = rawData.size() - numberOfValues; i < rawData.size(); i++) {
+            for (int i = rawData.size() - (numberOfValues - returnData.size()); i < rawData.size(); i++) {
                 returnData.add(rawData.get(i));
             }
         }

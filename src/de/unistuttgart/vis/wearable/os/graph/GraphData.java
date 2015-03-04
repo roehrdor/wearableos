@@ -1,6 +1,7 @@
 package de.unistuttgart.vis.wearable.os.graph;
 
 import java.util.Date;
+import java.util.List;
 
 public class GraphData {
 	private String title;

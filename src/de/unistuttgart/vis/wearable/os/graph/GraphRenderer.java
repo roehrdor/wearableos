@@ -156,6 +156,9 @@ public class GraphRenderer {
 		return new ChartThreadTuple(thread, view);
 	}
 
+    private static GraphData[] graphData;
+    private static GraphType graphType;
+
 	public static ChartThreadTuple createGraph(final PSensor sensor,
 			Context context, final int numberOfValuesToBeShown) {
 
@@ -163,7 +166,7 @@ public class GraphRenderer {
 
 			@Override
 			public GraphData[] getData() {
-				Vector<SensorData> data = sensor.getRawData(numberOfValuesToBeShown);
+                Vector<SensorData> data = sensor.getRawData(numberOfValuesToBeShown);
 
                 if (data == null || data.size() == 0)
                 {
@@ -171,8 +174,8 @@ public class GraphRenderer {
                 }
 
 				int numberOfDimensions = data.get(0).getDimension();
-                Log.d("fpDEBUG", "showing graph with " + data.size() + " values");
-				final GraphData[] graphs = new GraphData[numberOfDimensions];
+
+                graphData = new GraphData[numberOfDimensions];
 				for (int dimension = 0; dimension < numberOfDimensions; dimension++) {
 					double[] values = new double[data.size()];
 					Date[] dates = new Date[data.size()];
@@ -182,14 +185,14 @@ public class GraphRenderer {
 					}
 					GraphData gd = new GraphData("Dimension: "
 							+ (int) (dimension + 1), dates, values);
-					graphs[dimension] = gd;
+                    graphData[dimension] = gd;
 				}
 
-				return graphs;
+				return graphData;
 			}
 		};
-
-		return createView(context, "Samples", sensor.getGraphType(), generator);
+        graphType = sensor.getGraphType();
+		return createView(context, "Samples", graphType, generator);
 	}
 
 	private static int getColor(int dimension) {

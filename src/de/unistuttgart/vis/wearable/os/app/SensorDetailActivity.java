@@ -62,6 +62,8 @@ public class SensorDetailActivity extends Activity {
     }
 
     public void showGraph(View view) {
+        saveValues();
+
         Intent intent = new Intent(getBaseContext(), GraphActivity.class);
         intent.putExtra("sensorId", getIntent().getIntExtra("sensorId", -1));
         startActivity(intent);
@@ -221,6 +223,12 @@ public class SensorDetailActivity extends Activity {
     @Override
     public void onBackPressed() {
 
+        saveValues();
+
+        this.finish();
+    }
+
+    private void saveValues() {
         if (!(smoothness > 0) || !(powerOption > 0)) {
             Toast.makeText(getBaseContext(),
                     "Please check your SensorProperties. No null values allowed.", Toast.LENGTH_SHORT)
@@ -235,8 +243,6 @@ public class SensorDetailActivity extends Activity {
         sensor.setDisplayedMeasurementSystem(measurementSystems[spinner2.getSelectedItemPosition()]);
         sensor.setSensorType(sensorTypes[spinner.getSelectedItemPosition()]);
         sensor.setDisplayedSensorName(textView.getText().toString());
-
-        this.finish();
     }
 
     @Override

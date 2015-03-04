@@ -54,14 +54,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    IGarmentCallback igcb = new IGarmentCallback.Stub() {
-        @Override
-        public void callback(BaseCallbackObject value) throws RemoteException {
-            //ValueChangedCallback vcb = (ValueChangedCallback)value;
-            //Log.d("CALLBACK", "DATA " + Utils.unixToDate(vcb.date) + " " + vcb.data[0] + " " + vcb.data[1] + " " + vcb.data[2]);
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,14 +65,6 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.sleepUninterrupted(2000);
-                APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
-            }
-        }).start();
     }
 
     public static Context getContext() {
