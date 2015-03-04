@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Properties {
     // These are constant right now but could basically be changed dynamically
     public static java.io.File storageDirectory = new java.io.File("/data/data/de.unistuttgart.vis.wearable.os/files");
+    public static java.io.File exportDirectory = new java.io.File("/data/data/de.unistuttgart.vis.wearable.os");
 
     //
     // This lock is used to synchronize concurrent access to the below data fields
