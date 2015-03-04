@@ -329,7 +329,7 @@ public class Sensor implements Externalizable {
         return new PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
                 this.savePeriod, this.smoothness, this.sensorType, this.graphType,
                 this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
-                this.displayedMeasurementUnit, this.displayedMeasurementSystem);
+                this.displayedMeasurementUnit, this.displayedMeasurementSystem, this.isInternalSensor);
     }
 
     /**
@@ -341,7 +341,7 @@ public class Sensor implements Externalizable {
         return new de.unistuttgart.vis.wearable.os.api.PSensor(this.sensorID, this.displayedSensorName, this.bluetoothID, this.sampleRate,
                 this.savePeriod, this.smoothness, this.sensorType, this.graphType,
                 this.rawDataMeasurementUnit, this.rawDataMeasurementSystem,
-                this.displayedMeasurementUnit, this.displayedMeasurementSystem);
+                this.displayedMeasurementUnit, this.displayedMeasurementSystem, this.isInternalSensor);
     }
 
     /////////////////////////////////////////////////////////

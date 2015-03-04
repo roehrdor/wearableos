@@ -36,7 +36,8 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="20dp"
-                android:minHeight="20dp" />
+                android:minHeight="20dp"
+                android:layout_marginRight="10dp" />
 
             <Spinner
                 android:id="@+id/sensorAdd_spinner_MeasurmentSystem"
@@ -45,7 +46,8 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:minHeight="20dp"
-                android:layout_below="@+id/sensorAdd_spinner_SensorType" />
+                android:layout_below="@+id/sensorAdd_spinner_SensorType"
+                android:layout_marginRight="10dp" />
 
             <Spinner
                 android:id="@+id/sensorAdd_spinner_Bluetooth"
@@ -54,12 +56,11 @@
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
-                android:layout_below="@+id/sensorAdd_spinner_MeasurmentSystem"
-                android:nestedScrollingEnabled="true" />
+                android:layout_below="@+id/sensorAdd_spinner_MeasurmentSystem"/>
 
             <ImageButton
                 android:id="@+id/button1"
-                android:layout_width="52dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|top"
                 android:background="@null"
@@ -69,7 +70,8 @@
                 android:onClick="refreshBluetoothSpinner"
                 android:src="@android:drawable/ic_popup_sync"
                 android:layout_toRightOf="@+id/sensorAdd_spinner_Bluetooth"
-                android:layout_alignTop="@+id/sensorAdd_spinner_Bluetooth" />
+                android:layout_alignTop="@+id/sensorAdd_spinner_Bluetooth"
+                android:layout_alignBottom="@+id/sensorAdd_spinner_Bluetooth" />
 
             <Spinner
                 android:id="@+id/sensorAdd_spinner_SensorDriver"
@@ -78,7 +80,8 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:minHeight="20dp"
-                android:layout_below="@+id/sensorAdd_spinner_Bluetooth" />
+                android:layout_below="@+id/sensorAdd_spinner_Bluetooth"
+                android:layout_marginRight="10dp" />
         </RelativeLayout>
 
         <LinearLayout
