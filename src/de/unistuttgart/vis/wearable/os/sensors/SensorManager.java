@@ -9,6 +9,8 @@ package de.unistuttgart.vis.wearable.os.sensors;
 
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
 
+import java.util.*;
+
 /**
  * The server manager keeps track of all sensors that are used by GarmentOS. New Sensors shall be
  * registered here. This class also offers the ability to get any sensor according to its ID.
@@ -17,6 +19,29 @@ import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
  */
 @android.annotation.SuppressLint("UseSparseArrays")
 public final class SensorManager {
+
+
+    /**
+     * Sort the Map by the sensor names so the order they will be returned in is alphabetical
+     * This function shall usually be called after inserting any new sensor into the map
+     *
+     * @param map the map to be sorted
+     * @return the sorted map
+     */
+    protected static Map<Integer, Sensor> sortByValues(java.util.Map<Integer, Sensor> map) {
+        List<Map.Entry<Integer, Sensor>> entries = new LinkedList<Map.Entry<Integer, Sensor>>((map.entrySet()));
+        Collections.sort(entries, new Comparator<Map.Entry<Integer, Sensor>>() {
+            @Override
+            public int compare(Map.Entry<Integer, Sensor> lhs, Map.Entry<Integer, Sensor> rhs) {
+                return lhs.getValue().getDisplayedSensorName().compareTo(rhs.getValue().getDisplayedSensorName());
+            }
+        });
+        Map<Integer, Sensor> sortedMap = new LinkedHashMap<Integer, Sensor>();
+        for(Map.Entry<Integer, Sensor> entry : entries)
+            sortedMap.put(entry.getKey(), entry.getValue());
+        return sortedMap;
+    }
+
     // Reserve the first 64 IDs for internal sensors only
     public static final int MAXIMUM_INTERNAL_SENSOR_ID = 0x40;
 
@@ -32,7 +57,7 @@ public final class SensorManager {
     static {
         allSensors = SettingsStorage.readSensors();
         if(allSensors == null)
-            allSensors = new java.util.HashMap<Integer, Sensor>();
+            allSensors = new java.util.LinkedHashMap<Integer, Sensor>();
     }
 
     /**
@@ -49,7 +74,10 @@ public final class SensorManager {
      * @param sensor the sensor to add to the system
      */
     public static void addNewSensor(Sensor sensor) {
+        // Insert the sensor into the map and afterwards sort it
+        // this is actually better than sorting the map every time before returning it
         allSensors.put(sensor.getSensorID(), sensor);
+        allSensors = sortByValues(allSensors);
     }
 
     /**

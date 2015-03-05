@@ -9,11 +9,9 @@ package de.unistuttgart.vis.wearable.os.service;
 
 import android.content.Intent;
 import android.os.Message;
-import android.util.Log;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
-import de.unistuttgart.vis.wearable.os.app.MainActivity;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
@@ -64,7 +62,6 @@ public class GarmentOSService extends android.app.Service {
 	
 	
 	
-	
 	// =========================================================
 	// Getter and setter functions
 	// =========================================================
@@ -75,9 +72,9 @@ public class GarmentOSService extends android.app.Service {
 	public static android.content.Context getContext() {
 		return context;
 	}
-	
-	
-	
+
+
+
 	// =========================================================
 	// Overriden functions
 	// =========================================================
