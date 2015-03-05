@@ -7,10 +7,8 @@
  */
 package de.unistuttgart.vis.wearable.os.storage;
 
-import android.util.Log;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 
 /**
  * <p>
@@ -401,7 +399,7 @@ public class SensorDataDeSerializer implements Runnable {
      */
     private static int searchNotYounger(java.io.RandomAccessFile raf, long value, int offset, int fileSize, int chunkSize) throws java.io.IOException {
         int currentPos = fileSize - chunkSize;
-        long currentValue = Long.MAX_VALUE;
+        long currentValue;
 
         raf.seek(offset);
 
