@@ -20,6 +20,11 @@ import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 
+/**
+ * what is this class good for?
+ */
+//TODO delete this class if not needed
+@Deprecated
 public class GraphModuleSensors extends PopupModuleSensors {
 
 	private LinearLayout chart;
@@ -81,22 +86,22 @@ public class GraphModuleSensors extends PopupModuleSensors {
 	private long lastUpdate = 0;
 
 	private void fillChartImage() {
-		if (lastUpdate + 100 >= new Date().getTime()) {
-			return;
-		}
-		lastUpdate = new Date().getTime();
-
-		GraphRenderer.ChartThreadTuple tuple = GraphRenderer.createGraph(
-				sensor, getContext(), NUMBER_OF_VALUES, false);
-		chart.removeAllViews();
-		
-		View graph = tuple.getChart();
-		
-		chart.addView(graph);
-		
-		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) graph.getLayoutParams();
-		layoutParams.width = 250;
-		layoutParams.height = 130;
+//		if (lastUpdate + 100 >= new Date().getTime()) {
+//			return;
+//		}
+//		lastUpdate = new Date().getTime();
+//
+//		GraphRenderer.ChartThreadTuple tuple = graphRenderer.createGraph(
+//				sensor, getContext(), NUMBER_OF_VALUES, false);
+//		chart.removeAllViews();
+//
+//		View graph = tuple.getChart();
+//
+//		chart.addView(graph);
+//
+//		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) graph.getLayoutParams();
+//		layoutParams.width = 250;
+//		layoutParams.height = 130;
 
 	}
 

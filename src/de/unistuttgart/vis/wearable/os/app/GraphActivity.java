@@ -26,6 +26,7 @@ public class GraphActivity extends Activity {
     PSensor sensor;
     IGarmentCallback igcb;
     private final int NUMBER_OF_VALUES = 300;
+    GraphRenderer graphRenderer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class GraphActivity extends Activity {
 
         sensor = APIFunctions.getSensorById(getIntent().getExtras()
                 .getInt("sensorId"));
+        graphRenderer = new GraphRenderer();
 		fillChart();
 	}
 
@@ -68,7 +70,7 @@ public class GraphActivity extends Activity {
         lastUpdate = new Date().getTime();
 
         GraphRenderer.ChartThreadTuple tuple =
-                GraphRenderer.createGraph(sensor, this, NUMBER_OF_VALUES, loadFromStorage);
+                graphRenderer.createGraph(sensor, this, NUMBER_OF_VALUES, loadFromStorage);
         chart.removeAllViews();
         chart.addView(tuple.getChart());
     }
