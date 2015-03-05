@@ -12,6 +12,7 @@ import android.os.Message;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
+import de.unistuttgart.vis.wearable.os.bluetoothservice.GarmentOSBluetoothService;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
@@ -58,8 +59,17 @@ public class GarmentOSService extends android.app.Service {
         msg.obj = bco;
         mHandler.sendMessage(msg);
 	}
-	
-	
+
+    /**
+     * Start the bluetooth service for the given sensor ID
+     *
+     * @param sensorID the sensor ID to start the service for
+     */
+    public static void startBTService(int sensorID) {
+        Intent startBT = new Intent(context, GarmentOSBluetoothService.class);
+        startBT.putExtra("btId", sensorID);
+        context.startService(startBT);
+    }
 	
 	
 	// =========================================================
