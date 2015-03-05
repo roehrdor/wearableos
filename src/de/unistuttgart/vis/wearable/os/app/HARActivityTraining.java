@@ -320,7 +320,7 @@ public class HARActivityTraining extends Activity {
 		// activity
 		activityBtn = (Button) findViewById(R.id.har_train_button7);
 		activityBtn.setText(ActivityRecognitionModule
-				.getInstance().getSupportedActivityList().get(0));
+				.getInstance().getActivities().get(0).getActivityEnum().toString());
 		activityBtn.refreshDrawableState();
 		activityBtn.setOnClickListener(new OnClickListener() {
 
@@ -331,9 +331,9 @@ public class HARActivityTraining extends Activity {
 				final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 						context, R.layout.custom_spinner_item);
 				adapter.addAll(Arrays.copyOf(ActivityRecognitionModule
-						.getInstance().getSupportedActivityList().toArray(),
+						.getInstance().getActivities().toArray(),
 						ActivityRecognitionModule.getInstance()
-								.getSupportedActivityList().size(),
+								.getActivities().size(),
 						String[].class));
 				alertDialogBuilder
 						.setTitle("Select Activity")
@@ -404,6 +404,7 @@ public class HARActivityTraining extends Activity {
 		startBtn = (Button) findViewById(R.id.har_train_button5);
 		startBtn.setOnClickListener(new OnClickListener() {
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
 
@@ -418,10 +419,9 @@ public class HARActivityTraining extends Activity {
 				}
 
 				boolean noData = false;
-				for (int sensor : ActivityRecognitionModule.getInstance()
-						.getSupportedSensorList()) {
+				for (String sensor : ActivityRecognitionModule.getInstance().getSensors()) {
 					try {
-						APIFunctions.SENSORS_SENSOR_getRawDataII(sensor,
+						APIFunctions.SENSORS_SENSOR_getRawDataII(Integer.valueOf(sensor),
 								Utils.dateToUnix(startDate.getTime()),
 								Utils.dateToUnix(endDate.getTime()));
 //					} catch (DatabaseObjectNotClosedException e) {
@@ -429,7 +429,7 @@ public class HARActivityTraining extends Activity {
 					} catch (NullPointerException e) {
 						Log.e("har", "[HARActivityTraining]:[onCreate] random NullPointerException");
 					}
-					if(!APIFunctions.SENSORS_SENSOR_isEnabled(sensor)) {
+					if(!APIFunctions.SENSORS_SENSOR_isEnabled(Integer.valueOf(sensor))) {
 						noData = true;
 						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 								context);
@@ -475,7 +475,7 @@ public class HARActivityTraining extends Activity {
 							@Override
 							protected Void doInBackground(Void... params) {
 								ActivityRecognitionModule.getInstance()
-										.startTraining(activity, windowLength);
+										.train(activity, windowLength);
 								return null;
 							}
 						}.execute();
@@ -486,9 +486,9 @@ public class HARActivityTraining extends Activity {
 							@Override
 							protected Void doInBackground(Void... params) {
 								ActivityRecognitionModule.getInstance()
-										.startTraining(activity, windowLength,
-												Utils.dateToUnix(startDate.getTime()),
-												Utils.dateToUnix(endDate.getTime()));
+										.train(activity, windowLength,
+												startDate.getTime(),
+												endDate.getTime());
 								return null;
 							}
 						}.execute();

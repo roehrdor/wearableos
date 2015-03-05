@@ -2,11 +2,6 @@ package de.unistuttgart.vis.wearable.os.activityRecognition;
 
 import java.util.LinkedHashMap;
 
-import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
-import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.sensors.SensorType;
-
 public class FeatureSet extends LinkedHashMap<String, Double> {
 
 	private static final long serialVersionUID = -1741609859493206564L;
@@ -19,72 +14,56 @@ public class FeatureSet extends LinkedHashMap<String, Double> {
 		StructuralFeatureExtraction stru;
 		TransientFeatureExtraction tran;
 
-		for (Entry<Integer, PSensorData> entry : timeWindow.entrySet()) {
-			int sensorDimension = entry.getValue().getDimension();
-			int dataListSize = entry.getValue().toSensorDataList().size();
-			
-			if(dataListSize <= 2) {
-				timeWindow.setActivityLabel("dead (time window does not hold enough data)");
+		for (Entry<String, float[][]> entry : timeWindow.entrySet()) {
+			this.values = entry.getValue();
+
+			if (values[0].length <= 2) {
+				timeWindow
+						.setActivityLabel("dead (time window does not hold enough data)");
 				return;
 			}
 
-			if (sensorDimension == 0) {
+			if (values.length == 0) {
 				timeWindow.setActivityLabel("dead (sensorDimension is 0)");
 				return;
 			}
-			values = new float[sensorDimension][dataListSize];
-			int counter = 0;
-			for (SensorData sensorData : entry.getValue().toSensorDataList()) {
+			String key = entry.getKey().split("_")[0];
 
-				for (int dimension = 0; dimension < sensorDimension; dimension++) {
+			if (entry.getKey().split("_")[1].equals("ACCELEROMETER")) {
 
-					values[dimension][counter] = sensorData.getData()[dimension];
-				}
-				counter++;
-			}
-
-			if (SensorType.values()[APIFunctions
-					.SENSORS_SENSOR_getSensorType(entry.getKey())]
-					.equals(SensorType.ACCELEROMETER)) {
-
-				for (int dimension = 0; dimension < sensorDimension; dimension++) {
+				for (int dimension = 0; dimension < values.length; dimension++) {
 					stat = new StatisticalFeatureExtraction(values[dimension]);
-					this.put(entry.getKey() + "_mean_" + dimension,
-							stat.getMean());
-					this.put(entry.getKey() + "_median_" + dimension,
-							stat.getMedian());
-					this.put(entry.getKey() + "_interquartileRange_"
-							+ dimension, stat.getInterquartileRange());
-					this.put(entry.getKey() + "_rootMeanSquare_" + dimension,
+					this.put(key + "_mean_" + dimension, stat.getMean());
+					this.put(key + "_median_" + dimension, stat.getMedian());
+					this.put(key + "_interquartileRange_" + dimension,
+							stat.getInterquartileRange());
+					this.put(key + "_rootMeanSquare_" + dimension,
 							stat.getRootMeanSquare());
-					this.put(entry.getKey() + "_varianceMean_" + dimension,
+					this.put(key + "_varianceMean_" + dimension,
 							stat.getVarianceMean());
-					this.put(entry.getKey() + "_varianceMedian_" + dimension,
+					this.put(key + "_varianceMedian_" + dimension,
 							stat.getVarianceMedian());
-					this.put(entry.getKey() + "_meanAbsoluteDeviation_"
-							+ dimension, stat.getMeanAbsoluteDeviation());
-					this.put(entry.getKey() + "_medianAbsoluteDeviation_"
-							+ dimension, stat.getMedianAbsoluteDeviation());
-					this.put(entry.getKey() + "_standardDeviationMean_"
-							+ dimension, stat.getStandardDeviationMean());
-					this.put(entry.getKey() + "_standardDeviationMedian_"
-							+ dimension, stat.getStandardDeviationMedian());
+					this.put(key + "_meanAbsoluteDeviation_" + dimension,
+							stat.getMeanAbsoluteDeviation());
+					this.put(key + "_medianAbsoluteDeviation_" + dimension,
+							stat.getMedianAbsoluteDeviation());
+					this.put(key + "_standardDeviationMean_" + dimension,
+							stat.getStandardDeviationMean());
+					this.put(key + "_standardDeviationMedian_" + dimension,
+							stat.getStandardDeviationMedian());
 					try {
-						if (sensorDimension > 1) {
-							if (dimension + 1 < sensorDimension) {
+						if (values.length > 1) {
+							if (dimension + 1 < values.length) {
 								this.put(
-										entry.getKey() + "_correlationMean_"
-												+ dimension,
+										key + "_correlationMean_" + dimension,
 										stat.getCorrelationMean(values[dimension + 1]));
 								this.put(
-										entry.getKey() + "_correlationMedian_"
-												+ dimension,
+										key + "_correlationMedian_" + dimension,
 										stat.getCorrelationMedian(values[dimension + 1]));
 							} else {
-								this.put(entry.getKey() + "_correlationMean_"
-										+ dimension,
+								this.put(key + "_correlationMean_" + dimension,
 										stat.getCorrelationMean(values[0]));
-								this.put(entry.getKey() + "_correlationMedian_"
+								this.put(key + "_correlationMedian_"
 										+ dimension,
 										stat.getCorrelationMedian(values[0]));
 							}
@@ -97,7 +76,7 @@ public class FeatureSet extends LinkedHashMap<String, Double> {
 				}
 			} else {
 
-				for (int dimension = 0; dimension < sensorDimension; dimension++) {
+				for (int dimension = 0; dimension < values.length; dimension++) {
 					try {
 						stru = new StructuralFeatureExtraction(
 								values[dimension], polynomDegree);
@@ -107,21 +86,19 @@ public class FeatureSet extends LinkedHashMap<String, Double> {
 						return;
 					}
 					for (int degree = 0; degree < polynomDegree + 1; degree++) {
-						this.put(entry.getKey() + "_polynomCoefficient"
-								+ degree + "_" + dimension,
-								stru.getCoefficient(degree));
+						this.put(key + "_polynomCoefficient" + degree + "_"
+								+ dimension, stru.getCoefficient(degree));
 					}
-					this.put(entry.getKey() + "_meanVariation_" + dimension,
+					this.put(key + "_meanVariation_" + dimension,
 							stru.getMeanVariation());
 
 					tran = new TransientFeatureExtraction(values[dimension]);
-					this.put(entry.getKey() + "_trend_" + dimension,
+					this.put(key + "_trend_" + dimension,
 							(double) tran.getTrend());
-					this.put(
-							entry.getKey() + "_magnitudeOfChange_" + dimension,
+					this.put(key + "_magnitudeOfChange_" + dimension,
 							tran.getMagnitudeOfChange());
-					this.put(entry.getKey() + "_signedMagnitudeOfChange_"
-							+ dimension, tran.getSignedMagnitudeOfChange());
+					this.put(key + "_signedMagnitudeOfChange_" + dimension,
+							tran.getSignedMagnitudeOfChange());
 
 				}
 			}
