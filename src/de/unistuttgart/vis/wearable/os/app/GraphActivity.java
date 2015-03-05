@@ -78,4 +78,10 @@ public class GraphActivity extends Activity {
         super.onPause();
         APIFunctions.unregisterCallback(igcb, CallbackFlags.VALUE_CHANGED);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
+    }
 }

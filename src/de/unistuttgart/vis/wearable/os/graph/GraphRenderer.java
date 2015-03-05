@@ -156,7 +156,6 @@ public class GraphRenderer {
 		return new ChartThreadTuple(thread, view);
 	}
 
-    private static GraphData[] graphData;
     private static GraphType graphType;
     private static Vector<SensorData> lastData = new Vector<SensorData>();
     // TODO last data bug - static - multiple calls will produce wrong data
@@ -178,23 +177,26 @@ public class GraphRenderer {
 
 			@Override
 			public GraphData[] getData() {
-                // loead the new Data
+                // load the new Data
                 Vector<SensorData> data = sensor.getRawData(numberOfValuesToBeShown, loadFromStorage);
 
                 if (data == null) {
                     data = new Vector<SensorData>();
                 }
-                // if needed add the needed number of data from the lastData to data
+
+                // if needed add the number of data from the lastData to data
                 if ((data.size() < numberOfValuesToBeShown) && lastData.size() != 0) {
+                    lastData.removeAll(data);
                     int numberOfValuesToDelete = (data.size() + lastData.size() - numberOfValuesToBeShown);
                     for (int i = 0; i < numberOfValuesToDelete; i++) {
                         lastData.remove(0);
                     }
                     lastData.addAll(data);
                     data = lastData;
+                } else {
+                    //this data is now the lastData
+                    lastData = data;
                 }
-                //this data is now the lastData
-                lastData = data;
 
                 if (data.size() == 0)
                 {
@@ -204,7 +206,7 @@ public class GraphRenderer {
 				int numberOfDimensions = data.get(0).getDimension();
 
                 // create the values for the graph
-                graphData = new GraphData[numberOfDimensions];
+                GraphData[] graphData = new GraphData[numberOfDimensions];
 				for (int dimension = 0; dimension < numberOfDimensions; dimension++) {
 					double[] values = new double[data.size()];
 					Date[] dates = new Date[data.size()];
