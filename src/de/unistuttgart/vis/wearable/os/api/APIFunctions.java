@@ -7,9 +7,13 @@
  */
 package de.unistuttgart.vis.wearable.os.api;
 
+import de.unistuttgart.vis.wearable.os.activity.Activity;
+import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 import java.util.List;
 
@@ -34,6 +38,55 @@ public class APIFunctions {
             }
         }
         return 0xFFFFFFFFFFl;
+    }
+
+    /**
+     * Get the currently performed activity
+     *
+     * @return the currently performed activity or null if not available or missing rights
+     */
+    public static ActivityEnum getCurrentActivity() {
+        if(APIHandle.isServiceBound()) {
+            try {
+                int ret = APIHandle.getGarmentAPIHandle().getCurrentActivity(APIHandle.getAppPackageID());
+                if(ret != Constants.ENUMERATION_NULL && ret != Constants.ILLEGAL_VALUE)
+                    return ActivityEnum.values()[ret];
+                else
+                    return null;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    /**
+     * Get the activity performed at the given time
+     *
+     * @param time the time the activity has been performed at
+     * @return the activity for the given time, null if not available or if the app is lacking rights
+     */
+    public static ActivityEnum getActivityAtTime(java.util.Date time) {
+        return getActivityAtTime(time.getTime());
+    }
+
+    /**
+     * Get the activity performed at the given time
+     *
+     * @param time the time the activity has been performed at
+     * @return the activity for the given time, null if not available or if the app is lacking rights
+     */
+    public static ActivityEnum getActivityAtTime(long time) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                int ret = APIHandle.getGarmentAPIHandle().getActivityAtTime(APIHandle.getAppPackageID(), time);
+                if(ret != Constants.ENUMERATION_NULL && ret != Constants.ILLEGAL_VALUE)
+                    return ActivityEnum.values()[ret];
+                else
+                    return null;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
     }
 
     /**

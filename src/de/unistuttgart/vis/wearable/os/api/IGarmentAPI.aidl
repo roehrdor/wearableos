@@ -16,6 +16,9 @@ interface IGarmentAPI {
 
 	void registerApp(String app);
 
+	int getCurrentActivity(String app);
+	int getActivityAtTime(String app, long time);
+
 	void registerCallback(String app, IGarmentCallback callback, int ID);
 	void unregisterCallback(String app, IGarmentCallback callback, int ID);
 

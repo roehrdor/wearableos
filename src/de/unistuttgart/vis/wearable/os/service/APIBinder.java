@@ -8,6 +8,8 @@
 package de.unistuttgart.vis.wearable.os.service;
 
 import android.os.RemoteException;
+import de.unistuttgart.vis.wearable.os.activity.Activity;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
@@ -28,7 +30,33 @@ import java.util.HashSet;
  */
 class APIBinder extends IGarmentAPI.Stub {
 
-	/**
+    /**
+     * Return the currently performed activity
+     * @param app the app requesting the activity
+     * @return the activity or {@link de.unistuttgart.vis.wearable.os.utils.Constants#ENUMERATION_NULL} if not available
+     */
+    @Override
+    public int getCurrentActivity(String app) throws RemoteException {
+        Activity activity;
+        if((activity = ActivityRecognitionModule.getInstance().getCurrentActivity()) != null && activity.getActivityEnum() != null)
+            return activity.getActivityEnum().ordinal();
+        else
+            return Constants.ENUMERATION_NULL;
+    }
+
+    /**
+     * Return the activity performed at the given time
+     * @param app the app requesting the activity
+     * @param time the time the activity has been performed at
+     * @return the activity or {@link de.unistuttgart.vis.wearable.os.utils.Constants#ENUMERATION_NULL} if not available
+     */
+    @Override
+    public int getActivityAtTime(String app, long time) throws RemoteException {
+        //TODO
+        return Constants.ENUMERATION_NULL;
+    }
+
+    /**
 	 * Returns the result from the function call
 	 * {@link System#currentTimeMillis()}
 	 * 
