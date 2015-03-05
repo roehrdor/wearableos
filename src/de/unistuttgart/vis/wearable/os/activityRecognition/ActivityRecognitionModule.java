@@ -47,6 +47,7 @@ public class ActivityRecognitionModule {
 		instance.neuralNetworkManager = new NeuralNetworkManager(""/*
 				GarmentOSService.getContext().getFilesDir().getAbsolutePath()*/);
 		(instance.currentActivity = new Activity()).setActivityEnum(ActivityEnum.NOACTIVITY);
+		instance.loadActivities();
 		Log.i("har", "ActivityRecognitionModule loaded");
 	}
 	
@@ -71,6 +72,14 @@ public class ActivityRecognitionModule {
 	}
 	
 	private ActivityRecognitionModule() {
+	}
+	
+	private void loadActivities() {
+		for(ActivityEnum activityEnum : ActivityEnum.values()) {
+			Activity activity = new Activity();
+			activity.setActivityEnum(activityEnum);
+			activities.add(activity);
+		}
 	}
 	
 	/**
@@ -334,8 +343,27 @@ public class ActivityRecognitionModule {
 		return activities;
 	}
 	
+	/**
+	 * Returns the activity which was performed at a specific time. 
+	 * If no activity was found at that time, an activity object with
+	 * NOACTIVITY will be returned.
+	 * @param date
+	 * 		The time when the activity was performed
+	 * @return
+	 * 		Activity object with the performed activity or NOACTIVITY
+	 */
 	public Activity getActivityAtTime(Date date) {
-		return currentActivity;
+		for(Activity activity : activities) {
+			for(Date[] dateArr : activity.getActivityTimes()) {
+				if(date.getTime() >= dateArr[0].getTime() &&
+						date.getTime() <= dateArr[1].getTime()) {
+					return activity;
+				}
+			}
+		}
+		Activity activity = new Activity();
+		activity.setActivityEnum(ActivityEnum.NOACTIVITY);
+		return activity;
 	}
 	
 	/**
