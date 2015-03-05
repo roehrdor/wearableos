@@ -18,6 +18,7 @@ import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.*;
+import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
@@ -38,10 +39,16 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     @Override
     public PSensor API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
-                                 int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws  RemoteException{
+                                 int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws RemoteException{
         Sensor sensor = new Sensor(null, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
                 MeasurementUnits.values()[rawDataMeasurementUnit], MeasurementSystems.values()[displayedMeasurementSystem], MeasurementUnits.values()[displayedMeasurementUnit]);
-        return sensor == null ? null : sensor.toParcelable();
+
+        if(sensor != null) {
+            GarmentOSService.startBTService(sensor.getSensorID());
+            return sensor.toParcelable();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -55,8 +62,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public PUserApp[] API_getRegisteredUserApplications()
-			throws RemoteException {
+	public PUserApp[] API_getRegisteredUserApplications() throws RemoteException {
 		UserApp[] aua = PrivacyManager.instance.getAllApps();
 		PUserApp[] apua = new PUserApp[aua.length];
 		for(int i = 0; i != apua.length; ++i) {
@@ -66,8 +72,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public PUserApp API_getRegisteredUserAppByName(String name)
-			throws RemoteException {
+	public PUserApp API_getRegisteredUserAppByName(String name) throws RemoteException {
 		return PrivacyManager.instance.getApp(name).toParcelable();
 	}
 
@@ -87,7 +92,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
-    public PSensor[] API_getAllSensorsByType(int sensorType) {
+    public PSensor[] API_getAllSensorsByType(int sensorType) throws RemoteException {
         java.util.Collection<Sensor> sensors = SensorManager.getAllSensors(SensorType.values()[sensorType]);
         PSensor[] pSensors = new PSensor[sensors.size()];
         int i = -1;
@@ -110,66 +115,57 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	// Calls to UserApp, oid represents the unique ID of the object 
 	//
 	@Override
-	public boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp == null || userApp.sensorProhibited(id);
 	}
 
 	@Override
-	public boolean PRIVACY_USERAPP_grantPermission(int oid, int id)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_grantPermission(int oid, int id) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp != null && userApp.grantPermission(id);
 	}
 
 	@Override
-	public boolean PRIVACY_USERAPP_revokePermission(int oid, int id)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_revokePermission(int oid, int id) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp != null && userApp.revokePermission(id);
 	}
 
 	@Override
-	public boolean PRIVACY_USERAPP_denySensorType(int oid, int flag)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_denySensorType(int oid, int flag) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp != null && userApp.denySensorType(flag);
 	}
 
 	@Override
-	public boolean PRIVACY_USERAPP_allowSensorType(int oid, int flag)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_allowSensorType(int oid, int flag) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp != null && userApp.allowSensorType(flag);
 	}
 
 	@Override
-	public boolean PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_sensorTypeGranted(int oid, int flag) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp != null && userApp.sensorTypeGranted(flag);
 	}
 
 	@Override
-	public void PRIVACY_USERAPP_grantActivityRecognition(int oid)
-			throws RemoteException {
+	public void PRIVACY_USERAPP_grantActivityRecognition(int oid) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         if(userApp != null)
             userApp.grantActivityRecognition();
 	}
 
 	@Override
-	public void PRIVACY_USERAPP_denyActivityRecognition(int oid)
-			throws RemoteException {
+	public void PRIVACY_USERAPP_denyActivityRecognition(int oid) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         if(userApp != null)
             userApp.denyActivityRecognition();
 	}
 
 	@Override
-	public boolean PRIVACY_USERAPP_activityRecognitionGranted(int oid)
-			throws RemoteException {
+	public boolean PRIVACY_USERAPP_activityRecognitionGranted(int oid) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         return userApp != null && userApp.activityRecognitionGranted();
 	}
@@ -208,8 +204,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	// Calls to Sensor, sid represents the unique ID of the object 
 	//
 	@Override
-	public void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled)
-			throws RemoteException {
+	public void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -218,8 +213,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
     @Override
-	public void SENSORS_SENSOR_setDisplayedSensorName(int sid,
-			String displayedSensorName) throws RemoteException {
+	public void SENSORS_SENSOR_setDisplayedSensorName(int sid, String displayedSensorName) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -228,8 +222,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public void SENSORS_SENSOR_setSampleRate(int sid, int sampleRate)
-			throws RemoteException {
+	public void SENSORS_SENSOR_setSampleRate(int sid, int sampleRate) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -238,8 +231,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
     @Override
-	public void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod)
-			throws RemoteException {
+	public void SENSORS_SENSOR_setSavePeriod(int sid, int savePeriod) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -248,8 +240,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public void SENSORS_SENSOR_setSmoothness(int sid, float smoothness)
-			throws RemoteException {
+	public void SENSORS_SENSOR_setSmoothness(int sid, float smoothness) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -258,8 +249,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public void SENSORS_SENSOR_setSensorType(int sid, int sensorType)
-			throws RemoteException {
+	public void SENSORS_SENSOR_setSensorType(int sid, int sensorType) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -268,8 +258,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public void SENSORS_SENSOR_setGraphType(int sid, int graphType)
-			throws RemoteException {
+	public void SENSORS_SENSOR_setGraphType(int sid, int graphType) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -278,8 +267,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid,
-			int displayedMeasurementUnit) throws RemoteException {
+	public void SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -288,8 +276,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
 	@Override
-	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid,
-			int displayedMeasurementSystem) throws RemoteException {
+	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
@@ -298,7 +285,7 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 	}
 
     @Override
-    public PSensorData SENSORS_SENSOR_getRawData(int sid) {
+    public PSensorData SENSORS_SENSOR_getRawData(int sid) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);
         if(sensor == null)
