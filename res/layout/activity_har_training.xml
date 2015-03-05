@@ -70,7 +70,8 @@
         android:textColor="#000000"
         android:layout_below="@+id/har_train_radioGroup1"
         android:layout_toRightOf="@+id/har_train_button1"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="10dp"
+        android:minWidth="80dp" />
 
     <TextView
         android:id="@+id/har_train_textView2"
@@ -108,7 +109,8 @@
         android:layout_gravity="center"
         android:textColor="#000000"
         android:layout_below="@+id/har_train_button1"
-        android:layout_alignLeft="@+id/har_train_button2" />
+        android:layout_alignLeft="@+id/har_train_button2"
+        android:minWidth="80dp" />
 
     <TextView
         android:id="@+id/har_train_textView3"
