@@ -79,6 +79,15 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
 	}
 	//</nsdk>
 
+    /**
+     * Add raw data to the sensor
+     *
+     * @param sensorData the sensor data that is added to the sensor
+     */
+    public void addRawData (SensorData sensorData) {
+        APIFunctions.SENSORS_SENSOR_addRawData(this.ID, sensorData);
+    }
+
 
     // =====================================================================
 	//

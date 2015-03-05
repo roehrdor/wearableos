@@ -11,6 +11,7 @@ import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
@@ -428,6 +429,17 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");	
 	}
+
+    public static void SENSORS_SENSOR_addRawData(int sid, SensorData sensorData) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().SENSORS_SENSOR_addRawData(sid, sensorData.getLongUnixDate(), sensorData.getData());
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 
     @Deprecated
     public static boolean SENSORS_SENSOR_isEnabled(int sid) {

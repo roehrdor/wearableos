@@ -60,6 +60,7 @@ interface IGarmentInternalAPI {
 	void 		SENSORS_SENSOR_setGraphType(int sid, int graphType);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem);
 	void 		SENSORS_SENSOR_setDisplayedMeasurementUnit(int sid, int displayedMeasurementUnit);
+	void 		SENSORS_SENSOR_addRawData(int sid, long time, in float[] data);
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
 	PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end);
 }

@@ -31,6 +31,15 @@ public class PSensorData extends de.unistuttgart.vis.wearable.os.parcel.PSensorD
     }
 
     /**
+     * Create a new PSensorData object from the given Sensor Data
+     *
+     * @param sensorData the sensor data to convert into a PSensorData object
+     */
+    public PSensorData(SensorData sensorData) {
+        super(sensorData);
+    }
+
+    /**
      * Private constructor to create a new object from parcel
      */
     protected PSensorData() {

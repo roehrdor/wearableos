@@ -275,7 +275,16 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         sensor.setDisplayedMeasurementUnit(MeasurementUnits.values()[displayedMeasurementUnit]);
 	}
 
-	@Override
+    @Override
+    public void SENSORS_SENSOR_addRawData(int sid, long time, float[] data) throws RemoteException {
+        Sensor sensor;
+        sensor = SensorManager.getSensorByID(sid);
+        if(sensor == null)
+            return;
+        sensor.addRawData(new SensorData(data, time));
+    }
+
+    @Override
 	public void SENSORS_SENSOR_setDisplayedMeasurementSystem(int sid, int displayedMeasurementSystem) throws RemoteException {
         Sensor sensor;
         sensor = SensorManager.getSensorByID(sid);

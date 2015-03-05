@@ -19,6 +19,23 @@ public class PSensorData {
         return this.dimension;
     }
 
+    /**
+     * Create a new PSensorData object from the given Sensor Data
+     *
+     * @param sensorData the sensor data to convert into a PSensorData object
+     */
+    protected PSensorData(SensorData sensorData) {
+        if(sensorData == null)
+            return;
+
+        this.dimension = sensorData.getData().length;
+        this.time = new long[1];
+        this.data = new float[this.dimension];
+        this.time[0] = sensorData.getLongUnixDate();
+        for(int d = 0; d != this.dimension; ++d)
+            this.data[d]  = sensorData.getData()[d];
+    }
+
 
     /**
      * Create a new PSensorData object from the given List of Sensor Data
