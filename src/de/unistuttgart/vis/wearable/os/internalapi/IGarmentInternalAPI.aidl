@@ -16,7 +16,7 @@ interface IGarmentInternalAPI {
 	//
 	// Internal API Function calls
 	//
-	void        API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
+	PSensor     API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
 	                             int sensorType, String bluetoothID, int rawDataMeasurementSystem,
 	                             int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit);
     void        API_removeSensor(int sensorID);

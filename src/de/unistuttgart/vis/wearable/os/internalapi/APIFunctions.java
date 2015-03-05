@@ -91,17 +91,16 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static void addNewSensor(int sampleRate, int savePeriod, float smoothness,
+    public static PSensor addNewSensor(int sampleRate, int savePeriod, float smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
                              MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                              MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
         if (APIHandle.isInternalServiceBound()) {
             try {
-                APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(sampleRate, savePeriod,
+                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(sampleRate, savePeriod,
                                     smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
                                     rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
                                     displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());
-                return;
             } catch (android.os.RemoteException e) {
             }
         }
