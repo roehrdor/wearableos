@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#c0d6e4">
 
-    <LinearLayout
+    <RelativeLayout
 
         android:id="@+id/LinearLayout2"
         android:layout_width="match_parent"
@@ -14,19 +14,22 @@
         tools:context="${relativePackage}.${activityClass}" >
 
         <Button
-            android:id="@+id/Button01"
+            android:id="@+id/Button_Dropbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:background="#606060"
             android:drawableLeft="@drawable/dropbox"
             android:onClick="changeToDropBox"
             android:text="@string/btn_dropbox"
             android:textColor="#FFFFFF"
-            android:textSize="25sp" />
+            android:textSize="25sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp" />
 
         <Button
-            android:id="@+id/Button2"
+            android:id="@+id/Button_OneDrive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -35,10 +38,11 @@
             android:onClick="changeToOneDrive"
             android:text="@string/btn_onedrive"
             android:textColor="#FFFFFF"
-            android:textSize="25sp" />
+            android:textSize="25sp"
+            android:layout_below="@+id/Button_Dropbox" />
 
         <Button
-            android:id="@+id/Button3"
+            android:id="@+id/Button_GoogleDrive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -47,10 +51,11 @@
             android:onClick="changeToGoogleDrive"
             android:text="@string/btn_gooledrive"
             android:textColor="#FFFFFF"
-            android:textSize="25sp" />
+            android:textSize="25sp"
+            android:layout_below="@+id/Button_OneDrive" />
 
         <Button
-            android:id="@+id/Button02"
+            android:id="@+id/Button_Local"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -59,20 +64,42 @@
             android:onClick="export"
             android:text="@string/btn_local"
             android:textColor="#FFFFFF"
-            android:textSize="25sp" />
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
-                android:layout_weight="1.23" android:weightSum="1">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                      android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/encrypt"
-                      android:id="@+id/textView9"
-                      android:layout_gravity="center" android:layout_weight="0.94" android:layout_marginLeft="10dp"
-                      android:layout_marginTop="5dp"/>
-            <Switch android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/switch5"
-                    android:gravity="right" android:layout_marginTop="5dp" android:layout_gravity="center"/>
-        </LinearLayout>
+            android:textSize="25sp"
+            android:layout_below="@+id/Button_GoogleDrive" />
 
-    </LinearLayout>
+        <Switch android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/switch_encrypt_data"
+            android:layout_marginTop="5dp"
+            android:checked="false"
+            android:layout_alignRight="@+id/Button_Local"
+            android:text="Encrypt Data"
+            android:layout_below="@+id/Button_Local"
+            android:layout_alignLeft="@+id/radioButtonExport"
+            android:layout_alignStart="@+id/radioButtonExport"
+            android:textSize="25dp"
+            android:gravity="left" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export"
+            android:id="@+id/radioButtonExport"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:checked="false"
+            android:textSize="25dp"
+            android:layout_below="@+id/switch_encrypt_data" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Import"
+            android:id="@+id/radioButtonImport"
+            android:checked="false"
+            android:textSize="25dp"
+            android:layout_alignLeft="@+id/radioButtonExport"
+            android:layout_alignStart="@+id/Button_Dropbox"
+            android:layout_below="@+id/radioButtonExport"
+            android:layout_marginTop="10dp" />
+
+    </RelativeLayout>
 </ScrollView>
