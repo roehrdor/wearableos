@@ -400,7 +400,8 @@ public class APIFunctions {
     public static List<SensorData> getHeartRate(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getHeartRate(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getHeartRate(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -416,7 +417,8 @@ public class APIFunctions {
     public static List<SensorData> getAccelerometer(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getAccelerometer(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getAccelerometer(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -432,7 +434,8 @@ public class APIFunctions {
     public static List<SensorData> getMagneticField(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getMagneticField(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getMagneticField(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -448,7 +451,8 @@ public class APIFunctions {
     public static List<SensorData> getGyroscope(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getGyroscope(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getGyroscope(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -464,7 +468,8 @@ public class APIFunctions {
     public static List<SensorData> getLight(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getLight(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getLight(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -480,7 +485,8 @@ public class APIFunctions {
     public static List<SensorData> getPressure(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getPressure(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getPressure(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -496,7 +502,8 @@ public class APIFunctions {
     public static List<SensorData> getProximity(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getProximity(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getProximity(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -512,7 +519,8 @@ public class APIFunctions {
     public static List<SensorData> getGravity(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getGravity(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getGravity(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -528,7 +536,8 @@ public class APIFunctions {
     public static List<SensorData> getRotationVector(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getRotationVector(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getRotationVector(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -544,7 +553,8 @@ public class APIFunctions {
     public static List<SensorData> getRelativeHumidity(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getHeartRate(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getRelativeHumidity(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -560,7 +570,8 @@ public class APIFunctions {
     public static List<SensorData> getTemperature(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getTemperature(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getTemperature(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
@@ -576,7 +587,8 @@ public class APIFunctions {
     public static List<SensorData> getGPS(int numValues) {
         if(APIHandle.isServiceBound()) {
             try {
-                return APIHandle.getGarmentAPIHandle().API_getGPS(APIHandle.getAppPackageID(), numValues).toSensorDataList();
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getGPS(APIHandle.getAppPackageID(), numValues);
+                return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
             }
         }
