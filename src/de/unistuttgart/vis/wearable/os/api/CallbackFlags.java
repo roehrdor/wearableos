@@ -82,7 +82,7 @@ public final class CallbackFlags {
 	 * <p>
 	 * Create a single flag value from multiple single flags. This function can
 	 * be used since
-	 * {@link APIFunctions#registerCallback(IGarmentServiceCallback, int)} needs
+	 * {@link APIFunctions#registerCallback(IGarmentCallback, int)} needs
 	 * to be called with a single flag value. Instead of calling this function
 	 * multiple times the developer can call this function to put multiple flags
 	 * together.
