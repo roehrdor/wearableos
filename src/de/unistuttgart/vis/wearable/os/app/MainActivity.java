@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
     }
 
     public void openStorageActivity(View view) {
-        Intent intent = new Intent(this, Import_ExportActivity.class);
+        Intent intent = new Intent(this, StorageActivity.class);
         startActivity(intent);
     }
 

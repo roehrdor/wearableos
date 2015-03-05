@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,7 @@ public class Dropbox extends Activity {
     private String currentDir;
     private List<String> dir;
     private Integer[] images;
+    private boolean cancelled = false;
 
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
@@ -310,6 +312,7 @@ public class Dropbox extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        cancelled = false;
         images = new Integer[2];
         images[0] = R.drawable.folder;
         images[1] = R.drawable.file;
@@ -357,6 +360,7 @@ public class Dropbox extends Activity {
 
                 if(entry != null) {
                     for (DropboxAPI.Entry ent : entry.contents) {
+
                         if (!getIntent().getBooleanExtra("isExport", false)) {
                             if (ent.isDir || ent.path.endsWith(".zip")) {
                                 String[] dirs = ent.path.split("/");
@@ -373,33 +377,43 @@ public class Dropbox extends Activity {
 
                     }
                 }
+                if (dir.size()==0){
+                    dir.add("No Content");
+                }
                 runOnUiThread(new Runnable(){
                     public void run() {
+
                         list = (ListView) findViewById(R.id.listView1);
-                        String [] s = new String[dir.size()];
-                        s = dir.toArray(s);
-                        adapter = new StorageAdapter(Dropbox.this,s,images);
-                        list.setAdapter(adapter);
-                        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            /*
-                             * Checks if the user wants to browse the parent directory or a
-                             * child directory
-                             */
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view,
-                                                    int position, long id) {
+                        String [] tmpNames = new String[dir.size()];
+                        tmpNames = dir.toArray(tmpNames);
+                        if (dir.get(0).equals("No Content")) {
+                            list.setAdapter(new ArrayAdapter<String>(getBaseContext(),
+                                    android.R.layout.simple_list_item_1, tmpNames));
 
-                                if (list.getItemAtPosition(position).toString().endsWith(".zip")){
-                                    finished =false;
-                                    currentFilePath = currentEntry.path + File.separator + list.getItemAtPosition(position).toString();
-                                    downloadTask = new Download();
-                                    downloadTask.execute(null,null,null);
-                                } else {
-                                    setFileList(currentEntry.path + File.separator + list.getItemAtPosition(position).toString());
+                        } else {
+                            adapter = new StorageAdapter(Dropbox.this, tmpNames, images);
+                            list.setAdapter(adapter);
+                            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                /*
+                                 * Checks if the user wants to browse the parent directory or a
+                                 * child directory
+                                 */
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view,
+                                                        int position, long id) {
+                                    if (list.getItemAtPosition(position).toString().endsWith(".zip")){
+                                        finished =false;
+                                        currentFilePath = currentEntry.path + File.separator + list.getItemAtPosition(position).toString();
+                                        downloadTask = new Download();
+                                        downloadTask.execute(null,null,null);
+                                    } else {
+                                        setFileList(currentEntry.path + File.separator + list.getItemAtPosition(position).toString());
+                                    }
+
                                 }
+                            });
+                        }
 
-                            }
-                        });
                     }
                 });
 
@@ -423,12 +437,17 @@ public class Dropbox extends Activity {
             } catch (IllegalStateException e) {
             }
 
-
+        } else {
+            if (cancelled) {
+                finish();
+            }
         }
+
     }
 
     @Override
     public void onBackPressed() {
+        cancelled=true;
         if (currentEntry== null){
             super.onBackPressed();
         }

@@ -73,33 +73,8 @@
             android:layout_alignRight="@+id/Button_Local"
             android:text="Encrypt Data"
             android:layout_below="@+id/Button_Local"
-            android:layout_alignLeft="@+id/radioButtonExport"
-            android:layout_alignStart="@+id/radioButtonExport"
             android:textSize="25dp"
-            android:gravity="left" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Export"
-            android:id="@+id/radioButtonExport"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="10dp"
-            android:checked="false"
-            android:textSize="25dp"
-            android:layout_below="@+id/switch_encrypt_data" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Import"
-            android:id="@+id/radioButtonImport"
-            android:checked="false"
-            android:textSize="25dp"
-            android:layout_alignLeft="@+id/radioButtonExport"
-            android:layout_alignStart="@+id/Button_Dropbox"
-            android:layout_below="@+id/radioButtonExport"
-            android:layout_marginTop="10dp" />
+            android:gravity="left" android:layout_alignStart="@id/Button_Local"/>
 
     </RelativeLayout>
 </ScrollView>

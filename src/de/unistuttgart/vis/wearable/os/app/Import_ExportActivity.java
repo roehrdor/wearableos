@@ -15,7 +15,7 @@ public class Import_ExportActivity extends Activity{
         public void onCreate(Bundle savedInstanceState){
 
                 super.onCreate(savedInstanceState);
-                setContentView(R.layout.import_export);
+//                setContentView(R.layout.import_export);
         }
 
         public void startExportActivity(View view) {

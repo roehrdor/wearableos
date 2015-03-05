@@ -20,7 +20,6 @@ import de.unistuttgart.vis.wearable.os.cloud.googleDrive.GoogleDrive;
 import de.unistuttgart.vis.wearable.os.cloud.oneDrive.OneDrive;
 
 public class StorageActivity extends Activity {
-    private boolean isExport = false;
     private Switch mySwitch;
     private boolean encrypted;
     private String key;
@@ -28,9 +27,8 @@ public class StorageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isExport = getIntent().getBooleanExtra("isExport", false);
         setContentView(R.layout.activity_storage);
-        mySwitch = (Switch) findViewById(R.id.switch5);
+        mySwitch = (Switch) findViewById(R.id.switch_encrypt_data);
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
@@ -63,39 +61,59 @@ public class StorageActivity extends Activity {
     }
 
     public void changeToDropBox(View view) {
-        Intent intent = new Intent(getBaseContext(), Dropbox.class);
-        intent.putExtra("isExport",isExport);
-        if (encrypted){
-            intent.putExtra("key", key);
-            intent.putExtra("encrypted",encrypted);
-        }
+        AlertDialog.Builder alert = new AlertDialog.Builder(StorageActivity.this);
+        alert.setTitle("Please choose");
+        alert.setView(null);
 
-        startActivity(intent);
+        alert.setPositiveButton("Export", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                Intent intent = new Intent(getBaseContext(), Dropbox.class);
+                intent.putExtra("isExport",true);
+                if (encrypted){
+                    intent.putExtra("key", key);
+                    intent.putExtra("encrypted",encrypted);
+                }
+                startActivity(intent);
+            }
+        });
+
+        alert.setNegativeButton("Import", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                Intent intent = new Intent(getBaseContext(), Dropbox.class);
+                intent.putExtra("isExport",false);
+                startActivity(intent);
+            }
+        });
+        alert.setCancelable(false);
+        alert.show();
+
+
+
     }
 
-    public void changeToOneDrive(View view) {
-        Intent intent = new Intent(getBaseContext(), OneDrive.class);
-        intent.putExtra("isExport",isExport);
-        if (encrypted){
-            intent.putExtra("key", key);
-            intent.putExtra("encrypted",encrypted);
-        }
-        startActivity(intent);
-  }
-
-    public void changeToGoogleDrive(View view) {
-        Intent intent = new Intent(getBaseContext(), GoogleDrive.class);
-        intent.putExtra("isExport",isExport);
-        if (encrypted){
-            intent.putExtra("key", key);
-            intent.putExtra("encrypted",encrypted);
-        }
-        startActivity(intent);
-    }
+//    public void changeToOneDrive(View view) {
+//        Intent intent = new Intent(getBaseContext(), OneDrive.class);
+//        intent.putExtra("isExport",isExport);
+//        if (encrypted){
+//            intent.putExtra("key", key);
+//            intent.putExtra("encrypted",encrypted);
+//        }
+//        startActivity(intent);
+//  }
+//
+//    public void changeToGoogleDrive(View view) {
+//        Intent intent = new Intent(getBaseContext(), GoogleDrive.class);
+//        intent.putExtra("isExport",isExport);
+//        if (encrypted){
+//            intent.putExtra("key", key);
+//            intent.putExtra("encrypted",encrypted);
+//        }
+//        startActivity(intent);
+//    }
 
     public void export(View view) {
         Intent intent = new Intent(getBaseContext(), ImportExportArchiveActivity.class);
-        intent.putExtra("isExport",isExport);
+//        intent.putExtra("isExport",isExport);
         if (encrypted){
             intent.putExtra("key", key);
             intent.putExtra("encrypted",encrypted);
