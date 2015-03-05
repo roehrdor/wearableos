@@ -21,12 +21,14 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -49,7 +51,7 @@ public class HARActivityTraining extends Activity {
 	private Button startTimeBtn;
 	private Button endDateBtn;
 	private Button endTimeBtn;
-	private Button activityBtn;
+	private Spinner activitySpinner;
 	private EditText millisecondsETx;
 
 	// final ContextThemeWrapper context = new ContextThemeWrapper(this,
@@ -318,39 +320,25 @@ public class HARActivityTraining extends Activity {
 		});
 
 		// activity
-		activityBtn = (Button) findViewById(R.id.har_train_button7);
-		activityBtn.setText(ActivityRecognitionModule
-				.getInstance().getActivities().get(0).getActivityEnum().toString());
-		activityBtn.refreshDrawableState();
-		activityBtn.setOnClickListener(new OnClickListener() {
+        ArrayAdapter adapter = new ArrayAdapter(HARActivityTraining.this, android.R.layout.simple_spinner_item, ActivityRecognitionModule.getInstance().getActivityNames());
+        activitySpinner = (Spinner) findViewById(R.id.har_train_activity_spinner);
+        activitySpinner.setAdapter(adapter);
+        activitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-						context);
-				final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-						context, R.layout.custom_spinner_item);
-				adapter.addAll(Arrays.copyOf(ActivityRecognitionModule
-						.getInstance().getActivities().toArray(),
-						ActivityRecognitionModule.getInstance()
-								.getActivities().size(),
-						String[].class));
-				alertDialogBuilder
-						.setTitle("Select Activity")
-						.setAdapter(adapter,
-								new DialogInterface.OnClickListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                activitySpinner.setSelection(position);
+                activity = activitySpinner.getSelectedItem().toString();
+            }
 
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										activity = adapter.getItem(which)
-												.toString();
-										activityBtn.setText(activity);
-									}
-								}).show();
-			}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
 
-		});
+            }
+        });
+
 
 		// window length
 		millisecondsETx = (EditText) findViewById(R.id.har_train_editText1);
@@ -415,7 +403,7 @@ public class HARActivityTraining extends Activity {
 
 				// if no activity is set, set it to the shown
 				if (activity == (null)) {
-					activity = (String) activityBtn.getText();
+					activity = activitySpinner.getSelectedItem().toString();
 				}
 
 				boolean noData = false;

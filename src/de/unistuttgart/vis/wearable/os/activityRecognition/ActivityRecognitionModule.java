@@ -342,6 +342,17 @@ public class ActivityRecognitionModule {
 	public List<Activity> getActivities() {
 		return activities;
 	}
+
+    /**
+     * @return the names of the activites
+     */
+    public List<String> getActivityNames(){
+        List<String> list = new ArrayList<String>();
+        for(Activity activity : activities){
+            list.add(activity.getActivityEnum().toString());
+        }
+        return  list;
+    }
 	
 	/**
 	 * Returns the activity which was performed at a specific time. 
