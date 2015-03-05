@@ -32,6 +32,7 @@ public class NeuralNetworkManager {
 	// list with all currently supported sensors
 	private List<String> sensors = new ArrayList<String>();
 	private int inputNeurons = 0;
+	private byte savePeriode = 0;
 	private String file = "";
 	private final String NN_FILE = "nn.data";
 	private final String NNM_FILE = "nn.data";
@@ -60,18 +61,13 @@ public class NeuralNetworkManager {
 		}
 		if (inputNeurons < 1) {
 			throw new IllegalArgumentException(
-					"The number of input neurons must be 1 or higher!");
+					"The number of input neurons must be higher than 1!");
 		}
-
 		this.inputNeurons = inputNeurons;
-		try {
-			neuralNetwork = new NeuralNetwork(new int[] { inputNeurons,
+		neuralNetwork = new NeuralNetwork(new int[] { inputNeurons,
 					inputNeurons / 2, 1 });
-			status = Status.INITIALIZED;
-			return true;
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(e);
-		}
+		status = Status.INITIALIZED;
+		return true;
 	}
 
 	/**
@@ -150,6 +146,12 @@ public class NeuralNetworkManager {
 	 */
 	public double recognise(TimeWindow timeWindow) throws NullPointerException,
 			IllegalArgumentException {
+		if(status == Status.NOTINITIALIZED) {
+			throw new NullPointerException("No neural network found!");
+		}
+		if(status == Status.INITIALIZED) {
+			throw new NullPointerException("No trained neural network found!");
+		}
 		if (activities.size() == 0) {
 			throw new NullPointerException("No activities found!");
 		}
@@ -188,6 +190,9 @@ public class NeuralNetworkManager {
 	 */
 	public void train(TimeWindow timeWindow) throws NullPointerException,
 			IllegalArgumentException {
+		if(status == Status.NOTINITIALIZED) {
+			throw new NullPointerException("No neural network found!");
+		}
 		if (activities.size() == 0) {
 			throw new NullPointerException("No activities found!");
 		}
@@ -218,6 +223,15 @@ public class NeuralNetworkManager {
 		if (status.equals(Status.NOTINITIALIZED) && !trainings.contains(0)) {
 			status = Status.TRAINED;
 		}
+		if(savePeriode == Byte.MAX_VALUE) {
+			try {
+				save();
+			} catch (FileNotFoundException e) {
+			}
+			savePeriode = 0;
+		} else {
+			savePeriode++;
+		}
 	}
 
 	/**
@@ -239,8 +253,8 @@ public class NeuralNetworkManager {
 	public void delete(String file) throws FileNotFoundException {
 		neuralNetwork.delete();
 		status = Status.NOTINITIALIZED;
-		new File(file + "nn.data").delete();
-		new File(file + "nnm.data").delete();
+		new File(file + NN_FILE).delete();
+		new File(file + NNM_FILE).delete();
 	}
 
 	/**

@@ -86,7 +86,6 @@ public class ActivityRecognitionModule {
 	 * 			The created time window
 	 */
 	public TimeWindow createTimeWindow(String activity, Date begin, Date end) {
-		// TODO check whether the activity is in the activity enum or not
 		TimeWindow timeWindow = new TimeWindow(activity, begin, end);
 		
 		for(String sid : neuralNetworkManager.getSensors()) {
@@ -335,7 +334,7 @@ public class ActivityRecognitionModule {
 		return activities;
 	}
 	
-	public Activity getActivityByDate(Date date) {
+	public Activity getActivityAtTime(Date date) {
 		return currentActivity;
 	}
 	
