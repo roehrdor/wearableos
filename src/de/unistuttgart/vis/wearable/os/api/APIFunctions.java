@@ -7,9 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.api;
 
-import de.unistuttgart.vis.wearable.os.activity.Activity;
 import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
-import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
