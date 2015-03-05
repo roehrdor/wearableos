@@ -7,8 +7,6 @@
  */
 package de.unistuttgart.vis.wearable.os.sensors;
 
-import android.util.Log;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -16,9 +14,6 @@ import java.io.ObjectOutput;
 import java.util.Date;
 import java.util.Vector;
 
-import android.util.Log;
-import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
-import de.unistuttgart.vis.wearable.os.api.CallBackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;

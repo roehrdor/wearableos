@@ -1,10 +1,8 @@
 package de.unistuttgart.vis.wearable.os.graph;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import android.content.Context;
+import android.graphics.Color;
+import android.view.View;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -15,10 +13,12 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
-import android.view.View;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
 import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 

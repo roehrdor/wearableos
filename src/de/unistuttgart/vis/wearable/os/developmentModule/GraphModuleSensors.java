@@ -1,15 +1,13 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
 
-import java.util.Date;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.RemoteException;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
+import java.util.Date;
+
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
@@ -19,12 +17,8 @@ import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
+import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 
-/**
- * what is this class good for?
- */
-//TODO delete this class if not needed
-@Deprecated
 public class GraphModuleSensors extends PopupModuleSensors {
 
 	private LinearLayout chart;
@@ -32,6 +26,7 @@ public class GraphModuleSensors extends PopupModuleSensors {
 	private PSensor sensor;
 	private IGarmentCallback igcb;
 	private final int NUMBER_OF_VALUES = 300;
+    GraphRenderer graphRenderer = new GraphRenderer();
 
 	public GraphModuleSensors(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -62,48 +57,40 @@ public class GraphModuleSensors extends PopupModuleSensors {
 		super.onDetachedFromWindow();
 	}
 
-	private void fillChart() {
-		fillChartImage();
+    private void fillChart() {
+        fillChartImage(true);
 
-		// register callback
-		igcb = new IGarmentCallback.Stub() {
-			@Override
-			public void callback(BaseCallbackObject value)
-					throws RemoteException {
-				if (value instanceof ValueChangedCallback) {
-					((Activity) getContext()).runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							fillChartImage();
-						}
-					});
-				}
-			}
-		};
-		APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
-	}
+        // register callback
+        igcb = new IGarmentCallback.Stub() {
+            @Override
+            public void callback(BaseCallbackObject value) throws RemoteException {
+                if (value instanceof ValueChangedCallback) {
+                    final SensorData data = ((ValueChangedCallback) value).toSensorData();
 
-	private long lastUpdate = 0;
+                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fillChartImage(false);
+                        }
+                    });
+                }
+            }
+        };
+        APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
+    }
 
-	private void fillChartImage() {
-//		if (lastUpdate + 100 >= new Date().getTime()) {
-//			return;
-//		}
-//		lastUpdate = new Date().getTime();
-//
-//		GraphRenderer.ChartThreadTuple tuple = graphRenderer.createGraph(
-//				sensor, getContext(), NUMBER_OF_VALUES, false);
-//		chart.removeAllViews();
-//
-//		View graph = tuple.getChart();
-//
-//		chart.addView(graph);
-//
-//		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) graph.getLayoutParams();
-//		layoutParams.width = 250;
-//		layoutParams.height = 130;
+    private long lastUpdate = 0;
+    private void fillChartImage(boolean loadFromStorage) {
+        if (lastUpdate + 100 >= new Date().getTime()) {
+            return;
+        }
+        lastUpdate = new Date().getTime();
 
-	}
+        GraphRenderer.ChartThreadTuple tuple =
+                graphRenderer.createGraph(sensor, getContext(), NUMBER_OF_VALUES, loadFromStorage);
+        chart.removeAllViews();
+        chart.addView(tuple.getChart());
+    }
 
 	@Override
 	protected void onSensorChanged(PSensor selecedSensor) {
