@@ -125,8 +125,8 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
 
-    <Button
-        android:id="@+id/har_train_button7"
+    <Spinner
+        android:id="@+id/har_train_activity_spinner"
         style="?android:attr/spinnerStyle"
         android:gravity="center"
         android:layout_width="wrap_content"
@@ -145,7 +145,7 @@
         android:text="@string/textView_train_timeWindow"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#000000"
-        android:layout_below="@+id/har_train_button7"
+        android:layout_below="@+id/har_train_activity_spinner"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp" />
 
