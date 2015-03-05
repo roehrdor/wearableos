@@ -50,6 +50,22 @@ public class Archiver {
         throw new IllegalAccessError("This constructor shall not be used");
     }
 
+
+    /**
+     * Check whether the given zip file is encrypted
+     *
+     * @param file the file that needs to be checked
+     * @return true if the file is encrypted
+     */
+    public static boolean isFileEncrypted(File file) throws IOException {
+        RandomAccessFile raf;
+        byte[] buffer = new byte[4];
+        raf = new RandomAccessFile(file, "rw");
+        raf.read(buffer);
+        raf.close();
+        return buffer[0] != 0x50 || buffer[1] != 0x4B || buffer[2] != 0x03 || buffer[3] != 0x04;
+    }
+
     /**
      * Return all files in the given directory and in sub directory
      *
