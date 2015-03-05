@@ -25,8 +25,6 @@ import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 
 public class SensorsActivity extends Activity {
-
-
     PSensor[] sensors;
 
     @Override
@@ -79,7 +77,6 @@ public class SensorsActivity extends Activity {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,
                                              boolean isChecked) {
-                    Log.d("lr DEBUG", "Wieso ????????" + sensor.getDisplayedSensorName());
                     sensor.setEnabled(isChecked);
                 }
             });

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,12 +7,14 @@
     android:orientation="vertical"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    tools:context=".HARActivityTraining" >
+    tools:context=".HARActivityTraining"
+    android:id="@+id/RelativeLayout1">
 
     <RadioGroup
         android:id="@+id/har_train_radioGroup1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
 
         <RadioButton
             android:id="@+id/har_train_radio0"
@@ -30,150 +32,109 @@
             android:textColor="#000000" />
     </RadioGroup>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/har_train_textView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight=".20"
+        android:layout_gravity="center"
+        android:text="@string/textView_train_start_date"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_radioGroup1"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
 
-        <TextView
-            android:id="@+id/har_train_textView1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".20"
-            android:layout_gravity="center"
-            android:text="@string/textView_train_start_date"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/har_train_button1"
-            style="?android:attr/spinnerStyle"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".40"
-            android:layout_gravity="center"
-            android:textColor="#000000"/>
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight=".05"
-            android:background="#c0d6e4"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:id="@+id/har_train_separator2" />
-
-        <Button
-            android:id="@+id/har_train_button2"
-            style="?android:attr/spinnerStyle"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".25"
-            android:layout_gravity="center"
-            android:textColor="#000000" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight=".10"
-            android:background="#c0d6e4"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:id="@+id/har_train_separator6" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/har_train_button1"
+        style="?android:attr/spinnerStyle"
+        android:gravity="center"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight=".40"
+        android:layout_gravity="center"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_radioGroup1"
+        android:layout_toRightOf="@+id/har_train_textView1"
+        android:layout_marginLeft="30dp"
+        android:minWidth="150dp" />
 
-        <TextView
-            android:id="@+id/har_train_textView2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".20"
-            android:layout_gravity="center"
-            android:text="@string/textView_train_end_date"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/har_train_button3"
-            style="?android:attr/spinnerStyle"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".40"
-            android:layout_gravity="center"
-            android:textColor="#000000"/>
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight=".05"
-            android:background="#c0d6e4"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:id="@+id/har_train_separator3" />
-
-        <Button
-            android:id="@+id/har_train_button4"
-            style="?android:attr/spinnerStyle"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".25"
-            android:layout_gravity="center"
-            android:textColor="#000000"/>
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight=".10"
-            android:background="#c0d6e4"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:id="@+id/har_train_separator4" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/har_train_button2"
+        style="?android:attr/spinnerStyle"
+        android:gravity="center"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight=".25"
+        android:layout_gravity="center"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_radioGroup1"
+        android:layout_toRightOf="@+id/har_train_button1"
+        android:layout_marginLeft="10dp" />
 
-        <TextView
-            android:id="@+id/har_train_textView3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight=".20"
-            android:text="@string/textView_train_activity"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#000000" />
+    <TextView
+        android:id="@+id/har_train_textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight=".20"
+        android:layout_gravity="center"
+        android:text="@string/textView_train_end_date"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_button1"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
 
-        <Button
-            android:id="@+id/har_train_button7"
-            style="?android:attr/spinnerStyle"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight=".40"
-            android:textColor="#000000" />
+    <Button
+        android:id="@+id/har_train_button3"
+        style="?android:attr/spinnerStyle"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight=".40"
+        android:layout_gravity="center"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_button1"
+        android:layout_alignLeft="@+id/har_train_button1"
+        android:minWidth="150dp" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight=".40"
-            android:background="#c0d6e4"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:id="@+id/har_train_separator5" />
+    <Button
+        android:id="@+id/har_train_button4"
+        style="?android:attr/spinnerStyle"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight=".25"
+        android:layout_gravity="center"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_button1"
+        android:layout_alignLeft="@+id/har_train_button2" />
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/har_train_textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight=".20"
+        android:text="@string/textView_train_activity"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_button3"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <Button
+        android:id="@+id/har_train_button7"
+        style="?android:attr/spinnerStyle"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight=".40"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_button3"
+        android:layout_alignLeft="@+id/har_train_button1"
+        android:minWidth="150dp" />
 
     <TextView
         android:id="@+id/har_train_textView4"
@@ -181,72 +142,66 @@
         android:layout_height="wrap_content"
         android:text="@string/textView_train_timeWindow"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#000000" />
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_button7"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <EditText
+        android:id="@+id/har_train_editText1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight=".25"
+        android:hint="@string/edittext_train_recomended"
+        android:textColorHint="#999999"
+        android:inputType="number"
+        android:textColor="#000000"
+        android:layout_below="@+id/har_train_textView4"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:enabled="false">
 
-        <EditText
-            android:id="@+id/har_train_editText1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".25"
-            android:ems="10"
-            android:hint="@string/edittext_train_recomended"
-            android:textColorHint="#999999"
-            android:inputType="number"
-            android:textColor="#000000" >
+        <requestFocus />
+    </EditText>
 
-            <requestFocus />
-        </EditText>
-
-        <TextView
-            android:id="@+id/har_train_textView5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".75"
-            android:text="@string/button_train_millisec"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#000000" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_gravity="bottom"
-        style="?android:buttonBarStyle"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/har_train_textView5"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_weight=".75"
+        android:text="@string/button_train_millisec"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000"
+        android:layout_toRightOf="@+id/har_train_editText1"
+        android:layout_below="@+id/har_train_textView4"
+        android:layout_marginTop="15dp" />
 
-        <Button
-            android:id="@+id/har_train_button6"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#606060"
-            android:text="@string/button_train_cancle"
-            android:textColor="#FFFFFF" />
+    <Button
+        android:id="@+id/har_train_button6"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#606060"
+        android:text="@string/button_train_cancle"
+        android:textColor="#FFFFFF"
+        android:layout_below="@+id/har_train_editText1"
+        android:layout_marginTop="10dp"
+        android:minWidth="@android:dimen/thumbnail_width" />
 
-        <View
-            android:layout_width="1px"
-            android:layout_height="fill_parent"
-            android:background="#c0d6e4"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:id="@+id/har_train_separator1" />
+    <Button
+        android:id="@+id/har_train_button5"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_weight="1"
+        android:background="#606060"
+        android:text="@string/button_train_start"
+        android:textColor="#FFFFFF"
+        android:layout_below="@+id/har_train_editText1"
+        android:layout_toRightOf="@+id/har_train_button6"
+        android:layout_marginTop="10dp"
+        android:minWidth="@android:dimen/thumbnail_width" />
 
-        <Button
-            android:id="@+id/har_train_button5"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_weight="1"
-            android:background="#606060"
-            android:text="@string/button_train_start"
-            android:textColor="#FFFFFF" />
-
-    </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
