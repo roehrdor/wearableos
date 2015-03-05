@@ -208,6 +208,12 @@ public class SensorDataDeSerializer implements Runnable {
             dataDimension = raf.readInt();
             numberOfDataSetsInFile = (currentFileLength - 12) / ((dataDimension + 1) * 4);
 
+            //
+            // If not data fields are available, skip
+            //
+            if(numberOfDataSetsInFile < 1 || currentFileLength <= 12)
+                return;
+
 
             //
             // Now we have to check what working flag we have set and what we actually shall do
