@@ -7,6 +7,7 @@
  */
 package de.unistuttgart.vis.wearable.os.storage;
 
+import android.util.Log;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
@@ -193,6 +194,7 @@ public class SensorDataDeSerializer implements Runnable {
             //
             file = new java.io.File(Properties.storageDirectory, String.valueOf(sensorID));
             if(!file.exists()) {
+                workerEnd(threadID);
                 return;
             }
 
@@ -325,7 +327,15 @@ public class SensorDataDeSerializer implements Runnable {
             raf.close();
         } catch (java.io.IOException ioe) {
         }
+        workerEnd(threadID);
 
+    }
+
+    /**
+     * The worker finished, remove from active queue
+     * @param threadID the thread that has finished
+     */
+    private void workerEnd(long threadID) {
         //
         // Remove the id to signal the job is finished
         //
