@@ -1,8 +1,8 @@
 package de.unistuttgart.vis.wearable.os.activityRecognition;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 
-import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
 
 /**
@@ -11,15 +11,15 @@ import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
  * training data or data to classify.
  *
  */
-public class TimeWindow extends LinkedHashMap<Integer, PSensorData> {
+public class TimeWindow extends LinkedHashMap<String, float[][]> {
 	private static final long serialVersionUID = -8506989075775065844L;
 	// Activity of this time window
 	private String activityLabel;
 	// Feature set of this time window
 	private FeatureSet featureSet;
-	private int begin, end;
+	private Date begin, end;
 
-	public TimeWindow(String activityLabel, int begin, int end) {
+	public TimeWindow(String activityLabel, Date begin, Date end) {
 		if(activityLabel == null) {
 			this.activityLabel = "dead (activity label was null)";
 		} else {
@@ -29,12 +29,11 @@ public class TimeWindow extends LinkedHashMap<Integer, PSensorData> {
 		this.end = end;
 	}
 
-	public void addSensorDataByID(int sid) {
-		super.put(sid,
-				APIFunctions.SENSORS_SENSOR_getRawDataII(sid, begin, end));
+	public void addSensorDataByID(String sid, float[][] values) {
+		super.put(sid, values);
 	}
 	
-	public PSensorData getSensorData(int sid) {
+	public float[][] getSensorData(String sid) {
 		return this.get(sid);
 	}
 
@@ -54,11 +53,11 @@ public class TimeWindow extends LinkedHashMap<Integer, PSensorData> {
 		this.activityLabel = activityLabel;
 	}
 
-	public int getBegin() {
+	public Date getBegin() {
 		return begin;
 	}
 
-	public int getEnd() {
+	public Date getEnd() {
 		return end;
 	}
 

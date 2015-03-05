@@ -242,7 +242,6 @@ public class InternalSensors implements SensorEventListener {
         }
         if (rotationVectorSensor == null &&
                 sensorManager.getSensorList(android.hardware.Sensor.TYPE_ROTATION_VECTOR).size() > 0) {
-                // TODO stimmt hier die Einheit usw?
             rotationVectorSensor = new Sensor(androidRotationVectorSensor, DEFAULT_SAMPLERATE,
                     DEFAULT_SAVEPERIOD, DEFAULT_SMOOTHNESS, "internal_rotation_vector",
                     SensorType.ROTATION_VECTOR, MeasurementSystems.RADIAN,

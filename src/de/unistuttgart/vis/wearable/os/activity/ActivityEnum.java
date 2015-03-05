@@ -1,5 +1,7 @@
 package de.unistuttgart.vis.wearable.os.activity;
 
+import java.util.Locale;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -31,6 +33,15 @@ public enum ActivityEnum implements Parcelable {
 
 	public String toString() {
 		return name;
+	}
+	
+	public static boolean contains(String s) {
+		for(ActivityEnum a : ActivityEnum.values()) {
+			if(a.name().equals(s.toUpperCase(Locale.US))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static final Parcelable.Creator<ActivityEnum> CREATOR = new Parcelable.Creator<ActivityEnum>() {

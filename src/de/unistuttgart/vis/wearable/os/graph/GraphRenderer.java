@@ -1,10 +1,8 @@
 package de.unistuttgart.vis.wearable.os.graph;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import android.content.Context;
+import android.graphics.Color;
+import android.view.View;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -15,10 +13,12 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
-import android.view.View;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
 import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 
@@ -48,7 +48,7 @@ public class GraphRenderer {
 		}
 	}
 
-	private GraphRenderer() {
+	public GraphRenderer() {
 	}
 
 	private static float legendTextSize = 18.0f;
@@ -156,10 +156,8 @@ public class GraphRenderer {
 		return new ChartThreadTuple(thread, view);
 	}
 
-    private static GraphType graphType;
-    private static Vector<SensorData> lastData = new Vector<SensorData>();
-    // TODO last data bug - static - multiple calls will produce wrong data
-    // Solution: Non static
+    private GraphType graphType;
+    private Vector<SensorData> lastData = new Vector<SensorData>();
     /**
      * creates the graph with the given number of values (see getRawData(int, boolean)
      * @param sensor the sensor to show data from
@@ -167,7 +165,7 @@ public class GraphRenderer {
      * @param numberOfValuesToBeShown the number of values to show in the graph
      * @param loadFromStorage if the data can also be from the storage or just from the memory
      */
-	public static ChartThreadTuple createGraph(final PSensor sensor,
+	public ChartThreadTuple createGraph(final PSensor sensor,
 			Context context, final int numberOfValuesToBeShown, final boolean loadFromStorage) {
             if (loadFromStorage) {
                 lastData = new Vector<SensorData>();
@@ -186,7 +184,14 @@ public class GraphRenderer {
 
                 // if needed add the number of data from the lastData to data
                 if ((data.size() < numberOfValuesToBeShown) && lastData.size() != 0) {
-                    lastData.removeAll(data);
+                    // prevent multiple SensorData
+                    for(int i = 0; i != lastData.size();) {
+                        if(lastData.get(i).getLongUnixDate() >= data.get(0).getLongUnixDate())
+                            lastData.remove(i);
+                        else
+                            ++i;
+                    }
+
                     int numberOfValuesToDelete = (data.size() + lastData.size() - numberOfValuesToBeShown);
                     for (int i = 0; i < numberOfValuesToDelete; i++) {
                         lastData.remove(0);
