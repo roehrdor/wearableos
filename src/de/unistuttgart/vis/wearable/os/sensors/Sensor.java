@@ -33,7 +33,7 @@ public class Sensor implements Externalizable {
     private transient Vector<SensorData> rawData = new Vector<SensorData>();
 
     private boolean isInternalSensor = false;
-    String sensorDriverName = null;
+    String sensorDriverName = "";
 
     private boolean isEnabled = false;
 
