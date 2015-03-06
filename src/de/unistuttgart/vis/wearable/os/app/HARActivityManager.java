@@ -242,10 +242,13 @@ public class HARActivityManager extends Activity {
 		}
 	}
 
-	// TODO
 	protected void deleteBtn() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				context);
-		alertDialogBuilder.setTitle("ERROR").setMessage("Nope").show();
+		try {
+			ActivityRecognitionModule.getInstance().deleteNeuralNetwork();
+		} catch (FileNotFoundException e) {
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+					context);
+			alertDialogBuilder.setTitle("ERROR").setMessage(e.getMessage()).show();
+		}
 	}
 }

@@ -413,8 +413,8 @@ public class ActivityRecognitionModule {
 		neuralNetworkManager.close();
 	}
 	
-	public void deleteNeuralNetwork(String file) throws FileNotFoundException {
-		neuralNetworkManager.delete(file);
+	public void deleteNeuralNetwork() throws FileNotFoundException {
+		neuralNetworkManager.delete();
 	}
 	
 	public Status getNeuralNetworkStatus() {

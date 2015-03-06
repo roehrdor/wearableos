@@ -74,8 +74,6 @@ public class NeuralNetworkManager {
 	 * Saves the neural network and the information in two separate files
 	 * (nn.data and nnm.data)
 	 * 
-	 * @param file
-	 *            Path where the data should be saved..
 	 * @return true if the data was saved correctly false else
 	 */
 	public boolean save() throws FileNotFoundException {
@@ -102,8 +100,6 @@ public class NeuralNetworkManager {
 	/**
 	 * Loads the neural network and the information.
 	 * 
-	 * @param file
-	 *            Path where the data is located
 	 * @return true if the data was loaded correctly false else
 	 * @throws FileNotFoundException
 	 */
@@ -246,11 +242,9 @@ public class NeuralNetworkManager {
 	 * Deletes the neural network and additional information from the storage
 	 * and memory.
 	 * 
-	 * @param file
-	 *            Path to the files to delete
 	 * @throws FileNotFoundException
 	 */
-	public void delete(String file) throws FileNotFoundException {
+	public void delete() throws FileNotFoundException {
 		neuralNetwork.delete();
 		status = Status.NOTINITIALIZED;
 		new File(file + NN_FILE).delete();
