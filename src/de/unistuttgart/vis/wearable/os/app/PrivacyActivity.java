@@ -64,7 +64,17 @@ public class PrivacyActivity extends Activity {
             } catch (PackageManager.NameNotFoundException e) {
                 imageView.setImageResource(R.drawable.ic_launcher);
             }
-            textView.setText(apps[position].getName());
+
+            //
+            // Try to get the name of the application from the Android Package Manager
+            //
+            try {
+                // if we can access the name using the Package Manager set it this way
+                textView.setText(getPackageManager().getApplicationLabel(getPackageManager().getApplicationInfo(apps[position].getName(), 0)));
+            } catch (PackageManager.NameNotFoundException nameNotFoundException) {
+                // Otherwise set the package name of the application
+                textView.setText(apps[position].getName());
+            }
 
             return itemView;
         }
