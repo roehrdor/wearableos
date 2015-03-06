@@ -18,7 +18,6 @@ import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
-import de.unistuttgart.vis.wearable.os.sensorDriver.SensorDriver;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataDeSerializer;
 import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
@@ -34,7 +33,7 @@ public class Sensor implements Externalizable {
     private transient Vector<SensorData> rawData = new Vector<SensorData>();
 
     private boolean isInternalSensor = false;
-    SensorDriver sensorDriver = null;
+    String sensorDriverName = null;
 
     private boolean isEnabled = false;
 
@@ -71,7 +70,7 @@ public class Sensor implements Externalizable {
      * which is not forgiven yet.
      * Use only for external Sensors
      */
-    public Sensor(SensorDriver sensorDriver, int sampleRate, int savePeriod, float smoothness,
+    public Sensor(String sensorDriverName, int sampleRate, int savePeriod, float smoothness,
                   String displayedSensorName, SensorType sensorType, String bluetoothID,
                   MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                   MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
@@ -87,7 +86,7 @@ public class Sensor implements Externalizable {
 
         sensorID = id;
 
-        this.sensorDriver = sensorDriver;
+        this.sensorDriverName = sensorDriverName;
         this.sampleRate = sampleRate;
         this.savePeriod = savePeriod;
         this.smoothness = smoothness;
