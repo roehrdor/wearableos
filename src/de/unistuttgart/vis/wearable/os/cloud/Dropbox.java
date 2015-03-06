@@ -21,6 +21,7 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ public class Dropbox extends Activity {
     private String currentDir;
     private List<String> dir;
     private Integer[] images;
-    private boolean cancelled = false;
 
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
@@ -100,7 +100,7 @@ public class Dropbox extends Activity {
         protected Boolean doInBackground(Void... params) {
 
 
-            // Database Path
+            //  Path
             tmp = new File(Dropbox.this.getFilesDir().getAbsolutePath()+File.separator+"tmp.zip");
 
             if (getIntent().getBooleanExtra("encrypted",false)) {
@@ -119,7 +119,7 @@ public class Dropbox extends Activity {
 
                 try {
                     // set request for connectionEstablished to Dropbox
-                    request = mDBApi.putFileOverwriteRequest(currentDir, inputStream, tmp.length(),
+                    request = mDBApi.putFileOverwriteRequest(currentDir+File.separator+"gos-sensors.zip", inputStream, tmp.length(),
                             new ProgressListener() {
 
                                 @Override
@@ -232,6 +232,8 @@ public class Dropbox extends Activity {
             } finally {
                 if (outputStream != null) {
                     try {
+                        // TODO look for encryption
+                        Archiver.unpackArchiveFile(file);
                         outputStream.close();
                     } catch (IOException e) {
                     }
@@ -243,7 +245,7 @@ public class Dropbox extends Activity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-
+            file.delete();
             // print result
             runOnUiThread(new Runnable() {
 
@@ -312,7 +314,6 @@ public class Dropbox extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        cancelled = false;
         images = new Integer[2];
         images[0] = R.drawable.folder;
         images[1] = R.drawable.file;
@@ -437,21 +438,17 @@ public class Dropbox extends Activity {
             } catch (IllegalStateException e) {
             }
 
-        } else {
-            if (cancelled) {
-                finish();
-            }
         }
+
 
     }
 
     @Override
     public void onBackPressed() {
-        cancelled=true;
         if (currentEntry== null){
             super.onBackPressed();
         }
-        if (!currentEntry.path.equals("/")) {
+        if (currentEntry!=null&&!currentEntry.path.equals("/")) {
             setFileList(currentEntry.parentPath());
         } else {
             super.onBackPressed();
@@ -465,9 +462,14 @@ public class Dropbox extends Activity {
      * @param view
      */
     public void upload(View view) {
-        finished =false;
-        uploadTask = new Upload();
-        uploadTask.execute(null, null, null);
+        if (list==null){
+            Toast.makeText(getApplicationContext(),"Please accept Authentication",Toast.LENGTH_LONG).show();
+            onBackPressed();
+        } else {
+            finished = false;
+            uploadTask = new Upload();
+            uploadTask.execute(null, null, null);
+        }
     }
 
 

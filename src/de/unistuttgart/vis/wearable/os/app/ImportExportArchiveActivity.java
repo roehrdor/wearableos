@@ -153,7 +153,12 @@ public class ImportExportArchiveActivity extends Activity {
                     Toast.LENGTH_SHORT).show();
             onBackPressed();
         } else{
-            // TODO Handle import
+            // TODO look for encryption
+            File tmp = new File(currentFilePath + File.separator + "gos_sensors.zip");
+            Archiver.createArchiveFile(tmp);
+            Toast.makeText(getBaseContext(), "Archive import finished",
+                    Toast.LENGTH_SHORT).show();
+            onBackPressed();
         }
     }
 }

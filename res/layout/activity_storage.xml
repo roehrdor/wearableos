@@ -6,7 +6,7 @@
 
     <RelativeLayout
 
-        android:id="@+id/LinearLayout2"
+        android:id="@+id/RelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#c0d6e4"
