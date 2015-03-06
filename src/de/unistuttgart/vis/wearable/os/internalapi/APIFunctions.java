@@ -55,6 +55,10 @@ public class APIFunctions {
 	//
 	// =============================================================================
 
+    public static void unpackArchiveFile(java.io.File file) {
+
+    }
+
     public static void registerCallback(IGarmentCallback callback, int cause) {
         if(APIHandle.isServiceBound()) {
             try {
