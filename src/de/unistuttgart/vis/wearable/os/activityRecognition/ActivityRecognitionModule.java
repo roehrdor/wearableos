@@ -26,7 +26,7 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 
 /**
- * TODO AutoSave
+ * TODO AutoSave when training and recognition stops
  * @author Tobias
  *
  */
@@ -57,7 +57,7 @@ public class ActivityRecognitionModule {
 	private NeuralNetworkManager neuralNetworkManager;	
 	private Activity currentActivity;
 	
-	private int trains = 0;
+	private int trainingNumber = 0;
 	private Date beginActivity;
 	private Date endActivity;
 	private boolean training = false;
@@ -293,7 +293,7 @@ public class ActivityRecognitionModule {
 						Looper.prepare();
 					}
 					Date timeWindowBegin = new Date();
-					timeWindowBegin.setTime(begin.getTime() + windowLength * trains);
+					timeWindowBegin.setTime(begin.getTime() + windowLength * trainingNumber);
 					Date timeWindowEnd = new Date();
 					timeWindowEnd.setTime(timeWindowBegin.getTime() + windowLength);
 					if(timeWindowEnd.getTime() >= end.getTime()) {
@@ -304,7 +304,7 @@ public class ActivityRecognitionModule {
 					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						try {
 							neuralNetworkManager.train(timeWindow);
-							incTrains();
+							incTrainingNumber();
 						} catch (NullPointerException e) {
 							return;
 						} catch (IllegalArgumentException e) {
@@ -324,8 +324,8 @@ public class ActivityRecognitionModule {
 		}
 	}
 	
-	private synchronized void incTrains() {
-		trains++;
+	private synchronized void incTrainingNumber() {
+		trainingNumber++;
 	}
 	
 	/**
@@ -342,17 +342,17 @@ public class ActivityRecognitionModule {
 	public List<Activity> getActivities() {
 		return activities;
 	}
-
-    /**
-     * @return the names of the activites
-     */
-    public List<String> getActivityNames(){
-        List<String> list = new ArrayList<String>();
-        for(Activity activity : activities){
-            list.add(activity.getActivityEnum().toString());
-        }
-        return  list;
-    }
+	
+	/**
+	 * @return the names of the activities
+	 */
+	public List<String> getActivityNames() {
+		List<String> list = new ArrayList<String>();
+		for(Activity activity : activities) {
+			list.add(activity.getActivityEnum().toString());
+		}
+		return list;
+	}
 	
 	/**
 	 * Returns the activity which was performed at a specific time. 
@@ -401,7 +401,6 @@ public class ActivityRecognitionModule {
 	 * @throws FileNotFoundException 
 	 */
 	public void loadNeuralNetwork() throws FileNotFoundException {
-		// TODO
 		neuralNetworkManager.load();
 	}
 	
@@ -437,16 +436,10 @@ public class ActivityRecognitionModule {
 		neuralNetworkManager.addActivity(activity);
 	}
 
-	/**
-	 * @return the training
-	 */
 	public boolean isTraining() {
 		return training;
 	}
 
-	/**
-	 * @return the recognizing
-	 */
 	public boolean isRecognizing() {
 		return recognizing;
 	}
