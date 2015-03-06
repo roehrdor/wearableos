@@ -1,5 +1,6 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
 
+import java.util.List;
 import java.util.Vector;
 
 import de.unistuttgart.vis.wearable.os.R;
@@ -44,17 +45,30 @@ public class GpsModule extends PopupModuleDate {
 		//
 		// content.addView(button);
 
-		PSensor[] gpsSensors = APIFunctions
-				.getAllSensors(SensorType.GPS_SENSOR);
+		// PSensor[] gpsSensors = APIFunctions
+		// .getAllSensors(SensorType.GPS_SENSOR);
+		//
+		//
+		//
+		// PSensor gpsSensor = gpsSensors[0];
+		//
+		// Vector<SensorData> gpsData = gpsSensor.getRawData(NUMBER_OF_VALUES);
+		//
+		// if (gpsData.isEmpty()) {
+		// content.setText("no Data");
+		// } else {
+		// content.setText(gpsData.get(0).getData()[0] + "");
+		// }
 
-		PSensor gpsSensor = gpsSensors[0];
+		List<SensorData> datas = APIFunctions.getGPS(1);
+		if (datas != null && datas.size() > 0) {
+			SensorData data = datas.get(0);
+			
+			if(data.getDimension() >= 2) {
+				content.setText(String.format("(%.2f, %.2f, %.2f)", data.getData()[0],
+						data.getData()[1], data.getData()[2]));
 
-		Vector<SensorData> gpsData = gpsSensor.getRawData(NUMBER_OF_VALUES);
-
-		if (gpsData.isEmpty()) {
-			content.setText("no Data");
-		} else {
-			content.setText(gpsData.get(0).getData()[0] + "");
+			}
 		}
 
 		super.createLayout(context, content, R.drawable.gps, "GPS");
