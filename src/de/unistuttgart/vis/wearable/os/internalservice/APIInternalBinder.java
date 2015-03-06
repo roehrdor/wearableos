@@ -9,6 +9,7 @@ package de.unistuttgart.vis.wearable.os.internalservice;
 
 import android.os.RemoteException;
 
+import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
@@ -21,6 +22,8 @@ import de.unistuttgart.vis.wearable.os.sensors.*;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
+
+import java.io.File;
 
 /**
  * <p>
@@ -35,6 +38,11 @@ import de.unistuttgart.vis.wearable.os.utils.Utils;
  * @author roehrdor
  */
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
+
+    @Override
+    public void API_unpackArchiveFile(String file) throws RemoteException {
+        Archiver.unpackArchiveFile(new File(file));
+    }
 
     @Override
     public PSensor API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,

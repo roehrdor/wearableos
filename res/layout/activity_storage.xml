@@ -74,7 +74,7 @@
             android:text="Encrypt Data"
             android:layout_below="@+id/Button_Local"
             android:textSize="25dp"
-            android:gravity="left" android:layout_alignStart="@id/Button_Local"/>
+            android:gravity="left" />
 
     </RelativeLayout>
 </ScrollView>

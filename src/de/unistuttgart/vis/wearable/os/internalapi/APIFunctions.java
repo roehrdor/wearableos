@@ -56,7 +56,14 @@ public class APIFunctions {
 	// =============================================================================
 
     public static void unpackArchiveFile(java.io.File file) {
-
+        if(APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().API_unpackArchiveFile(file.getAbsolutePath());
+                return;
+            } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
     }
 
     public static void registerCallback(IGarmentCallback callback, int cause) {
