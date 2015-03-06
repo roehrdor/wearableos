@@ -22,6 +22,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 import java.io.*;
@@ -193,7 +194,7 @@ public class Dropbox extends Activity {
         protected Boolean doInBackground(Void... params) {
 
             // TODO add right path
-            file = new File(Environment.getExternalStorageDirectory()+File.separator+"tmp.zip");
+            file = new File(Properties.exportDirectory, "tmp.zip");
             outputStream = null;
             try {
                 outputStream = new FileOutputStream(file);
