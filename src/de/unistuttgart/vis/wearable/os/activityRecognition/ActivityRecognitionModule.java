@@ -23,6 +23,7 @@ import de.unistuttgart.vis.wearable.os.api.ActivityChangedCallback;
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 
 /**
@@ -44,6 +45,7 @@ public class ActivityRecognitionModule {
 		} catch(Exception e) {
 			throw new RuntimeException("Exception occured in creating singleton instance!");
 		}
+		// TODO
 		instance.neuralNetworkManager = new NeuralNetworkManager(""/*
 				GarmentOSService.getContext().getFilesDir().getAbsolutePath()*/);
 		(instance.currentActivity = new Activity()).setActivityEnum(ActivityEnum.NOACTIVITY);
@@ -415,6 +417,39 @@ public class ActivityRecognitionModule {
 	
 	public void deleteNeuralNetwork() throws FileNotFoundException {
 		neuralNetworkManager.delete();
+	}
+	
+	public boolean createNeuralNetwork() throws IllegalArgumentException {
+		if (getSensors().size() < 1) {
+			throw new IllegalArgumentException(
+					"No sensors found at neural network manager!");
+		}
+		int inputNeurons = 0;
+		for (String sid : getSensors()) {
+			if (SensorManager.getSensorByID(Integer.valueOf(sid))
+					.getSensorType().equals(SensorType.ACCELEROMETER)) {
+				if (SensorManager.getSensorByID(Integer.valueOf(sid))
+						.getRawData().get(0).getDimension() > 1) {
+					inputNeurons += SensorManager
+							.getSensorByID(Integer.valueOf(sid)).getRawData()
+							.get(0).getDimension() * 10;
+				} else {
+					inputNeurons += SensorManager
+							.getSensorByID(Integer.valueOf(sid)).getRawData()
+							.get(0).getDimension() * 12;
+				}
+			} else {
+				inputNeurons += SensorManager
+						.getSensorByID(Integer.valueOf(sid)).getRawData()
+						.get(0).getDimension() * 8;
+			}
+		}
+		try {
+			return neuralNetworkManager.create(inputNeurons);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+
 	}
 	
 	public Status getNeuralNetworkStatus() {

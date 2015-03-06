@@ -28,6 +28,7 @@ public class HARActivityManager extends Activity {
 	private Button saveBtn;
 	private Button loadBtn;
 	private Button deleteBtn;
+	private Button createBtn;
 
 	private List<String> sensorsList;
 	private List<String> activitiesList;
@@ -42,11 +43,18 @@ public class HARActivityManager extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_har_manager);
 
-		sensorsBtn = (Button) findViewById(R.id.har_manager_button1);
-		activitiesBtn = (Button) findViewById(R.id.har_manager_button2);
-		saveBtn = (Button) findViewById(R.id.har_manager_button3);
-		loadBtn = (Button) findViewById(R.id.har_manager_button4);
-		deleteBtn = (Button) findViewById(R.id.har_manager_button5);
+		sensorsBtn = (Button) findViewById(R.id.har_manager_sensors);
+		activitiesBtn = (Button) findViewById(R.id.har_manager_activities);
+		saveBtn = (Button) findViewById(R.id.har_manager_save);
+		loadBtn = (Button) findViewById(R.id.har_manager_load);
+		deleteBtn = (Button) findViewById(R.id.har_manager_delete);
+		createBtn = (Button) findViewById(R.id.har_manager_create);
+		if (ActivityRecognitionModule.getInstance().getNeuralNetworkStatus()
+				.toString().equals("NOTINITIALIZED")) {
+			createBtn.setVisibility(View.VISIBLE);
+		} else {
+			createBtn.setVisibility(View.INVISIBLE);
+		}
 
 		sensorsBtn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -76,6 +84,12 @@ public class HARActivityManager extends Activity {
 			@Override
 			public void onClick(View v) {
 				deleteBtn();
+			}
+		});
+		createBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				createBtn();
 			}
 		});
 
@@ -249,6 +263,24 @@ public class HARActivityManager extends Activity {
 			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 					context);
 			alertDialogBuilder.setTitle("ERROR").setMessage(e.getMessage()).show();
+		}
+	}
+	
+	protected void createBtn() {
+		try {
+			if(ActivityRecognitionModule.getInstance().createNeuralNetwork()) {
+				Toast.makeText(context, "Neural network created", Toast.LENGTH_SHORT);
+			} else {
+				Toast.makeText(context, "Neural network not created", Toast.LENGTH_SHORT);
+			}
+		} catch(IllegalArgumentException e) {
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+					context);
+			alertDialogBuilder.setTitle("ERROR").setMessage(e.getMessage()).show();
+		} catch(ExceptionInInitializerError e) {
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+					context);
+			alertDialogBuilder.setTitle("ERROR").setMessage("No permission!").show();
 		}
 	}
 }

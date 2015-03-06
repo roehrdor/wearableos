@@ -106,6 +106,6 @@
     <string name="btn_local">Local</string>
     <string name="btn_importDropbox">Import</string>
     <string name="textView_text_no_archive_for_import">No archive available for import</string>
-
+	<string name="har_button_manager_create">Create neural network</string>
 
 </resources>

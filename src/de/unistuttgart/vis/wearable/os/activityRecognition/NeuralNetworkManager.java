@@ -67,6 +67,12 @@ public class NeuralNetworkManager {
 		neuralNetwork = new NeuralNetwork(new int[] { inputNeurons,
 					inputNeurons / 2, 1 });
 		status = Status.INITIALIZED;
+		try {
+			save();
+		} catch(FileNotFoundException e) {
+			close();
+			return false;
+		}
 		return true;
 	}
 
