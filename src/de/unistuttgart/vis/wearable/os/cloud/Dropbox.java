@@ -21,6 +21,7 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 import java.io.*;
@@ -233,7 +234,7 @@ public class Dropbox extends Activity {
                 if (outputStream != null) {
                     try {
                         // TODO look for encryption
-                        Archiver.unpackArchiveFile(file);
+                        APIFunctions.unpackArchiveFile(file);
                         outputStream.close();
                     } catch (IOException e) {
                     }

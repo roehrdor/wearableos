@@ -18,6 +18,7 @@ import java.util.List;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.cloud.StorageAdapter;
+import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 
 public class ImportExportArchiveActivity extends Activity {
 
@@ -155,7 +156,7 @@ public class ImportExportArchiveActivity extends Activity {
         } else{
             // TODO look for encryption
             File tmp = new File(currentFilePath + File.separator + "gos_sensors.zip");
-            Archiver.createArchiveFile(tmp);
+            APIFunctions.unpackArchiveFile(tmp);
             Toast.makeText(getBaseContext(), "Archive import finished",
                     Toast.LENGTH_SHORT).show();
             onBackPressed();
