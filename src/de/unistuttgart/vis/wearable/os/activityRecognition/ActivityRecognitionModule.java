@@ -282,6 +282,7 @@ public class ActivityRecognitionModule {
 		if(!ActivityEnum.contains(activity)) {
 			throw new IllegalArgumentException("Activity not defined in activity enum!");
 		}
+		trainingNumber = 0;
 		training = true;
 		scheduler = Executors.newScheduledThreadPool(4);
 		try {
