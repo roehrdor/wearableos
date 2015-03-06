@@ -25,8 +25,10 @@ import java.lang.reflect.Array;
 import java.util.Set;
 
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.bluetoothservice.GarmentOSBluetoothService;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
+import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
@@ -41,6 +43,7 @@ public class AddSensorActivity extends Activity {
     private Spinner spinner2;
     private Spinner spinner3;
     private BluetoothDevice btDevice;
+    private BluetoothAdapter myBluetoothAdapter;
     private String btMac;
     SensorType[] sensorTypes;
     MeasurementSystems[] measurementSystems;
@@ -170,7 +173,7 @@ public class AddSensorActivity extends Activity {
 
 
         spinner3 = (Spinner) findViewById(R.id.sensorAdd_spinner_Bluetooth);
-        BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (!myBluetoothAdapter.isEnabled()) {
             Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -206,8 +209,8 @@ public class AddSensorActivity extends Activity {
         spinner4 = (Spinner) findViewById(R.id.sensorAdd_spinner_SensorDriver);
         ArrayAdapter adapter1 = new ArrayAdapter(this,
                 android.R.layout.simple_spinner_item);
-        adapter1.add("LightDriver");
-        adapter1.add("StepDriver");
+        adapter1.add("lightDriver");
+        adapter1.add("stepDriver");
 
         spinner4.setAdapter(adapter1);
         spinner4.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -229,7 +232,23 @@ public class AddSensorActivity extends Activity {
     }
 
     public void refreshBluetoothSpinner(View view) {
-        // niy
+        loadBTDevices();
+    }
+
+    private void loadBTDevices() {
+        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (!myBluetoothAdapter.isEnabled()) {
+            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOnIntent, 1);
+        }
+
+        Set<BluetoothDevice> pairedDevices = myBluetoothAdapter.getBondedDevices();
+        ArrayAdapter<BluetoothDevice> BTArrayAdapter = new ArrayAdapter<BluetoothDevice>(this, android.R.layout.simple_spinner_item);
+        for (BluetoothDevice device : pairedDevices) {
+            BTArrayAdapter.add(device);
+        }
+        spinner3.setAdapter(BTArrayAdapter);
     }
 
     public int getPosition(SensorType[] sensorTypes, SensorType sensorType) {
@@ -274,12 +293,14 @@ public class AddSensorActivity extends Activity {
             Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
                     Toast.LENGTH_SHORT).show();
         }  else {
-            de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
+            de.unistuttgart.vis.wearable.os.internalapi.PSensor saveSensor = APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
             Intent startBT = new Intent(this, GarmentOSBluetoothService.class);
-            startBT.putExtra("btDevice", btMac);
-            startBT.putExtra("btId", textView.getText().toString());
-            startBT.putExtra("btDriver", sensorDriver);
-            startService(startBT);
+            //startBT.putExtra("btDevice", btMac);
+            //startBT.putExtra("btId", saveSensor.getID());
+            //startBT.putExtra("btDriver", sensorDriver);
+
+            Log.d("BluetoothComService", "Service started");
+            //startService(startBT);
             Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
             this.finish();
         }

@@ -49,13 +49,18 @@
         </service>
         
         <!-- The internal service -->
-        <service 
+        <service
             android:name="de.unistuttgart.vis.wearable.os.internalservice.GarmentOSServiceInternal"
             android:process=":remote">
             <intent-filter >
                 <action android:name="de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI"/>
                 <action android:name="de.unistuttgart.vis.wearable.os.internalservice.GarmentOSServiceInternal"/>
-            </intent-filter>            
+            </intent-filter>
+        </service>
+
+        <!-- The bluetooth service -->
+        <service
+            android:name="de.unistuttgart.vis.wearable.os.bluetoothservice.GarmentOSBluetoothService" >
         </service>
 
         <!-- Dropbox Activity -->

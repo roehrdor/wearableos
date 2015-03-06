@@ -3,6 +3,12 @@ package de.unistuttgart.vis.wearable.os.bluetoothservice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -11,6 +17,7 @@ import java.util.Vector;
 
 import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.sensorDriver.SensorDriver;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
@@ -29,10 +36,20 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import javax.net.ssl.SSLParameters;
+
+/**
+ * Created by Manuel on 05.03.2015.
+ * Provides the infrastructure for every bluetooth communication between that settingsapp and a sensor.
+ * only start this service when creating an sensor!
+ *
+ * @author Manuel
+ *
+ */
 public class GarmentOSBluetoothService extends Service{
 	
     private BluetoothAdapter mBluetoothAdapter;
-    public static final String BT_DEVICE = "btdevice";
+    public static final String BT_DEVICE = "btDevice";
     public static final String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB";
     public static final String GOS_UUID = "00009101-0000-1000-8000-00805F9B34FB";
     public static final int STATE_NONE = 0; // we're doing nothing
@@ -41,8 +58,8 @@ public class GarmentOSBluetoothService extends Service{
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing
     // connection
     public static final int STATE_CONNECTED = 3; // now connected to a remote
-	private static final String BT_DRIVER = null;
-	private static final String BT_ID = null;
+	private static final String BT_DRIVER = "btDriver";
+	private static final String BT_ID = "btId";
     // device
     private ConnectThread mConnectThread;
     private static ConnectedThread mConnectedThread;
@@ -53,7 +70,8 @@ public class GarmentOSBluetoothService extends Service{
     public Vector<Byte> packdata = new Vector<Byte>(2048);
     public static BluetoothDevice device = null;
     private String driver = "";
-    private String sensorId = "";
+    private int sensorId = 0;
+    private de.unistuttgart.vis.wearable.os.internalapi.PSensor saveSensor;
     
     
     //HARDCODE
@@ -61,7 +79,7 @@ public class GarmentOSBluetoothService extends Service{
 
     @Override
     public void onCreate() {
-        Log.i("BluetoothComService", "Service started");
+        Log.d("BluetoothComService", "Service started");
         super.onCreate();
     }
 
@@ -85,10 +103,12 @@ public class GarmentOSBluetoothService extends Service{
         Log.i("BluetoothComService", "Onstart Command");
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
-            String macAddress = (String) intent.getSerializableExtra(BT_DEVICE);
-            driver = (String) intent.getSerializableExtra(BT_DRIVER);
-            sensorId = (String) (intent.getSerializableExtra(BT_ID));
-            device = mBluetoothAdapter.getRemoteDevice(macAddress);
+
+            driver = "stepDriver";
+            sensorId = intent.getIntExtra(BT_ID, 0);
+            saveSensor = de.unistuttgart.vis.wearable.os.internalapi.APIFunctions.API_getSensorById(sensorId);
+            String macAddress = saveSensor.getBluetoothID();
+            device = mBluetoothAdapter.getRemoteDevice(saveSensor.getBluetoothID());
             deviceName = device.getName();
             if (macAddress != null && macAddress.length() > 0) {
                 connectToDevice(macAddress);
@@ -104,6 +124,10 @@ public class GarmentOSBluetoothService extends Service{
         return START_STICKY;
     }
 
+    /**
+     *
+     * @param macAddress
+     */
     private synchronized void connectToDevice(String macAddress) {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(macAddress);
         if (mState == STATE_CONNECTING) {
@@ -218,7 +242,8 @@ public class GarmentOSBluetoothService extends Service{
             Log.i("BT4", device.getAddress() + "/" + device.getName());
             BluetoothSocket tmp = null;
             try {
-                tmp = device.createRfcommSocketToServiceRecord(UUID.fromString(GOS_UUID));
+                //IMPORTANT do not change UUID until you know what your btdevice does!
+                tmp = device.createRfcommSocketToServiceRecord(UUID.fromString(SPP_UUID));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -240,7 +265,6 @@ public class GarmentOSBluetoothService extends Service{
                 }
                 connectionFailed();
                 return;
-
             }
             synchronized (GarmentOSBluetoothService.this) {
                 mConnectThread = null;
@@ -322,26 +346,11 @@ public class GarmentOSBluetoothService extends Service{
 
     }
 
-    public void trace(String msg) {
-        Log.i("AbstractActivity", msg);
-        toast(msg);
-    }
-
-    public void toast(String msg) {
-        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onDestroy() {
         stop();
         Log.i("Printer Service", "Destroyed");
         super.onDestroy();
-    }
-
-    private void sendMsg(int flag) {
-        Message msg = new Message();
-        msg.what = flag;
-        handler.sendMessage(msg);
     }
 
     private Handler handler = new Handler() {
@@ -375,6 +384,14 @@ public class GarmentOSBluetoothService extends Service{
 
     };
 
+    /**
+     * listen to the inputstream for ever or until an error ocour.
+     * The recieved data ist processed by the driver call with reflection.
+     * Stores the processed raw data
+     *
+     * @param input
+     * @return
+     */
     private boolean parseData (InputStream input) {
     	
     	// Keep listening to the InputStream while connected
@@ -384,48 +401,65 @@ public class GarmentOSBluetoothService extends Service{
                  byte[] buffer = new byte[128];
                  String readMessage;
                  int bytes;
-                if (input.available()>2) { 
+                if (input.available()>2) {
                     try {
                        // Read from the InputStream
-                        bytes = input.read(buffer); 
-                        readMessage = new String(buffer, 0, bytes);
+                        bytes = input.read(buffer);
+                        String test = new String(buffer, 0, bytes);
+                        Log.i("Size", Integer.toString(bytes));
 
+                        byte[] sendBuffer = Arrays.copyOfRange(buffer, 0, bytes);
+                        float[] dataFloat = loadDriver(driver, buffer);
+
+                        SensorData data = new SensorData(dataFloat, Utils.dateToUnix(new Date()));
+                        saveSensor.addRawData(data);
+                        SystemClock.sleep(1000);
                        }catch (IOException e) {
                         Log.e("BTConnection", "disconnected", e);
                         break;
                     }
                     
-                    Log.i("BTInput", readMessage);
-                    
-                    //Obtain read data to db
-                    //TODO Verwaltungsmodul einbauen
-                    float[] dataFloat = {Float.parseFloat(readMessage)};
-                    SensorData data = new SensorData(dataFloat, Utils.dateToUnix(new Date()));
-                    
-                    Collection<Sensor> set = de.unistuttgart.vis.wearable.os.sensors.SensorManager.getAllSensors();
-                    
-                    for (Iterator<Sensor> iterator = set.iterator(); iterator.hasNext();) {
-						if (iterator.next().getDisplayedSensorName() == sensorId) {
-							Sensor saveSensor = iterator.next();
-							saveSensor.addRawData(data);
-							Log.i("BTInput", "Writen to " + iterator.next().getDisplayedSensorName() + " Data: " + dataFloat );
-						}
-					}
-					Log.i("BTInput", "Writen to db");
-					
-                    
         } else {
-            SystemClock.sleep(100);
                }
             } catch (IOException e) {
 
                 e.printStackTrace();
-            }
+            } catch (ClassNotFoundException e) {
+                 e.printStackTrace();
+             } catch (NoSuchMethodException e) {
+                 e.printStackTrace();
+             } catch (InvocationTargetException e) {
+                 e.printStackTrace();
+             } catch (InstantiationException e) {
+                 e.printStackTrace();
+             } catch (IllegalAccessException e) {
+                 e.printStackTrace();
+             }
 
-       }
+        }
     	return false;
 
     }
 
+    /**
+     * Loads driverclass, uses reflection to call encodeData() implemented by the driver class.
+     * Returns processed inputstream as float[]
+     *
+     *
+     * @param driver
+     * @param message
+     * @return
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    private float[] loadDriver(String driver, byte[] message) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Class newDriver = Class.forName("de.unistuttgart.vis.wearable.os.sensorDriver." + driver);
+        Object reciever = newDriver.newInstance();
+        Method encodeData = newDriver.getMethod("encodeData", byte[].class);
+        return (float[]) encodeData.invoke(reciever, message);
+    }
 
 }
