@@ -100,6 +100,7 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
             ret.rawDataMeasurementSystem = (o = source.readInt()) != Constants.ENUMERATION_NULL ? MeasurementSystems.values()[o] : null;
             ret.displayedMeasurementUnit = (o = source.readInt()) != Constants.ENUMERATION_NULL ? MeasurementUnits.values()[o] : null;
             ret.displayedMeasurementSystem = (o = source.readInt()) != Constants.ENUMERATION_NULL ? MeasurementSystems.values()[o] : null;
+            ret.bluetoothID = source.readString();
             return ret;
         }
 
@@ -131,5 +132,6 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
         dest.writeInt(this.rawDataMeasurementSystem == null ? Constants.ENUMERATION_NULL : this.rawDataMeasurementSystem.ordinal());
         dest.writeInt(this.displayedMeasurementUnit == null ? Constants.ENUMERATION_NULL : this.displayedMeasurementUnit.ordinal());
         dest.writeInt(this.displayedMeasurementSystem == null ? Constants.ENUMERATION_NULL : this.displayedMeasurementSystem.ordinal());
+        dest.writeString(this.bluetoothID);
     }
 }

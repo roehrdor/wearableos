@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
@@ -185,7 +185,7 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
         public PSensor createFromParcel(android.os.Parcel source) {
             PSensor ret = new PSensor(source.readInt(), source.readString());
             byte b = source.readByte();
-            int o = 0;;
+            int o = 0;
             ret.isInternalSensor = (b & 0x1) != 0x0;
             ret.isEnabled = (b & 0x2) != 0x0;
             ret.sampleRate = source.readInt();
@@ -197,6 +197,7 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
             ret.rawDataMeasurementSystem = (o = source.readInt()) != Constants.ENUMERATION_NULL ? MeasurementSystems.values()[o] : null;
             ret.displayedMeasurementUnit = (o = source.readInt()) != Constants.ENUMERATION_NULL ? MeasurementUnits.values()[o] : null;
             ret.displayedMeasurementSystem = (o = source.readInt()) != Constants.ENUMERATION_NULL ? MeasurementSystems.values()[o] : null;
+            ret.bluetoothID = source.readString();
             return ret;
         }
 
@@ -228,6 +229,7 @@ public class PSensor extends de.unistuttgart.vis.wearable.os.parcel.PSensor impl
         dest.writeInt(this.rawDataMeasurementSystem == null ? Constants.ENUMERATION_NULL : this.rawDataMeasurementSystem.ordinal());
         dest.writeInt(this.displayedMeasurementUnit == null ? Constants.ENUMERATION_NULL : this.displayedMeasurementUnit.ordinal());
         dest.writeInt(this.displayedMeasurementSystem == null ? Constants.ENUMERATION_NULL : this.displayedMeasurementSystem.ordinal());
+        dest.writeString(this.bluetoothID);
     }
 }
 
