@@ -83,6 +83,7 @@ public class GoogleDrive extends Activity implements
 
     @Override
     public void onBackPressed() {
+        // TODO handle case where currentParentId is null
         if(currentDirectoryId.equals(Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId())){
         super.onBackPressed();}
         else {
@@ -357,6 +358,8 @@ public class GoogleDrive extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        /* TODO handle the combination of request and result codes correctly
+         to only execute this after selecting the desired google account*/
             //if(requestCode==SIGN_IN_REQUEST_CODE&& resultCode == Activity.RESULT_OK){
              //   if(!isConnected){
                     isConnected=true;
@@ -691,6 +694,7 @@ public void searchForDefaultDirectory(){
                 double totalBytes = file.length();
                 double currentBytes = 0.0f;
                 // Overwrite file.
+                // TODO actually use a buffer to prevent overheating the device
                 BufferedOutputStream fileOutputStream = new BufferedOutputStream(
                         driveFileContents.getOutputStream());
 
@@ -825,23 +829,18 @@ public void searchForDefaultDirectory(){
         @Override
         protected Boolean doInBackground(DriveContents... params) {
             DriveContents existingFileContents = params[0];
-            // TODO use internal path or make temp path
+
             int bufferSize = 1024;
             byte[] buffer = new byte[bufferSize];
             double totalBytes = currentCloudArchiveFileSize;
             int currentBytes = 0;
 
             try {
-                // TODO handle downloaded archive
 
                 {
                     downloadDestination = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"gos_sensors.zip");
 
                     BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(downloadDestination));
-
-                    // TODO handle the downloaded file via import or replace sensor files
-
-                    // TODO outputStream to file object of archive
 
                     // Overwrite the local sensor files
                     BufferedInputStream contentInputStream = new BufferedInputStream(existingFileContents.getInputStream());

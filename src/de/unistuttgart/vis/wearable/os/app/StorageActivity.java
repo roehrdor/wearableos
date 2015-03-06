@@ -90,18 +90,36 @@ public class StorageActivity extends Activity {
 
     }
 
-//    public void changeToOneDrive(View view) {
-//        Intent intent = new Intent(getBaseContext(), OneDrive.class);
-//        intent.putExtra("isExport",isExport);
-//        if (encrypted){
-//            intent.putExtra("key", key);
-//            intent.putExtra("encrypted",encrypted);
-//        }
-//        startActivity(intent);
-//  }
-//
+   public void changeToOneDrive(View view) {
+       AlertDialog.Builder alert = new AlertDialog.Builder(StorageActivity.this);
+       alert.setTitle("Please choose");
+       alert.setView(null);
+
+       alert.setPositiveButton("Export", new DialogInterface.OnClickListener() {
+           public void onClick(DialogInterface dialog, int whichButton) {
+               Intent intent = new Intent(getBaseContext(), OneDrive.class);
+               intent.putExtra("isExport",true);
+               if (encrypted){
+                   intent.putExtra("key", key);
+                   intent.putExtra("encrypted",encrypted);
+               }
+               startActivity(intent);
+           }
+       });
+
+       alert.setNegativeButton("Import", new DialogInterface.OnClickListener() {
+           public void onClick(DialogInterface dialog, int whichButton) {
+               Intent intent = new Intent(getBaseContext(),OneDrive.class);
+               intent.putExtra("isExport", false);
+               startActivity(intent);
+           }
+       });
+       alert.show();
+
+  }
+
     public void changeToGoogleDrive(View view) {
-      AlertDialog.Builder alert = new AlertDialog.Builder(StorageActivity.this);
+    AlertDialog.Builder alert = new AlertDialog.Builder(StorageActivity.this);
     alert.setTitle("Please choose");
     alert.setView(null);
 
@@ -125,7 +143,6 @@ public class StorageActivity extends Activity {
         }
     });
     alert.show();
-
 
    }
 
