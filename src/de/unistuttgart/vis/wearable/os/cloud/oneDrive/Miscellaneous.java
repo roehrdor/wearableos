@@ -15,7 +15,8 @@ public class Miscellaneous {
 	private Miscellaneous() {
 		throw new AssertionError();
 	}
-    private static final String CLOUD_ARCHIVE_NAME = "gos_sensors";
+    private static final String CLOUD_ARCHIVE_NAME = "gos_sensors.zip";
+    private static final String CLOUD_ARCHIVE_NAME_NO_SUFFIX = "gos_sensors";
 	public static final String CODE = "code";
 	public static final String DATA = "data";
 	public static final String DESCRIPTION = "description";
@@ -46,10 +47,14 @@ public class Miscellaneous {
 	public static final String FOLDER = "folder";
 
     public static String getCloudArchiveFolderName(){
+
         return CLOUD_ARCHIVE_FOLDER_NAME;
     }
     public static String getCloudArchiveName(){
         return CLOUD_ARCHIVE_NAME;
+    }
+    public static String getCloudArchiveNameNoSuffix(){
+        return CLOUD_ARCHIVE_NAME_NO_SUFFIX;
     }
 
 }

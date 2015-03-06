@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -154,8 +155,7 @@
         <activity android:name=".cloud.oneDrive.OneDrive" android:label="One Drive"/>
         <activity android:name=".app.Import_ExportActivity"/>
         <activity android:name=".app.AppDetailActivity" />
-        <activity android:name=".app.AppDetailActivity" />
-        <activity android:name=".app.AppDetailActivity" />
+
         <activity android:name=".app.SensorDetailBluetoothActivity" />
 
         <meta-data android:name="com.google.android.gms.version"

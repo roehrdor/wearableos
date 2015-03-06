@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -75,16 +76,17 @@ public class UploadResultCallbacks {
                             Filters.and(
                                     Filters.eq(
                                             SearchableField.TITLE,
-                                            Miscellaneous.getCloudArchiveName()),
+                                            Miscellaneous.getCloudArchiveName() + ".zip"),
 
                                     Filters.eq(
                                             SearchableField.TRASHED,
-                                            false),
+                                            false)
 
-                                    Filters.eq(
+                                    ,Filters.eq(
                                             SearchableField.MIME_TYPE,
-                                            Miscellaneous.getZipMimeType())))
-                    .build();
+                                            Miscellaneous.getZipMimeType())
+                            ))
+                                    .build();
 
             getCurrentCloudDBFolder()
                     .queryChildren(
@@ -143,8 +145,6 @@ public class UploadResultCallbacks {
 								.setResultCallback(getNewDBCreateCallback());
 
 					} if(cloudFileMetaData!=null) {
-
-
 
 						final DriveFile cloudArchiveFile = Drive.DriveApi
 								.getFile(GoogleDrive
@@ -339,11 +339,13 @@ public class UploadResultCallbacks {
 
 												Filters.eq(
 														SearchableField.TRASHED,
-														false),
+														false)
+                                                ,
 
 														Filters.eq(
 																SearchableField.MIME_TYPE,
-																Miscellaneous.getZipMimeType())))
+																Miscellaneous.getZipMimeType())
+                                        ))
 								.build();
 
 						getCurrentCloudDBFolder()
@@ -442,6 +444,7 @@ public class UploadResultCallbacks {
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
             file.delete();
+
 
         }
 
@@ -574,5 +577,6 @@ public class UploadResultCallbacks {
 		}
 
 	}
+
 
 }

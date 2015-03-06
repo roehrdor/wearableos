@@ -321,10 +321,10 @@ public class Dropbox extends Activity {
         images[1] = R.drawable.file;
         super.onCreate(savedInstanceState);
         if (getIntent().getBooleanExtra("isExport",false)){
-            setContentView(R.layout.activity_dropbox_export);
+            setContentView(R.layout.activity_cloud_export);
             button = (Button) findViewById(R.id.button1);
         } else {
-            setContentView(R.layout.activity_dropbox_import);
+            setContentView(R.layout.activity_cloud_import);
         }
         context = this.getBaseContext();
 

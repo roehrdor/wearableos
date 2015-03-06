@@ -1,11 +1,11 @@
 package de.unistuttgart.vis.wearable.os.cloud.googleDrive;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,6 +16,7 @@ import com.google.android.gms.drive.DriveApi.MetadataBufferResult;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
+import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 
 /**
  * Class to provide the ResultCallbacks that are done in the background to
@@ -199,8 +200,11 @@ public class DownloadResultCallbacks {
 
 		private final ProgressDialog progressDialog;
 		private boolean cancelRequest = false;
+        File downloadDestination = null;
+        String password="";
 
 		public AsyncDriveFileDownloadTask(String password) {
+            this.password = password;
 			// create Progress Dialog to display the progress of upload
 			progressDialog = new ProgressDialog(GoogleDrive.getMainContext());
 			progressDialog.setMax(100);
@@ -233,7 +237,8 @@ public class DownloadResultCallbacks {
 		protected Boolean doInBackground(DriveContents... params) {
 			DriveContents existingFileContents = params[0];
             // TODO use internal path or make temp path
-
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
 			double totalBytes = getCurrentCloudArchiveFileSize();
 			int currentBytes = 0;
 
@@ -241,26 +246,31 @@ public class DownloadResultCallbacks {
                 // TODO handle downloaded archive
 
                     {
+                    downloadDestination = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"gos_sensors.zip");
+
+                    BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(downloadDestination));
+
 					// TODO handle the downloaded file via import or replace sensor files
 
-                    // TODO outputstream to file object of archive
+                    // TODO outputStream to file object of archive
 
 					// Overwrite the local sensor files
 					BufferedInputStream contentInputStream = new BufferedInputStream(existingFileContents.getInputStream());
 
-					int fileByte = 0;
+					int streamStatus = 0;
 
 					try {
-						while (fileByte != -1) {
-							fileByte = contentInputStream.read();
-							if (fileByte != -1 && !cancelRequest) {
-								currentBytes++;
+						while (streamStatus != -1) {
+							streamStatus = contentInputStream.read(buffer, 0, bufferSize);
+							if (streamStatus != -1 && !cancelRequest) {
+                                fileOutputStream.write(buffer, 0, streamStatus);
+								currentBytes+=streamStatus;
 								progressDialog.setProgress((int) ((currentBytes / totalBytes) * 100));
 
 								Log.i("gosDEBUG", "Writing Byte 340");
-							} else if (fileByte != -1 && cancelRequest) {
+							} else if (streamStatus != -1 && cancelRequest) {
 								contentInputStream.close();
-
+                                fileOutputStream.close();
 								progressDialog.dismiss();
 								break;
 							}
@@ -273,7 +283,7 @@ public class DownloadResultCallbacks {
 						try {
 
 							contentInputStream.close();
-
+                            fileOutputStream.close();
 							publishProgress("Successfully downloaded file");
 
 							progressDialog.dismiss();
@@ -308,7 +318,12 @@ public class DownloadResultCallbacks {
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
 			if(result){
-
+                if(password.equals("")){
+                    Archiver.unpackArchiveFile(downloadDestination);
+                }
+                else{
+                    Archiver.unpackEncryptedFile(password,downloadDestination);
+                }
 			}
 			else{
 				// TODO Handle data loss

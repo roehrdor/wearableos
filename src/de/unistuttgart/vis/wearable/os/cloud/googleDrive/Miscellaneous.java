@@ -1,5 +1,6 @@
 package de.unistuttgart.vis.wearable.os.cloud.googleDrive;
 
+import android.util.Log;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
@@ -55,6 +56,9 @@ public class Miscellaneous {
 			if (latestDriveFolderCandidate == null) {
 
 				latestDriveFolderCandidate = md;
+                Log.d("gosDEBUG-Title", md.getTitle());
+                Log.d("gosDEBUG-MimeType",md.getMimeType());
+                Log.d("gosDEBUG-all",md.toString());
 
 			} else {
 

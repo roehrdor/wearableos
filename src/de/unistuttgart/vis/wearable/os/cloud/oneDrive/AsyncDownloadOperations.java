@@ -1,6 +1,10 @@
 package de.unistuttgart.vis.wearable.os.cloud.oneDrive;
 
 import java.io.File;
+import java.io.IOException;
+
+import android.os.Environment;
+import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +29,7 @@ public class AsyncDownloadOperations {
 
 		@Override
 		public void onError(LiveOperationException arg0, LiveOperation arg1) {
-
+            Toast.makeText(OneDrive.getMainContext(),"Couldn't search for downloadable archive",Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
@@ -37,10 +41,12 @@ public class AsyncDownloadOperations {
 				for (int i = 0; i < cloudFolderFiles.length(); i++) {
 					try {
 						JSONObject cloudFolderFile = cloudFolderFiles.getJSONObject(i);
-
+                        Log.d("gosDEBUG",cloudFolderFile.optString(Miscellaneous.NAME));
+                        Log.d("gosDEBUG",cloudFolderFile.toString());
 						if (cloudFolderFile.optString(Miscellaneous.NAME).equals(
 								Miscellaneous.getCloudArchiveName())
 								&& cloudFolderFile.optString(Miscellaneous.TYPE).equals("file")) {
+                            Log.d("gosDEBUG","Found file");
 							correctCloudFile = cloudFolderFile;
 
 						}
@@ -52,7 +58,9 @@ public class AsyncDownloadOperations {
 				}
 				if (correctCloudFile != null) {
 
-					new OneDriveAsyncDownloadTask().execute(correctCloudFile);
+                    Toast.makeText(OneDrive.getMainContext(),"Starting download",Toast.LENGTH_SHORT).show();
+                    Log.d("gosDEBUG","Starting download");
+					new OneDriveAsyncDownloadTask(OneDrive.getPassword()).execute(correctCloudFile);
 
 				}
 			} else {
@@ -78,7 +86,7 @@ public class AsyncDownloadOperations {
 
 		@Override
 		public void onError(LiveOperationException arg0, LiveOperation arg1) {
-
+            Toast.makeText(OneDrive.getMainContext(),"Couldn't get list of files at One Drive",Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
@@ -95,6 +103,7 @@ public class AsyncDownloadOperations {
 							&& jO.optString(Miscellaneous.TYPE).equals("folder")) {
 						// The folder was found and now the desired file is
 						// searched inside of that folder
+                        Log.d("gosDEBUG","Found folder");
 						OneDrive.getConnectClient().getAsync(jO.optString(Miscellaneous.ID) + "/files",
 								getLiveDownloadPreparationListener());
 
@@ -113,13 +122,14 @@ public class AsyncDownloadOperations {
 	}
 
 	private class OneDriveAsyncDownloadTask extends AsyncTask<JSONObject, String, Long> {
-
+        private String password = "";
 		private final ProgressDialog progressDialog;
 		private boolean cancelRequest = false;
 		private JSONObject downloadJsonObject = null;
+        File downloadDestination = null;
 
-		public OneDriveAsyncDownloadTask() {
-
+		public OneDriveAsyncDownloadTask(String password) {
+            this.password = password;
 			// create Progress Dialog to display the progress of upload
 			progressDialog = new ProgressDialog(OneDrive.getMainContext());
 			progressDialog.setMax(100);
@@ -168,8 +178,17 @@ public class AsyncDownloadOperations {
 			// The required directories are created on the
 			// internal SDCard
 			// TODO import downloaded archive
-			File downloadDestination = new File("");
-			// The download of the archive file to the created
+
+			this.downloadDestination = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"gos_sensors.zip");
+            if(downloadDestination.exists()){
+                downloadDestination.delete();
+            }
+            try {
+                downloadDestination.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // The download of the archive file to the created
 			// directory is initiated
 			OneDrive.getConnectClient().downloadAsync(
 					downloadJsonObject.optString(Miscellaneous.ID) + "/content", downloadDestination,
@@ -199,6 +218,14 @@ public class AsyncDownloadOperations {
 						@Override
 						public void onDownloadCompleted(LiveDownloadOperation operation) {
 							publishProgress("Successfully downloaded archive");
+                            if(password.equals("")){
+
+                                Archiver.unpackArchiveFile(downloadDestination);
+                            }
+                            else{
+                                Archiver.unpackEncryptedFile(password, downloadDestination);
+                            }
+                            downloadDestination.delete();
 							progressDialog.dismiss();
 						}
 

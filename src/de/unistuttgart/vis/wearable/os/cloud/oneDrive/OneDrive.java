@@ -1,6 +1,8 @@
 package de.unistuttgart.vis.wearable.os.cloud.oneDrive;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,6 +22,7 @@ import com.microsoft.live.LiveConnectClient;
 import com.microsoft.live.LiveConnectSession;
 import com.microsoft.live.LiveStatus;
 import de.unistuttgart.vis.wearable.os.R;
+import org.json.JSONObject;
 
 
 /**
@@ -37,6 +40,10 @@ public class OneDrive extends Activity {
     private static String password = "";
     private Button button = null;
     private boolean isExport = true;
+    private ListView oneDriveFolderListView = null;
+    private ArrayList<JSONObject> childrenList = null;
+    private JSONObject parentDirectory = null;
+    private JSONComparator jsonComparator= null;
 
 
     @Override
@@ -51,6 +58,9 @@ public class OneDrive extends Activity {
             isExport = false;
         }
         password=getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
+        jsonComparator = new JSONComparator();
+        childrenList = new ArrayList<JSONObject>();
+        //Collections.sort(childrenList,jsonComparator);
     }
 
     @Override
