@@ -4,29 +4,24 @@ package de.unistuttgart.vis.wearable.os.app;
  * Created by Lucas on 08.02.2015.
  */
 
-import java.util.Date;
-
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.os.RemoteException;
+import android.view.View;
 import android.widget.LinearLayout;
+
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.api.APIFunctions;
-import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
-import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.api.PSensor;
-import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
-import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
+import de.unistuttgart.vis.wearable.os.graph.AbstractLiveGraph;
 
 public class GraphActivity extends Activity {
 
-	private LinearLayout chart;
+	protected LinearLayout chart;
     PSensor sensor;
     IGarmentCallback igcb;
-    private final int NUMBER_OF_VALUES = 300;
-    GraphRenderer graphRenderer;
+    LiveGraph liveGraph;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,54 +31,35 @@ public class GraphActivity extends Activity {
 
         sensor = APIFunctions.getSensorById(getIntent().getExtras()
                 .getInt("sensorId"));
-        graphRenderer = new GraphRenderer();
-		fillChart();
+        liveGraph = new LiveGraph(chart, sensor, 300, GraphActivity.this, 10);
 	}
 
-	private void fillChart() {
-        fillChartImage(true);
-
-        // register callback
-        igcb = new IGarmentCallback.Stub() {
-            @Override
-            public void callback(BaseCallbackObject value) throws RemoteException {
-                if (value instanceof ValueChangedCallback) {
-                    final SensorData data = ((ValueChangedCallback) value).toSensorData();
-
-                    GraphActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            fillChartImage(false);
-                        }
-                    });
-                }
-            }
-        };
-        APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
-	}
-
-    private long lastUpdate = 0;
-    private void fillChartImage(boolean loadFromStorage) {
-        if (lastUpdate + 100 >= new Date().getTime()) {
-            return;
+    class LiveGraph extends AbstractLiveGraph {
+//        LinearLayout chart;
+        protected LiveGraph (LinearLayout chart, PSensor pSensor, int numberOfValuesToShow,
+                        Context context, int graphsPerSecond) {
+            super(pSensor, numberOfValuesToShow, context, graphsPerSecond);
+//            this.chart = chart;
         }
-        lastUpdate = new Date().getTime();
 
-        GraphRenderer.ChartThreadTuple tuple =
-                graphRenderer.createGraph(sensor, this, NUMBER_OF_VALUES, loadFromStorage);
-        chart.removeAllViews();
-        chart.addView(tuple.getChart());
+        @Override
+        public void acceptGraph(View graph) {
+            if (chart != null) {
+                chart.removeAllViews();
+                chart.addView(graph);
+            }
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        APIFunctions.unregisterCallback(igcb, CallbackFlags.VALUE_CHANGED);
+        liveGraph.unRegisterCallback();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        APIFunctions.registerCallback(igcb, CallbackFlags.VALUE_CHANGED);
+        liveGraph.reregisterCallback();
     }
 }
