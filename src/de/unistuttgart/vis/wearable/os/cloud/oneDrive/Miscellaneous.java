@@ -8,7 +8,7 @@ package de.unistuttgart.vis.wearable.os.cloud.oneDrive;
  */
 public class Miscellaneous {
 
-	public static final String[] SCOPES = { "wl.skydrive" };
+	public static final String[] SCOPES = { "wl.skydrive_update" };
 	// TODO remove when releasing source code
 	public static final String CLIENT_ID = "000000004C129114";
     private static final String CLOUD_ARCHIVE_FOLDER_NAME = "Garment-OS";

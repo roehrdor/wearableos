@@ -51,7 +51,8 @@ public class GoogleDrive extends Activity implements
     private ListView googleDriveFolderListView = null;
     private ArrayList<Metadata> metadataArrayList = null;
     private GoogleDriveAdapter adapter = null;
-    // Thanks to very limited access for developers this is necessary to be able to get the parent directory
+    // Thanks to very limited access for developers this is necessary to be able to get the parent directory,
+    // updates of directory contents will be ignored
     private Stack<DriveId> directoryHistory = null;
     private DriveFile currentCloudDBFile = null;
     private static final int SIGN_IN_REQUEST_CODE = 0;
@@ -372,14 +373,6 @@ public class GoogleDrive extends Activity implements
         this.metadataArrayList = metadataArrayList;
     }
 
-    public void setListViewEntries(ArrayList<Metadata> childrenEntries){
-        setMetadataArrayList(childrenEntries);
-        adapter.clear();
-        adapter.addAll(metadataArrayList);
-        adapter.notifyDataSetChanged();
-
-    }
-
     public void loadDriveFolderContents(DriveId parentDirectory) {
 
     }
@@ -427,10 +420,7 @@ public class GoogleDrive extends Activity implements
     }
     protected void getArchiveList(DriveId parentDirectory){
         final DriveId curParentDirectory = parentDirectory;
-        final ArrayList<Metadata> archiveChildren = new ArrayList<Metadata>();
-
         final boolean resultAvailable = false;
-
 
         Drive.DriveApi.requestSync(
                 GoogleDrive.getGoogleApiClient()).setResultCallback(new ResultCallback<Status>() {
@@ -451,13 +441,14 @@ public class GoogleDrive extends Activity implements
                                         Log.d("gosDEBUG", "Finished loading directories and zip files");
                                         if (metadataBufferResult.getStatus().isSuccess()) {
                                             Log.d("gosDEBUG","Files in this directory: "+metadataBufferResult.getMetadataBuffer().getCount());
+                                            metadataArrayList.clear();
                                             for (Metadata currentFolder : metadataBufferResult.getMetadataBuffer()) {
                                                 if (currentFolder.isFolder() || (!currentFolder.isFolder()&&currentFolder.getTitle().endsWith(".zip")) ||
                                                         (!currentFolder.isFolder()&&currentFolder.getMimeType().equals(Miscellaneous.getZipMimeType())))
-                                                    archiveChildren.add(currentFolder);
+                                                    metadataArrayList.add(currentFolder);
                                             }
-                                            Collections.sort(archiveChildren, new MetadataComparator());
-                                            setListViewEntries(archiveChildren);
+                                            Collections.sort(metadataArrayList, new MetadataComparator());
+                                            adapter.notifyDataSetChanged();
 
                                         }
                                     }

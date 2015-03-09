@@ -1,6 +1,7 @@
 package de.unistuttgart.vis.wearable.os.cloud.oneDrive;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,6 @@ public class OneDriveAdapter extends ArrayAdapter<JSONObject>{
         }
         TextView fileNameView = (TextView)convertView.findViewById(R.id.text_view_file_name);
         ImageView iconView = (ImageView)convertView.findViewById(R.id.image_view_file_icon);
-
         fileNameView.setText(jsonData.optString(Miscellaneous.NAME));
 
         iconView.setImageDrawable(getContext().getResources().getDrawable(jsonData.optString(Miscellaneous.TYPE).equals("folder")?R.drawable.folder:R.drawable.file));
