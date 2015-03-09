@@ -8,45 +8,29 @@ import java.util.Comparator;
 public class JSONComparator implements Comparator<JSONObject>{
     @Override
     public int compare(JSONObject lhs, JSONObject rhs) {
-        if(lhs.optString(Miscellaneous.TYPE).equals("folder")&&!rhs.optString(Miscellaneous.TYPE).equals("folder")){
-            Log.d("gosDEBUG", "Branch :"+1);
-            return 1;
-        }
-        else if(!lhs.optString(Miscellaneous.TYPE).equals("folder")&&rhs.optString(Miscellaneous.TYPE).equals("folder")){
-            Log.d("gosDEBUG", "Branch :"+2);
-            return -1;
-        }
-        else if(lhs.optString(Miscellaneous.TYPE).equals("folder")&&rhs.optString(Miscellaneous.TYPE).equals("folder")){
-            Log.d("gosDEBUG", "Branch :"+3);
-            if(lhs.optString(Miscellaneous.NAME).compareTo(rhs.optString(Miscellaneous.NAME))>0){
-                Log.d("gosDEBUG", "Branch :"+4);
+
+        if(lhs.optString(Miscellaneous.TYPE).equals("folder")){
+            if(rhs.optString(Miscellaneous.TYPE).equals("folder")){
+                return lhs.optString(Miscellaneous.NAME).toLowerCase().compareTo(rhs.optString(Miscellaneous.NAME).toLowerCase());
+                }
+            else if(rhs.optString(Miscellaneous.TYPE).equals("file")) {
                 return 1;
             }
-            else if(lhs.optString(Miscellaneous.NAME).compareTo(rhs.optString(Miscellaneous.NAME))<0){
-                Log.d("gosDEBUG", "Branch :"+5);
-                return -1;
-            }
-            // Case that should never happen
             else{
-                Log.d("gosDEBUG", "Branch :"+6);
                 return 0;
             }
         }
-        else{
-            Log.d("gosDEBUG", "Branch :"+7);
-            if(lhs.optString(Miscellaneous.NAME).compareTo(rhs.optString(Miscellaneous.NAME))>0){
-                Log.d("gosDEBUG", "Branch :"+8);
-                return 1;
-            }
-            else if(lhs.optString(Miscellaneous.NAME).compareTo(rhs.optString(Miscellaneous.NAME))<0){
-                Log.d("gosDEBUG", "Branch :"+9);
+        else if(lhs.optString(Miscellaneous.TYPE).equals("file")){
+            if(rhs.optString(Miscellaneous.TYPE).equals("folder")){
                 return -1;
             }
-            // Case that should never happen
-            else{
-                Log.d("gosDEBUG", "Branch :"+10);
-                return 0;
+            else if(rhs.optString(Miscellaneous.TYPE).equals("file")) {
+                return lhs.optString(Miscellaneous.NAME).toLowerCase().compareTo(rhs.optString(Miscellaneous.NAME).toLowerCase());
             }
+            else return 0;
+        }
+        else {
+            return 0;
         }
     }
 }
