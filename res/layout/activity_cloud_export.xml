@@ -11,10 +11,22 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_weight="1.00">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_current_directory"
+                android:layout_margin="10dp"
+                android:layout_marginTop="0dp"/>
         <ListView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/listView1" android:layout_gravity="center_horizontal"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView8"
+                android:layout_margin="10dp"
+                android:layout_marginTop="0dp"/>
     </LinearLayout>
     <Button
         android:id="@+id/button1"

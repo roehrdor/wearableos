@@ -7,10 +7,13 @@
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}" android:weightSum="1">
 
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/textView_current_directory"
+              android:layout_margin="10dp" android:layout_marginTop="0dp"/>
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_weight="1.00">
+
         <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
