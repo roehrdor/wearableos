@@ -10,6 +10,7 @@ package de.unistuttgart.vis.wearable.os.internalapi;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
+import de.unistuttgart.vis.wearable.os.internalapi.IGarmentDriver;
 
 interface IGarmentInternalAPI {
 
@@ -19,7 +20,7 @@ interface IGarmentInternalAPI {
 
 	void        API_unpackArchiveFile(String file);
 
-	PSensor     API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
+	PSensor     API_addNewSensor(IGarmentDriver driver, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
 	                             int sensorType, String bluetoothID, int rawDataMeasurementSystem,
 	                             int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit);
     void        API_removeSensor(int sensorID);
@@ -32,10 +33,10 @@ interface IGarmentInternalAPI {
 	PSensor[]   API_getAllSensors();
 	PSensor[]   API_getAllSensorsByType(int sensorType);
 	PSensor     API_getSensorById(int id);
-	
-	
-	// 
-	// Function calls forward to UserApp object  
+
+
+	//
+	// Function calls forward to UserApp object
 	//
 	boolean 	PRIVACY_USERAPP_sensorProhibited(int oid, int id);
 	boolean 	PRIVACY_USERAPP_grantPermission(int oid, int id);
@@ -49,10 +50,10 @@ interface IGarmentInternalAPI {
 	int         PRIVACY_USERAPP_getDefaultSensor(int oid, int sensorType);
 	PSensor     PRIVACY_USERAPP_getDefaultSensorO(int oid, int sensorType);
 	void        PRIVACY_USERAPP_setDefaultSensor(int oid, int sensorType, int sensorID);
-	
-	
-	// 
-	// Function calls forward to Sensor object  
+
+
+	//
+	// Function calls forward to Sensor object
 	//
 	void 		SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled);
 	void 		SENSORS_SENSOR_setDisplayedSensorName(int sid, String displayedSensorName);
@@ -66,4 +67,25 @@ interface IGarmentInternalAPI {
 	void 		SENSORS_SENSOR_addRawData(int sid, long time, in float[] data);
 	PSensorData SENSORS_SENSOR_getRawData(int sid);
 	PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end);
+
+
+    //
+    //
+    //
+    void        HAR_train(String activity, int windowLength);
+    void        HAR_train_SiDD(String activity, int windowLength, long begin, long end);
+    void        HAR_stopTraining();
+    String[]    HAR_getActivityNames();
+    boolean     HAR_loadNeuralNetwork();
+    boolean     HAR_saveNeuralNetwork();
+    boolean     HAR_deleteNeuralNetwork();
+    boolean     HAR_createNeuralNetwork();
+    int         HAR_getNeuralNetworkStatus();
+    String[]    HAR_getSensors();
+    String[]    HAR_getSupportedActivities();
+    boolean     HAR_isTraining();
+    boolean     HAR_isRecognizing();
+    void        HAR_recognize(int windowLength);
+    void        HAR_stopRecognition();
+
 }

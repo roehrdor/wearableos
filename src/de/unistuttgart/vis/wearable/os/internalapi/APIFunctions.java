@@ -7,6 +7,8 @@
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
+import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetwork;
+import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetworkManager;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.sensors.MeasurementSystems;
@@ -14,6 +16,14 @@ import de.unistuttgart.vis.wearable.os.sensors.MeasurementUnits;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -109,10 +119,26 @@ public class APIFunctions {
                              MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
         if (APIHandle.isInternalServiceBound()) {
             try {
-                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(sampleRate, savePeriod,
+                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(null, sampleRate, savePeriod,
                                     smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
                                     rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
                                     displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static PSensor addNewSensor(IGarmentDriver driver, int sampleRate, int savePeriod, float smoothness,
+                                       String displayedSensorName, SensorType sensorType, String bluetoothID,
+                                       MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
+                                       MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(driver, sampleRate, savePeriod,
+                        smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
+                        rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
+                        displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());
             } catch (android.os.RemoteException e) {
             }
         }
@@ -484,4 +510,175 @@ public class APIFunctions {
     public static int SENSORS_SENSOR_getSensorType(int sid) {
         return de.unistuttgart.vis.wearable.os.api.APIFunctions.SENSORS_SENSOR_getSensorType(sid);
     }
+
+
+
+
+    // =====================================================================
+    //
+    // Function calls forward HAR Module
+    //
+    // =====================================================================
+
+    public static void train(final String activity, final int windowLength) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_train(activity, windowLength);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void train(final String activity, final int windowLength, final Date begin, final Date end) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_train_SiDD(activity, windowLength, Utils.dateToLongUnix(begin), Utils.dateToLongUnix(end));
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void stopTraining()  {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_stopTraining();
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static List<String> getActivityNames() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getActivityNames());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void loadNeuralNetwork() throws FileNotFoundException {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(!APIHandle.getGarmentInternalAPIHandle().HAR_loadNeuralNetwork())
+                    throw new FileNotFoundException();
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void saveNeuralNetwork() throws FileNotFoundException {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(!APIHandle.getGarmentInternalAPIHandle().HAR_saveNeuralNetwork())
+                    throw new FileNotFoundException();
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void deleteNeuralNetwork() throws FileNotFoundException {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                if(!APIHandle.getGarmentInternalAPIHandle().HAR_deleteNeuralNetwork())
+                    throw new FileNotFoundException();
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static boolean createNeuralNetwork() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().HAR_createNeuralNetwork();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static NeuralNetworkManager.Status getNeuralNetworkStatus() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return NeuralNetworkManager.Status.values()[APIHandle.getGarmentInternalAPIHandle().HAR_getNeuralNetworkStatus()];
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static List<String> getSensors() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getSensors());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static List<String> getSupportedActivities() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getSupportedActivities());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static boolean isTraining() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().HAR_isTraining();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static boolean isRecognizing() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                return APIHandle.getGarmentInternalAPIHandle().HAR_isRecognizing();
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void recognize(final int windowLength) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_recognize(windowLength);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void stopRecognition() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_stopRecognition();
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 }

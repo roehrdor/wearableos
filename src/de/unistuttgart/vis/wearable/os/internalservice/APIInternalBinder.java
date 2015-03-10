@@ -8,14 +8,12 @@
 package de.unistuttgart.vis.wearable.os.internalservice;
 
 import android.os.RemoteException;
-
+import de.unistuttgart.vis.wearable.os.activity.Activity;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
-import de.unistuttgart.vis.wearable.os.internalapi.IGarmentInternalAPI;
-import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
-import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
-import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
+import de.unistuttgart.vis.wearable.os.internalapi.*;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.*;
@@ -24,6 +22,8 @@ import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * <p>
@@ -45,10 +45,10 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
-    public PSensor API_addNewSensor(int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
+    public PSensor API_addNewSensor(IGarmentDriver driver, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
                                  int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws RemoteException{
-        Sensor sensor = new Sensor(null, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
+        Sensor sensor = new Sensor(driver, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
                 MeasurementUnits.values()[rawDataMeasurementUnit], MeasurementSystems.values()[displayedMeasurementSystem], MeasurementUnits.values()[displayedMeasurementUnit]);
 
         if(sensor != null) {
@@ -317,5 +317,112 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         if(sensor == null)
             return null;
         return new PSensorData((java.util.Vector<SensorData>)sensor.getRawData(Utils.longUnixToDate(start), Utils.longUnixToDate(end)).clone());
+    }
+
+
+    // =====================================================================
+    //
+    // Function calls forward to HAR Module
+    //
+    // =====================================================================
+
+
+    @Override
+    public void HAR_train(String activity, int windowLength) throws RemoteException {
+        ActivityRecognitionModule.getInstance().train(activity, windowLength);
+    }
+
+    @Override
+    public void HAR_train_SiDD(String activity, int windowLength, long begin, long end) throws RemoteException {
+        ActivityRecognitionModule.getInstance().train(activity, windowLength, Utils.longUnixToDate(begin), Utils.longUnixToDate(end));
+    }
+
+    @Override
+    public void HAR_stopTraining() throws RemoteException {
+        ActivityRecognitionModule.getInstance().stopTraining();
+    }
+
+    @Override
+    public String[] HAR_getActivityNames() throws RemoteException {
+        List<String> activities = ActivityRecognitionModule.getInstance().getActivityNames();
+        String[] activitiesArray = new String[activities.size()];
+        activities.toArray(activitiesArray);
+        return activitiesArray;
+    }
+
+    @Override
+    public boolean HAR_loadNeuralNetwork() throws RemoteException {
+        try {
+            ActivityRecognitionModule.getInstance().loadNeuralNetwork();
+        } catch (FileNotFoundException fileNotFoundException) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean HAR_saveNeuralNetwork() throws RemoteException {
+        try {
+            ActivityRecognitionModule.getInstance().saveNeuralNetwork();
+        } catch (FileNotFoundException fileNotFoundException) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean HAR_deleteNeuralNetwork() throws RemoteException {
+        try {
+            ActivityRecognitionModule.getInstance().deleteNeuralNetwork();
+        } catch (FileNotFoundException fileNotFoundException) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean HAR_createNeuralNetwork() throws RemoteException {
+        return ActivityRecognitionModule.getInstance().createNeuralNetwork();
+    }
+
+    @Override
+    public int HAR_getNeuralNetworkStatus() throws RemoteException {
+        return ActivityRecognitionModule.getInstance().getNeuralNetworkStatus().ordinal();
+    }
+
+    @Override
+    public String[] HAR_getSensors() throws RemoteException {
+        List<String> sensorsList = ActivityRecognitionModule.getInstance().getSensors();
+        String[] sensorsArray = new String[sensorsList.size()];
+        sensorsList.toArray(sensorsArray);
+        return sensorsArray;
+    }
+
+    @Override
+    public String[] HAR_getSupportedActivities() throws RemoteException {
+        List<String> supportedActivitiesList = ActivityRecognitionModule.getInstance().getSupportedActivities();
+        String[] supportedActivitiesArray = new String[supportedActivitiesList.size()];
+        supportedActivitiesList.toArray(supportedActivitiesArray);
+        return supportedActivitiesArray;
+    }
+
+    @Override
+    public boolean HAR_isTraining() throws RemoteException {
+        return ActivityRecognitionModule.getInstance().isTraining();
+    }
+
+    @Override
+    public boolean HAR_isRecognizing() throws RemoteException {
+        return ActivityRecognitionModule.getInstance().isRecognizing();
+    }
+
+    @Override
+    public void HAR_recognize(int windowLength) throws RemoteException {
+        ActivityRecognitionModule.getInstance().recognize(windowLength);
+    }
+
+    @Override
+    public void HAR_stopRecognition() throws RemoteException {
+        ActivityRecognitionModule.getInstance().stopRecognition();
     }
 }

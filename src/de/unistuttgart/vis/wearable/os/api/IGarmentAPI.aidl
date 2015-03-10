@@ -10,10 +10,12 @@ package de.unistuttgart.vis.wearable.os.api;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.api.PSensorData;
+import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 
 interface IGarmentAPI {
 	long currentTime();
 
+    int  registerDriver(IGarmentDriver driver);
 	void registerApp(String app);
 
 	int getCurrentActivity(String app);

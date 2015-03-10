@@ -1,7 +1,6 @@
 package de.unistuttgart.vis.wearable.os.app;
 
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +10,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 
 /**
  * TODO add info text
@@ -34,25 +34,23 @@ public class HARActivity extends Activity {
 	    
 		trainBtn = (Button) findViewById(R.id.button_har_train);
 		// TODO no hard coded string
-		if(ActivityRecognitionModule.getInstance().isTraining()) {
+		if(APIFunctions.isTraining()) {
 			trainBtn.setText("Stop training");
 		} else {
 			trainBtn.setText("Start training");
 		}
 		testBtn = (Button) findViewById(R.id.button_har_test);
 		// TODO no hard coded string
-		if(ActivityRecognitionModule.getInstance().isTraining()) {
+		if(APIFunctions.isTraining()) {
 			testBtn.setText("Stop recognizing");
 		} else {
 			testBtn.setText("Start recognizing");
 		}
 		manageBtn = (Button) findViewById(R.id.button_har_nnmanager);
 
-		harStatusTxt.setText(ActivityRecognitionModule.getInstance()
-				.getNeuralNetworkStatus().toString());
+		harStatusTxt.setText(APIFunctions.getNeuralNetworkStatus().toString());
 
-		switch (ActivityRecognitionModule.getInstance()
-				.getNeuralNetworkStatus()) {
+		switch (APIFunctions.getNeuralNetworkStatus()) {
 		case NOTINITIALIZED:
 			trainBtn.setVisibility(View.INVISIBLE);;
 			testBtn.setVisibility(View.INVISIBLE);
@@ -71,8 +69,8 @@ public class HARActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (ActivityRecognitionModule.getInstance().isTraining()) {
-					ActivityRecognitionModule.getInstance().stopTraining();
+				if (APIFunctions.isTraining()) {
+                    APIFunctions.stopTraining();
 				} else {
 					Intent intent = new Intent(context,
 							HARActivityTraining.class);
@@ -86,14 +84,13 @@ public class HARActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (ActivityRecognitionModule.getInstance().isRecognizing()) {
-					ActivityRecognitionModule.getInstance().stopRecognition();
+				if (APIFunctions.isRecognizing()) {
+                    APIFunctions.stopRecognition();
 				} else {
 					new AsyncTask<Void, Void, Void>() {
 						@Override
 						protected Void doInBackground(Void... params) {
-							ActivityRecognitionModule.getInstance().recognize(
-									2000);
+                            APIFunctions.recognize(2000);
 							return null;
 						}
 					}.execute();

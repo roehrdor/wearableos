@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 import android.app.Activity;
@@ -319,7 +318,7 @@ public class HARActivityTraining extends Activity {
 		});
 
 		// activity
-        ArrayAdapter adapter = new ArrayAdapter(HARActivityTraining.this, android.R.layout.simple_spinner_item, ActivityRecognitionModule.getInstance().getActivityNames());
+        ArrayAdapter adapter = new ArrayAdapter(HARActivityTraining.this, android.R.layout.simple_spinner_item, APIFunctions.getActivityNames());
         activitySpinner = (Spinner) findViewById(R.id.har_train_activity_spinner);
         activitySpinner.setAdapter(adapter);
         activitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -406,7 +405,7 @@ public class HARActivityTraining extends Activity {
 				}
 
 				boolean noData = false;
-				for (String sensor : ActivityRecognitionModule.getInstance().getSensors()) {
+				for (String sensor : APIFunctions.getSensors()) {
 					try {
 						APIFunctions.SENSORS_SENSOR_getRawDataII(Integer.valueOf(sensor),
 								Utils.dateToUnix(startDate.getTime()),
@@ -461,7 +460,7 @@ public class HARActivityTraining extends Activity {
 
 							@Override
 							protected Void doInBackground(Void... params) {
-								ActivityRecognitionModule.getInstance()
+								APIFunctions
 										.train(activity, windowLength);
 								return null;
 							}
@@ -472,10 +471,10 @@ public class HARActivityTraining extends Activity {
 
 							@Override
 							protected Void doInBackground(Void... params) {
-								ActivityRecognitionModule.getInstance()
+								APIFunctions
 										.train(activity, windowLength,
-												startDate.getTime(),
-												endDate.getTime());
+                                                startDate.getTime(),
+                                                endDate.getTime());
 								return null;
 							}
 						}.execute();

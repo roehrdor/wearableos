@@ -39,6 +39,21 @@ public class APIFunctions {
     }
 
     /**
+     * Register a new driver to the system
+     *
+     * @param driver the driver to be registered
+     */
+    public static int registerDriver(IGarmentDriver driver) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().registerDriver(driver);
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    /**
      * Get the currently performed activity
      *
      * @return the currently performed activity or null if not available or missing rights

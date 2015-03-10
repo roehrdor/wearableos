@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import de.unistuttgart.vis.wearable.os.activity.Activity;
 import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.api.*;
+import de.unistuttgart.vis.wearable.os.driver.DriverManager;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.privacy.UserApp;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
@@ -29,6 +30,17 @@ import java.util.HashSet;
  * @author roehrdor
  */
 class APIBinder extends IGarmentAPI.Stub {
+
+    /**
+     *
+     * @param driver
+     * @return
+     * @throws RemoteException
+     */
+    @Override
+    public int registerDriver(IGarmentDriver driver) throws RemoteException {
+        return DriverManager.addDriver(driver);
+    }
 
     /**
      * Return the currently performed activity
