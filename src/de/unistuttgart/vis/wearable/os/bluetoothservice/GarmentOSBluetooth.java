@@ -111,20 +111,41 @@ public class GarmentOSBluetooth extends Thread {
     }
 
 
-
     @Override
     public void run() {
+        //
+        // onStart is called once the Thread is started
+        //
         this.onStart();
+
+        //
+        // Run until the interrupt flag is visible in this state
+        // the interrupt flag will be only be available if the
+        // stopThread() function has been called
+        //
         while(!Thread.currentThread().isInterrupted()) {
+            //
+            // If the work flag is set to running call the onRun()
+            // method
+            //
             if(this.workFlag == RUNNING) {
                 this.onRun();
             }
 
+            //
+            // If the work flag is set to resuming call the
+            // onResume() function once and set the flag to running
+            // afterwards
+            //
             else if(this.workFlag == RESUMING) {
-                this.onResume();;
+                this.onResume();
                 this.workFlag = RUNNING;
             }
 
+            //
+            // If the work flag is set to paused call the onPause()
+            // function
+            //
             else if(this.workFlag == PAUSED) {
                 this.onPause();
             }
@@ -135,10 +156,23 @@ public class GarmentOSBluetooth extends Thread {
             try {
                 Thread.sleep(this.currentSleepTimePerIteration);
             } catch (InterruptedException ioe) {
+                //
+                // Since catching the InterruptedException will clear the interruption
+                // flag it will not be visible to the condition in the while loop.
+                // For the most interrupts we don't want to let the while condition
+                // see the flag since we do not want to stop the Thread yet, but if we
+                // want to stop the thread set the flag again by interrupting the current
+                // Thread by calling the interrupt() method
+                //
                 if(this.workFlag == STOPPED)
                     Thread.currentThread().interrupt();
             }
         }
+
+        //
+        // In the end call the onStop() function once before the Thread
+        // finally terminates
+        //
         this.onStop();
     }
 
@@ -147,20 +181,35 @@ public class GarmentOSBluetooth extends Thread {
      * Pause the current Thread, the thread can be resumed later on
      */
     public void pauseThread() {
-        this.workFlag = PAUSED;
-        this.currentSleepTimePerIteration = Long.MAX_VALUE;
-        this.interrupt();
+        if(this.workFlag != RUNNING) {
+            // Print a WARN message to the error output stream to notify the user
+            // that only a running Thread can be paused
+            System.err.println("WARN: Only a running Thread can be paused");
+        } else {
+            this.workFlag = PAUSED;
+            this.currentSleepTimePerIteration = Long.MAX_VALUE;
+            this.interrupt();
+        }
     }
 
     /**
      * Resume the Thread, note that this has no effect on an already running thread
      */
     public void resumeThread() {
-        this.workFlag = RESUMING;
-        this.currentSleepTimePerIteration = this.sleepTimePerIteration;
-        this.interrupt();
+        if(this.workFlag != PAUSED) {
+            // Print a WARN message to the error output stream to notify the user
+            // that only a paused server can be resumed
+            System.err.println("WARN: Only a paused Thread can be resumed");
+        } else {
+            this.workFlag = RESUMING;
+            this.currentSleepTimePerIteration = this.sleepTimePerIteration;
+            this.interrupt();
+        }
     }
 
+    /**
+     * Stop the Thread, note stopping the Thread this way is intended not as using {@link Thread#stop()}
+     */
     /**
      * Stop the Thread, note stopping the Thread this way is intended not as using {@link Thread#stop()}
      */
