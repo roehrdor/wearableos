@@ -379,7 +379,8 @@ class APIBinder extends IGarmentAPI.Stub {
         int sensorID = userApp.getDefaultSensor(sensorType);
         if(checkPermissionDenied(app, sensorID))
             return null;
-        return new PSensorData((java.util.Vector<SensorData>)(SensorManager.getSensorByID(sensorID).getRawData(numValues, true)).clone());
+        Sensor sensor = SensorManager.getSensorByID(sensorID);
+        return sensor != null ? new PSensorData((java.util.Vector<SensorData>)(sensor.getRawData(numValues, true)).clone()) : null;
     }
 
     /**
