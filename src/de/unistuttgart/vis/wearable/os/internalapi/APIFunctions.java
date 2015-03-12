@@ -18,6 +18,7 @@ import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -630,7 +631,7 @@ public class APIFunctions {
     public static List<String> getSensors() {
         if (APIHandle.isInternalServiceBound()) {
             try {
-                return Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getSensors());
+                return new ArrayList<String>(Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getSensors()));
             } catch (android.os.RemoteException e) {
             }
         }
@@ -640,7 +641,7 @@ public class APIFunctions {
     public static List<String> getSupportedActivities() {
         if (APIHandle.isInternalServiceBound()) {
             try {
-                return Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getSupportedActivities());
+                return new ArrayList<String>(Arrays.asList(APIHandle.getGarmentInternalAPIHandle().HAR_getSupportedActivities()));
             } catch (android.os.RemoteException e) {
             }
         }
