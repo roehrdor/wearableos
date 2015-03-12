@@ -689,4 +689,26 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static void addSensor(String sensor) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_addSensor(sensor);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void addActivity(String activity) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_addActivity(activity);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 }

@@ -437,4 +437,14 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     public void HAR_stopRecognition() throws RemoteException {
         ActivityRecognitionModule.getInstance().stopRecognition();
     }
+
+    @Override
+    public void HAR_addSensor(String sensor) throws RemoteException {
+        ActivityRecognitionModule.getInstance().addSensor(sensor);
+    }
+
+    @Override
+    public void HAR_addActivity(String activity) throws RemoteException {
+        ActivityRecognitionModule.getInstance().addActivity(activity);
+    }
 }

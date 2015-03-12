@@ -90,5 +90,6 @@ interface IGarmentInternalAPI {
     boolean     HAR_isRecognizing();
     void        HAR_recognize(int windowLength);
     void        HAR_stopRecognition();
-
+    void        HAR_addSensor(String sensor);
+    void        HAR_addActivity(String activity);
 }
