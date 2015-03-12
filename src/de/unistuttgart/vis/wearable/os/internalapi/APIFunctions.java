@@ -7,7 +7,6 @@
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
-import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetwork;
 import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetworkManager;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
@@ -18,9 +17,7 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -76,6 +73,17 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static void unpackEncryptedArchiveFile(java.io.File file, String key) {
+        if(APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().API_unpackEncryptedArchiveFile(file.getAbsolutePath(), key);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
     public static void registerCallback(IGarmentCallback callback, int cause) {
         if(APIHandle.isServiceBound()) {
             try {
@@ -119,7 +127,7 @@ public class APIFunctions {
                              MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
         if (APIHandle.isInternalServiceBound()) {
             try {
-                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(null, sampleRate, savePeriod,
+                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(Constants.NO_DRIVER, sampleRate, savePeriod,
                                     smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
                                     rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
                                     displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());
@@ -129,13 +137,13 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static PSensor addNewSensor(IGarmentDriver driver, int sampleRate, int savePeriod, float smoothness,
+    public static PSensor addNewSensor(int driverID, int sampleRate, int savePeriod, float smoothness,
                                        String displayedSensorName, SensorType sensorType, String bluetoothID,
                                        MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
                                        MeasurementSystems displayedMeasurementSystem, MeasurementUnits displayedMeasurementUnit) {
         if (APIHandle.isInternalServiceBound()) {
             try {
-                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(driver, sampleRate, savePeriod,
+                return APIHandle.getGarmentInternalAPIHandle().API_addNewSensor(driverID, sampleRate, savePeriod,
                         smoothness, displayedSensorName, sensorType.ordinal(), bluetoothID,
                         rawDataMeasurementSystem.ordinal(), rawDataMeasurementUnit.ordinal(),
                         displayedMeasurementSystem.ordinal(), displayedMeasurementUnit.ordinal());

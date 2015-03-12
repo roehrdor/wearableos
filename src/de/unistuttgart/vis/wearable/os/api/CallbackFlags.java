@@ -3,14 +3,14 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.api;
 
 /**
  * <p>
  * As provided by the
- * {@link APIFunctions#registerCallback(IGarmentServiceCallback, int)} the
+ * {@link APIFunctions#registerCallback(IGarmentCallback, int)} the
  * developer has the ability to register for several different events that are
  * recognized during the runtime of the GarmentOS Service.
  * </p>

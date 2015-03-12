@@ -139,6 +139,13 @@ public class Utils {
 		return (int) (date.getTime() / 1000L);
 	}
 
+    /**
+     * Create the long unix time stamp from the given {@link java.util.Date} object
+     *
+     * @param date
+     *            the date object
+     * @return the long unix time stamp for the date object
+     */
     public static long dateToLongUnix(java.util.Date date) {
         return date.getTime();
     }
@@ -154,6 +161,13 @@ public class Utils {
 		return new java.util.Date(1000L * unixTime);
 	}
 
+    /**
+     * Create a new {@link java.util.Date} object from the given long unix time stamp
+     *
+     * @param unixTime
+     *            the long unix time stamp to create a date object for
+     * @return the date object for the time stamp
+     */
     public static java.util.Date longUnixToDate(long unixTime) {
         return new java.util.Date(unixTime);
     }
@@ -167,6 +181,12 @@ public class Utils {
 		return (int) (System.currentTimeMillis() / 1000L);
 	}
 
+    /**
+     * Get the current unix date with milli seconds. This functions returns the value of the call to the
+     * function {@link System#currentTimeMillis()}
+     *
+     * @return the current time in unix time with milli seconds
+     */
     public static long getCurrentLongUnixTimeStamp() {
         return System.currentTimeMillis();
     }

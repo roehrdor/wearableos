@@ -1,16 +1,17 @@
 /*
- * This file is part of the Garment OS Project. For any details concerning use 
+ * This file is part of the Garment OS Project. For any details concerning use
  * of this project in source or binary form please refer to the provided license
  * file.
- * 
+ *
  * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.internalservice;
 
 import android.os.RemoteException;
-import de.unistuttgart.vis.wearable.os.activity.Activity;
 import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
+import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
+import de.unistuttgart.vis.wearable.os.driver.DriverManager;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
 import de.unistuttgart.vis.wearable.os.internalapi.*;
@@ -33,8 +34,8 @@ import java.util.List;
  * </p>
  * <p>
  * Note these functions will be executed in the service
- * </p> 
- * 
+ * </p>
+ *
  * @author roehrdor
  */
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
@@ -45,9 +46,20 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     }
 
     @Override
-    public PSensor API_addNewSensor(IGarmentDriver driver, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
+    public void API_unpackEncryptedArchiveFile(String file, String pw) throws RemoteException {
+        Archiver.unpackEncryptedFile(pw, new File(file));
+    }
+
+    @Override
+    public PGarmentDriver[] API_getDrivers() throws RemoteException {
+        return DriverManager.getPDrivers();
+    }
+
+    @Override
+    public PSensor API_addNewSensor(int driverID, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
                                  int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit) throws RemoteException{
+        IGarmentDriver driver = driverID == Constants.NO_DRIVER ? null : DriverManager.getDriverByID(driverID);
         Sensor sensor = new Sensor(driver, sampleRate, savePeriod, smoothness, displayedSensorName, SensorType.values()[sensorType], bluetoothID, MeasurementSystems.values()[rawDataMeasurementSystem],
                 MeasurementUnits.values()[rawDataMeasurementUnit], MeasurementSystems.values()[displayedMeasurementSystem], MeasurementUnits.values()[displayedMeasurementUnit]);
 

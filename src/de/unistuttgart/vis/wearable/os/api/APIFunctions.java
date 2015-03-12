@@ -399,6 +399,22 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Get the default sensor for the given sensor type
+     * @param sensorType the sensor type to get
+     * @return a {@link de.unistuttgart.vis.wearable.os.api.PSensor} object or null if the app is lacking permissions
+     *         or either the app or the sensor could not have been found or the default sensor has not yet been set
+     */
+    public static PSensor getDefaultSensor(SensorType sensorType) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                return APIHandle.getGarmentAPIHandle().API_getDefaultSensorByType(APIHandle.getAppPackageID(), sensorType.ordinal());
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
 
     //
     // Functions for the apps to get the sensor values from their default
@@ -603,6 +619,24 @@ public class APIFunctions {
                 PSensorData data = APIHandle.getGarmentAPIHandle().API_getGPS(APIHandle.getAppPackageID(), numValues);
                 return data == null ? null : data.toSensorDataList();
             } catch(android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    /**
+     * Get the latest number of sensor data values from the default GPS Sensor for the current app
+     * @param numValues the number of sensor data values to get
+     * @param sensorType the sensor type to get the values from
+     * @return a list of SensorData objects or null if the app is lacking permissions
+     *         or either the app or the sensor could not have been found or the default sensor has not yet been set
+     */
+    public static List<SensorData> getSensorData(int numValues, SensorType sensorType) {
+        if(APIHandle.isServiceBound()) {
+            try {
+                PSensorData data = APIHandle.getGarmentAPIHandle().API_getDefaultValues(APIHandle.getAppPackageID(), numValues, sensorType.ordinal());
+                return data == null ? null : data.toSensorDataList();
+            } catch (android.os.RemoteException e) {
             }
         }
         throw new RuntimeException("Connection failed");

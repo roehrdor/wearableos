@@ -45,6 +45,7 @@ interface IGarmentAPI {
     PSensor     API_getRelativeHumiditySensor(String app);
     PSensor     API_getTemperatureSensor(String app);
     PSensor     API_getGPSSensor(String app);
+    PSensor     API_getDefaultSensorByType(String app, int sensortype);
 
     //
     // Functions for the apps to get the sensor values from their default
@@ -62,6 +63,7 @@ interface IGarmentAPI {
     PSensorData API_getRelativeHumidity(String app, int numValues);
     PSensorData API_getTemperature(String app, int numValues);
     PSensorData API_getGPS(String app, int numValues);
+    PSensorData API_getDefaultValues(String app, int numValues, int sensortype);
 	
 	// 
 	// Function calls forward to Sensor object  

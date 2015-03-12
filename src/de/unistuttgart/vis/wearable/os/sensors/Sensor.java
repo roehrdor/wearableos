@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
-import de.unistuttgart.vis.wearable.os.internalapi.IGarmentDriver;
+import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.graph.GraphType;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;

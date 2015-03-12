@@ -3,7 +3,7 @@
  * of this project in source or binary form please refer to the provided license
  * file.
  * 
- * (c) 2014-2015 pfaehlfd, roehrdor, roehrlls
+ * (c) 2014-2015 GarmentOS
  */
 package de.unistuttgart.vis.wearable.os.utils;
 
@@ -23,7 +23,8 @@ public class Constants {
 	
 	public static final int ENUMERATION_NULL = 0x01000001;
     public static final int ILLEGAL_VALUE = 0x10000000;
-	
+
+    public static final int NO_DRIVER = 0xFFFFFFFF;
 	
 	//
 	// Permissions

@@ -7,7 +7,4 @@
  */
 package de.unistuttgart.vis.wearable.os.internalapi;
 
-interface IGarmentDriver {
-    float[] executeDriver(in byte[] stream);
-    String  getDriverName();
-}
+parcelable PGarmentDriver;

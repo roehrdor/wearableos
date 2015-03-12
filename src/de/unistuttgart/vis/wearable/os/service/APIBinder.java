@@ -357,6 +357,19 @@ class APIBinder extends IGarmentAPI.Stub {
         return getSensorByDefaultType(app, SensorType.GPS_SENSOR);
     }
 
+    /**
+     * Get the default Sensor for the given sensor type and app
+     *
+     * @param app        the app requesting the sensor
+     * @param sensortype the sensor type the app is requesting
+     * @return a {@link de.unistuttgart.vis.wearable.os.api.PSensor} object or null if the app is lacking permissions
+     * or either the app or the sensor could not have been found or the default sensor has not yet been set
+     */
+    @Override
+    public PSensor API_getDefaultSensorByType(String app, int sensortype) {
+        return sensortype != Constants.ENUMERATION_NULL ? getSensorByDefaultType(app, SensorType.values()[sensortype]) : null;
+    }
+
 
     //
     // Functions for the apps to get the sensor values from their default
@@ -525,6 +538,19 @@ class APIBinder extends IGarmentAPI.Stub {
     @Override
     public PSensorData API_getGPS(String app, int numValues) throws RemoteException {
         return getValuesByDefaultType(app, numValues, SensorType.GPS_SENSOR);
+    }
+
+    /**
+     * Get the latest number of sensor data values from the given sensor type for the given app
+     * @param app the app requesting the sensor values
+     * @param numValues the number of sensor data values to get
+     * @param sensortype the sensortype to get the data for
+     * @return a {@link de.unistuttgart.vis.wearable.os.api.PSensorData} object or null if the app is lacking permissions
+     *         or either the app or the sensor could not have been found or the default sensor has not yet been set
+     */
+    @Override
+    public PSensorData API_getDefaultValues(String app, int numValues, int sensortype) {
+        return sensortype != Constants.ENUMERATION_NULL ? getValuesByDefaultType(app, numValues, SensorType.values()[sensortype]) : null;
     }
 
 

@@ -10,7 +10,7 @@ package de.unistuttgart.vis.wearable.os.internalapi;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensorData;
-import de.unistuttgart.vis.wearable.os.internalapi.IGarmentDriver;
+import de.unistuttgart.vis.wearable.os.internalapi.PGarmentDriver;
 
 interface IGarmentInternalAPI {
 
@@ -19,8 +19,11 @@ interface IGarmentInternalAPI {
 	//
 
 	void        API_unpackArchiveFile(String file);
+	void        API_unpackEncryptedArchiveFile(String file, String pw);
 
-	PSensor     API_addNewSensor(IGarmentDriver driver, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
+	PGarmentDriver[]    API_getDrivers();
+
+	PSensor     API_addNewSensor(int driverID, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
 	                             int sensorType, String bluetoothID, int rawDataMeasurementSystem,
 	                             int rawDataMeasurementUnit, int displayedMeasurementSystem, int displayedMeasurementUnit);
     void        API_removeSensor(int sensorID);

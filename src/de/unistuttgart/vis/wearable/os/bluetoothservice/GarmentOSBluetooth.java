@@ -1,7 +1,7 @@
 package de.unistuttgart.vis.wearable.os.bluetoothservice;
 
 
-import de.unistuttgart.vis.wearable.os.internalapi.IGarmentDriver;
+import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
