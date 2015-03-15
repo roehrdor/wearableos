@@ -712,4 +712,36 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    public static void closeNeuralNetwork() {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_closeNeuralNetwork();
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void removeActivity(String activity) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_removeActivity(activity);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
+
+    public static void removeSensor(String sensor) {
+        if (APIHandle.isInternalServiceBound()) {
+            try {
+                APIHandle.getGarmentInternalAPIHandle().HAR_removeSensor(sensor);
+                return;
+            } catch (android.os.RemoteException e) {
+            }
+        }
+        throw new RuntimeException("Connection failed");
+    }
 }
