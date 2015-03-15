@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,46 +24,34 @@ public class HARActivity extends Activity {
 	final Context context = this;
 	private TextView harStatusTxt;
 	private Button trainBtn;
-	private Button testBtn;
-	private Button manageBtn;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_har);
 
-		harStatusTxt = (TextView) findViewById(R.id.har_textView_status_detail);
+		harStatusTxt = (TextView) findViewById(R.id.har_textView_status);
 	    
 		trainBtn = (Button) findViewById(R.id.button_har_train);
 		// TODO no hard coded string
-		if(APIFunctions.isTraining()) {
+		if (APIFunctions.isTraining()) {
 			trainBtn.setText("Stop training");
 		} else {
 			trainBtn.setText("Start training");
 		}
-		testBtn = (Button) findViewById(R.id.button_har_test);
-		// TODO no hard coded string
-		if(APIFunctions.isTraining()) {
-			testBtn.setText("Stop recognizing");
-		} else {
-			testBtn.setText("Start recognizing");
-		}
-		manageBtn = (Button) findViewById(R.id.button_har_nnmanager);
-
-		harStatusTxt.setText(APIFunctions.getNeuralNetworkStatus().toString());
 
 		switch (APIFunctions.getNeuralNetworkStatus()) {
 		case NOTINITIALIZED:
-			trainBtn.setVisibility(View.INVISIBLE);;
-			testBtn.setVisibility(View.INVISIBLE);
+			harStatusTxt.setText(R.string.notinitialized);
+			trainBtn.setVisibility(View.GONE);;
 			break;
 		case INITIALIZED:
+			harStatusTxt.setText(R.string.initialized);
 			trainBtn.setVisibility(View.VISIBLE);
-			testBtn.setVisibility(View.INVISIBLE);
 			break;
 		case TRAINED:
+			harStatusTxt.setText(R.string.initialized);
 			trainBtn.setVisibility(View.VISIBLE);
-			testBtn.setVisibility(View.VISIBLE);
 			break;
 		}
 
@@ -79,34 +69,51 @@ public class HARActivity extends Activity {
 			}
 
 		});
+	}
+	
 
-		testBtn.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				if (APIFunctions.isRecognizing()) {
-                    APIFunctions.stopRecognition();
-				} else {
-					new AsyncTask<Void, Void, Void>() {
-						@Override
-						protected Void doInBackground(Void... params) {
-                            APIFunctions.recognize(2000);
-							return null;
-						}
-					}.execute();
-				}
-			}
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onStart()
+	 */
+	@Override
+	protected void onRestart() {
+		super.onStart();
+		this.onCreate(null);
+	}
 
-		});
 
-		manageBtn.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(context, HARActivityManager.class);
-				startActivity(intent);
-			}
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		this.onCreate(null);
+	}
 
-		});
+
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(Menu.NONE, Menu.NONE, Menu.NONE,
+				R.string.action_settings);
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onMenuItemSelected(int, android.view.MenuItem)
+	 */
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		Intent intent = new Intent(context, HARActivityManager.class);
+		startActivity(intent);
+		return super.onMenuItemSelected(featureId, item);
 	}
 }

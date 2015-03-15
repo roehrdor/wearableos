@@ -9,6 +9,7 @@ package de.unistuttgart.vis.wearable.os.service;
 
 import android.content.Intent;
 import android.os.Message;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
@@ -16,6 +17,7 @@ import de.unistuttgart.vis.wearable.os.bluetoothservice.GarmentOSBluetoothServic
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * The Garment OS Service
@@ -122,5 +124,6 @@ public class GarmentOSService extends android.app.Service {
 		if(context == null)
 			context = getApplicationContext();
         new InternalSensors(context);
+		ActivityRecognitionModule.getInstance();
     }
 }

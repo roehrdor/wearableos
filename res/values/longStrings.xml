@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="notinitialized">
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text. 
+		Random test Text. Random test Text. Random test Text.
+	</string>
+	
+    <string name="initialized">
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        Random test Text2. Random test Text2. Random test Text2.
+        
+    </string>
+    
+</resources>

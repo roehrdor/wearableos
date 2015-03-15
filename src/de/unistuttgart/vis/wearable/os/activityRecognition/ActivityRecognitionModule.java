@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetworkManager.Status;
@@ -46,11 +47,12 @@ public class ActivityRecognitionModule {
 			throw new RuntimeException("Exception occured in creating singleton instance!");
 		}
 		// TODO
-		instance.neuralNetworkManager = new NeuralNetworkManager(""/*
-				GarmentOSService.getContext().getFilesDir().getAbsolutePath()*/);
+		instance.neuralNetworkManager = new NeuralNetworkManager(
+				Environment.getExternalStorageDirectory().toString());
+				/*GarmentOSService.getContext().getFilesDir().getAbsolutePath());*/
 		(instance.currentActivity = new Activity()).setActivityEnum(ActivityEnum.NOACTIVITY);
 		instance.loadActivities();
-		Log.i("har", "ActivityRecognitionModule loaded");
+		Log.i("har", "ActivityRecognitionModule loaded: " + Environment.getExternalStorageDirectory().toString());
 	}
 	
 	private final double LONG_MAX = 4294967296.0;
@@ -184,11 +186,11 @@ public class ActivityRecognitionModule {
 			
 			recognitionFuture.get();
 		} catch(InterruptedException e) {
-			
+			Log.e("har", "InterruptedException in recognize: " + e.getLocalizedMessage());
 		} catch(CancellationException e) {
-			
+			Log.e("har", "CancellationException in recognize: " + e.getLocalizedMessage());
 		} catch(ExecutionException e) {
-			
+			Log.e("har", "ExecutionException in recognize: " + e.getLocalizedMessage());
 		}
 	}
 
@@ -266,11 +268,11 @@ public class ActivityRecognitionModule {
 			}, 5000, windowLength / 2, TimeUnit.MILLISECONDS);
 			trainingFuture.get();
 		} catch(InterruptedException e) {
-			
+			Log.e("har", "InterruptedException in train: " + e.getLocalizedMessage());
 		} catch(CancellationException e) {
-			
+			Log.e("har", "CancellationException in train: " + e.getLocalizedMessage());
 		} catch(ExecutionException e) {
-			
+			Log.e("har", "ExecutionException in train: " + e.getLocalizedMessage());
 		}
 	}
 	
@@ -319,11 +321,11 @@ public class ActivityRecognitionModule {
 			}, windowLength / 2, TimeUnit.MILLISECONDS);
 			trainingFuture.get();
 		} catch(InterruptedException e) {
-			
+			Log.e("har", "InterruptedException in train: " + e.getLocalizedMessage());
 		} catch(CancellationException e) {
-			
+			Log.e("har", "CancellationException in train: " + e.getLocalizedMessage());
 		} catch(ExecutionException e) {
-			
+			Log.e("har", "ExecutionException in train: " + e.getLocalizedMessage());
 		}
 	}
 	
@@ -404,7 +406,7 @@ public class ActivityRecognitionModule {
 	 * @throws FileNotFoundException 
 	 */
 	public void loadNeuralNetwork() throws FileNotFoundException {
-		neuralNetworkManager.load();
+		neuralNetworkManager.load(false);
 	}
 	
 	public void saveNeuralNetwork() throws FileNotFoundException {
@@ -447,6 +449,7 @@ public class ActivityRecognitionModule {
 		try {
 			return neuralNetworkManager.create(inputNeurons);
 		} catch (IllegalArgumentException e) {
+			Log.e("har", "IllegalArgumentException in createNeuralNetwork: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -464,12 +467,20 @@ public class ActivityRecognitionModule {
 		neuralNetworkManager.addSensor(sensor);
 	}
 	
+	public void removeSensor(String sensor) {
+		neuralNetworkManager.removeSensor(sensor);
+	}
+	
 	public List<String> getSupportedActivities() {
 		return neuralNetworkManager.getActivities();
 	}
 	
 	public void addActivity(String activity) {
 		neuralNetworkManager.addActivity(activity);
+	}
+	
+	public void removeActivity(String activity) {
+		neuralNetworkManager.removeActivity(activity);
 	}
 
 	public boolean isTraining() {

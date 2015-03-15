@@ -153,8 +153,7 @@ public class HARActivityTraining extends Activity {
 								// check if start time is set correct
 								if ((startDate.get(Calendar.YEAR) == cyear
 										&& startDate.get(Calendar.MONTH) == cmonth
-										&& startDate.get(Calendar.DAY_OF_MONTH) == cday 
-										&& hourOfDay > chour)
+										&& startDate.get(Calendar.DAY_OF_MONTH) == cday && hourOfDay > chour)
 										|| startDate.get(Calendar.YEAR) == cyear
 										&& startDate.get(Calendar.MONTH) == cmonth
 										&& startDate.get(Calendar.DAY_OF_MONTH) == cday
@@ -279,8 +278,7 @@ public class HARActivityTraining extends Activity {
 														.get(Calendar.DAY_OF_MONTH) == endDate
 														.get(Calendar.DAY_OF_MONTH)
 												&& startDate
-														.get(Calendar.HOUR_OF_DAY) == hourOfDay 
-														&& startDate
+														.get(Calendar.HOUR_OF_DAY) == hourOfDay && startDate
 												.get(Calendar.MINUTE) > minute)) {
 
 									AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -318,25 +316,27 @@ public class HARActivityTraining extends Activity {
 		});
 
 		// activity
-        ArrayAdapter adapter = new ArrayAdapter(HARActivityTraining.this, android.R.layout.simple_spinner_item, APIFunctions.getActivityNames());
-        activitySpinner = (Spinner) findViewById(R.id.har_train_activity_spinner);
-        activitySpinner.setAdapter(adapter);
-        activitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(HARActivityTraining.this,
+				android.R.layout.simple_spinner_item,
+				APIFunctions.getSupportedActivities());
+		activitySpinner = (Spinner) findViewById(R.id.har_train_activity_spinner);
+		activitySpinner.setAdapter(adapter);
+		activitySpinner
+				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                activitySpinner.setSelection(position);
-                activity = activitySpinner.getSelectedItem().toString();
-            }
+					@Override
+					public void onItemSelected(AdapterView<?> parent,
+							View view, int position, long id) {
+						activitySpinner.setSelection(position);
+						activity = activitySpinner.getSelectedItem().toString();
+					}
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {
+						// TODO Auto-generated method stub
 
-            }
-        });
-
+					}
+				});
 
 		// window length
 		millisecondsETx = (EditText) findViewById(R.id.har_train_editText1);
@@ -347,7 +347,7 @@ public class HARActivityTraining extends Activity {
 						&& (keyCode == KeyEvent.KEYCODE_ENTER)) {
 					if (Integer.valueOf(millisecondsETx.getText().toString()) > 499
 							&& Integer.valueOf(millisecondsETx.getText()
-									.toString()) < 1440000) {
+									.toString()) < 1440001) {
 						windowLength = Integer.valueOf(millisecondsETx
 								.getText().toString());
 					} else {
@@ -407,29 +407,36 @@ public class HARActivityTraining extends Activity {
 				boolean noData = false;
 				for (String sensor : APIFunctions.getSensors()) {
 					try {
-						APIFunctions.SENSORS_SENSOR_getRawDataII(Integer.valueOf(sensor),
+						APIFunctions.SENSORS_SENSOR_getRawDataII(
+								Integer.valueOf(sensor),
 								Utils.dateToUnix(startDate.getTime()),
 								Utils.dateToUnix(endDate.getTime()));
-//					} catch (DatabaseObjectNotClosedException e) {
-//						noData = true;
+						// } catch (DatabaseObjectNotClosedException e) {
+						// noData = true;
 					} catch (NullPointerException e) {
-						Log.e("har", "[HARActivityTraining]:[onCreate] random NullPointerException");
+						Log.e("har",
+								"[HARActivityTraining]:[onCreate] random NullPointerException");
 					}
-					if(!APIFunctions.SENSORS_SENSOR_isEnabled(Integer.valueOf(sensor))) {
+					if (!APIFunctions.SENSORS_SENSOR_isEnabled(Integer
+							.valueOf(sensor))) {
 						noData = true;
 						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 								context);
 						alertDialogBuilder
 								.setTitle("Sensors are diabled!")
-								.setMessage("Enable them in the sensor settings first.")
-								.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-									
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										//HARActivityTraining.this.finish();
-										dialog.cancel();
-									}
-								}).setCancelable(false).show();
+								.setMessage(
+										"Enable them in the sensor settings first.")
+								.setPositiveButton("Ok",
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												// HARActivityTraining.this.finish();
+												dialog.cancel();
+											}
+										}).setCancelable(false).show();
 						break;
 					}
 				}
@@ -452,7 +459,7 @@ public class HARActivityTraining extends Activity {
 										}
 									}).show();
 				}
-				
+
 				// start training if data is available
 				if (!noData) {
 					if (live) {
@@ -460,25 +467,24 @@ public class HARActivityTraining extends Activity {
 
 							@Override
 							protected Void doInBackground(Void... params) {
-								APIFunctions
-										.train(activity, windowLength);
+								APIFunctions.train(activity, windowLength);
 								return null;
 							}
 						}.execute();
-						Toast.makeText(context, "Live training started", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "Live training started",
+								Toast.LENGTH_SHORT).show();
 					} else {
 						new AsyncTask<Void, Void, Void>() {
 
 							@Override
 							protected Void doInBackground(Void... params) {
-								APIFunctions
-										.train(activity, windowLength,
-                                                startDate.getTime(),
-                                                endDate.getTime());
+								APIFunctions.train(activity, windowLength,
+										startDate.getTime(), endDate.getTime());
 								return null;
 							}
 						}.execute();
-						Toast.makeText(context, "Database training started", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "Database training started",
+								Toast.LENGTH_SHORT).show();
 					}
 					HARActivityTraining.this.finish();
 				}

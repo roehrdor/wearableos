@@ -35,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="#606060"
-        android:text="@string/button_manager_save"
         android:textColor="#FFFFFF"
         android:textSize="25sp" />
 
@@ -56,16 +55,6 @@
         android:layout_margin="10dp"
         android:background="#606060"
         android:text="@string/har_button_manager_delete"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp" />
-    
-    <Button
-        android:id="@+id/har_manager_create"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="#606060"
-        android:text="@string/har_button_manager_create"
         android:textColor="#FFFFFF"
         android:textSize="25sp" />
 

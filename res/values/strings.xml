@@ -72,12 +72,10 @@
     <string name="checkBoxText_use_internal_directory">Use internal directory\n(Recommended)</string>
     <string name="OnOff">Sensor On/Off</string>
     <string name="btn_goBack">Cancel</string>
-    <string name="har">Activity Recognition</string>
-    <string name="title_activity_har">HARActivity</string>
-    <string name="harSettings">Human Activity Recognition Settings</string>
+    <string name="title_activity_har">Activity Recognition</string>
     <string name="har_status">HAR status: </string>
     <string name="har_currenactivity">Current Activity: </string>
-    <string name="btn_start_trainingHAR">Start training</string>
+    <string name="btn_start_trainingHAR">Training</string>
     <string name="har_popup_text">Select the activity</string>
     <string name="btn_popup_close">Start training</string>
     <string name="activity_status">Current activity</string>
