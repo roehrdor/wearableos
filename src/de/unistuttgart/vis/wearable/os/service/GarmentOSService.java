@@ -124,6 +124,13 @@ public class GarmentOSService extends android.app.Service {
 		if(context == null)
 			context = getApplicationContext();
         new InternalSensors(context);
-		ActivityRecognitionModule.getInstance();
+        new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Utils.sleepUninterrupted(2000);
+				ActivityRecognitionModule.getInstance();
+			}
+        }).start();
+		
     }
 }

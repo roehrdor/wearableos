@@ -48,8 +48,8 @@ public class ActivityRecognitionModule {
 		}
 		// TODO
 		instance.neuralNetworkManager = new NeuralNetworkManager(
-				Environment.getExternalStorageDirectory().toString());
-				/*GarmentOSService.getContext().getFilesDir().getAbsolutePath());*/
+				/*Environment.getExternalStorageDirectory().toString());*/
+				GarmentOSService.getContext().getFilesDir().getAbsolutePath());
 		(instance.currentActivity = new Activity()).setActivityEnum(ActivityEnum.NOACTIVITY);
 		instance.loadActivities();
 		Log.i("har", "ActivityRecognitionModule loaded: " + Environment.getExternalStorageDirectory().toString());
