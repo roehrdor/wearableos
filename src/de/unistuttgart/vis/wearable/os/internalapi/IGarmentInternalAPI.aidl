@@ -92,4 +92,7 @@ interface IGarmentInternalAPI {
     void        HAR_stopRecognition();
     void        HAR_addSensor(String sensor);
     void        HAR_addActivity(String activity);
+    void        HAR_closeNeuralNetwork();
+    void        HAR_removeSensor(String sensor);
+    void        HAR_removeActivity(String activity);
 }

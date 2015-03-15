@@ -447,4 +447,19 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     public void HAR_addActivity(String activity) throws RemoteException {
         ActivityRecognitionModule.getInstance().addActivity(activity);
     }
+
+    @Override
+    public void HAR_closeNeuralNetwork() throws RemoteException {
+        ActivityRecognitionModule.getInstance().closeNeuralNetwork();
+    }
+
+    @Override
+    public void HAR_removeSensor(String sensor) throws RemoteException {
+        ActivityRecognitionModule.getInstance().removeSensor(sensor);
+    }
+
+    @Override
+    public void HAR_removeActivity(String activity) throws RemoteException {
+        ActivityRecognitionModule.getInstance().removeActivity(activity);
+    }
 }
