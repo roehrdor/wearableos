@@ -74,7 +74,8 @@ public class UserApp implements java.io.Serializable  {
 	 * @return the sensorID of the default sensor for the given sensorType
 	 */
 	public int getDefaultSensor(SensorType sensorType) {
-		return defaultSensors.get(sensorType);
+        Integer ret;
+		return (ret = defaultSensors.get(sensorType)) == null ? Constants.ILLEGAL_VALUE : ret;
 	}
 
 	/**

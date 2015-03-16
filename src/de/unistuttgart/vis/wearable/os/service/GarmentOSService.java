@@ -127,7 +127,6 @@ public class GarmentOSService extends android.app.Service {
         new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Utils.sleepUninterrupted(2000);
 				ActivityRecognitionModule.getInstance();
 			}
         }).start();

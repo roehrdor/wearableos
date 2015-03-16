@@ -220,7 +220,7 @@ class APIBinder extends IGarmentAPI.Stub {
         if(userApp == null)
             return null;
         int sensorID = userApp.getDefaultSensor(sensorType);
-        if(checkPermissionDenied(app, sensorID))
+        if(sensorID == Constants.ILLEGAL_VALUE || checkPermissionDenied(app, sensorID))
             return null;
         Sensor sensor = SensorManager.getSensorByID(sensorID);
         return sensor == null ? null : sensor.toParcelableAPI();

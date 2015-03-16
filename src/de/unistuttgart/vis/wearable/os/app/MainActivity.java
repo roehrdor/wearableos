@@ -65,16 +65,6 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.sleepUninterrupted(2000);
-                //APIFunctions.getAccelerometer(20);
-                //APIFunctions.getHeartRateSensor();
-                ///**/APIFunctions.getHeartRate(20);
-            }
-        }).start();
     }
 
     public static Context getContext() {
