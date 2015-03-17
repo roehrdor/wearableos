@@ -1,6 +1,20 @@
 package de.unistuttgart.vis.wearable.os.bluetoothservice;
 
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.os.SystemClock;
+import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.UUID;
+
 import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
@@ -27,6 +41,15 @@ public class GarmentOSBluetooth extends Thread {
     protected long currentSleepTimePerIteration = sleepTimePerIteration;
     protected int workFlag = RUNNING;
 
+    // BT connection attributes
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice device = null;
+    private String macAddress = "";
+    public static final String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB";
+    private BluetoothSocket mmSocket = null;
+    private InputStream mmInStream = null;
+    private OutputStream mmOutStream = null;
+
     //
     // Local Sensor attributes
     //
@@ -47,6 +70,15 @@ public class GarmentOSBluetooth extends Thread {
      * This function will be called once the thread starts its work
      */
     protected void onStart() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if ( mBluetoothAdapter != null ) {
+            macAddress = sensor.getBluetoothID();
+            if (macAddress == null && macAddress.length() == 0) {
+                onStop();
+            } else {
+                //start thread
+            }
+        }
 
     }
 
@@ -75,30 +107,54 @@ public class GarmentOSBluetooth extends Thread {
         //
         // Running Thread work shall be done here
         //
-
+        byte[] recievedData = null;
         sensor.setEnabled(true);
         if(sensorDriver != null) {
-
-
-            //
-            //
-            //
-            // //TODO Process and cut the byte array
-            //
-            //
-            //
-
-
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
             try {
-                //
-                // Let the sensor driver do its work and insert the SensorData object
-                // if the sensor driver was able to create the data array
-                //
-                long timeNow = Utils.getCurrentLongUnixTimeStamp();
-                float[] data = this.sensorDriver.executeDriver(null);
-                if(data != null)
-                    sensor.addRawData(new SensorData(data, timeNow));
-            } catch (android.os.RemoteException re) {
+                tmpIn = mmSocket.getInputStream();
+                tmpOut = mmSocket.getOutputStream();
+            } catch (IOException e) {
+                Log.e("Printer Service", "temp sockets not created", e);
+            }
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+
+
+            while (true) {
+                recievedData = null;
+                try {
+                    byte[] buffer = new byte[128];
+                    String readMessage;
+                    int bytes;
+                    if (mmInStream.available() > 2) {
+                        try {
+                            // Read from the InputStream
+                            bytes = mmInStream.read(buffer);
+                            String test = new String(buffer, 0, bytes);
+                            recievedData = Arrays.copyOfRange(buffer, 0, bytes);
+
+                        } catch (IOException e) {
+                            break;
+                        }
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    //
+                    // Let the sensor driver do its work and insert the SensorData object
+                    // if the sensor driver was able to create the data array
+                    //
+                    long timeNow = Utils.getCurrentLongUnixTimeStamp();
+                    //sensorDriver is executed with the recieved Data form the socket as byte array
+                    float[] data = this.sensorDriver.executeDriver(recievedData);
+                    if (data != null)
+                        sensor.addRawData(new SensorData(data, timeNow));
+                } catch (android.os.RemoteException re) {
+                }
             }
         }
     }
@@ -117,6 +173,24 @@ public class GarmentOSBluetooth extends Thread {
         // onStart is called once the Thread is started
         //
         this.onStart();
+
+        //
+        //Connect to the bt device
+        //
+
+        device = mBluetoothAdapter.getRemoteDevice( macAddress );
+        if ( !sensor.isEnabled() ) {
+            this.onStop();
+        } else {
+            BluetoothSocket tmp = null;
+            try {
+                //IMPORTANT do not change UUID until you know what your btdevice does!
+                tmp = device.createRfcommSocketToServiceRecord(UUID.fromString(SPP_UUID));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mmSocket = tmp;
+        }
 
         //
         // Run until the interrupt flag is visible in this state
