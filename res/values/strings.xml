@@ -53,8 +53,7 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="btn_addSensor">Add sensor</string>
     <string name="title_activity_sensor_detail">SensorDetailActivity</string>
-    <string name="btn_exportDB">Export Database</string>
-    <string name="title_activity_export_db">ExportDbActivity</string>
+    <string name="title_activity_export_import">Export/Import-Activity</string>
     <string name="tv_permission">No write permission, saving not possible</string>
     <string name="btn_save">Save</string>
     <string name="bt_as_client">Start Client</string>

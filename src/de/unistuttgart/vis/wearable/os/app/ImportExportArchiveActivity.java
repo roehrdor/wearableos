@@ -1,17 +1,22 @@
 package de.unistuttgart.vis.wearable.os.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.cloud.FileAdapter;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 public class ImportExportArchiveActivity extends Activity {
 
@@ -20,31 +25,29 @@ public class ImportExportArchiveActivity extends Activity {
     private FileAdapter adapter;
     private ListView list;
     private Button btnSave;
-    private TextView text;
     private TextView currentDirectoryTextView = null;
     private boolean isExport = true;
-    private String password = "";
+    private String key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         folders = new ArrayList<File>();
         isExport = getIntent().getBooleanExtra("isExport", false);
-        password=getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
         setContentView(isExport?R.layout.activity_cloud_export:R.layout.activity_cloud_import);
         currentDirectoryTextView = (TextView)findViewById(R.id.textView_current_directory);
 
 
         if(isExport){
-            text = (TextView) findViewById(R.id.textView8);
-            btnSave = (Button) findViewById(R.id.button1);
+            btnSave = (Button) findViewById(R.id.btn_upload);
             btnSave.setEnabled(false);
+            btnSave.setText("No Write Permission");
         }
 
         currentDir = new File("/mnt/");
         folders.clear();
         folders.addAll(fill(currentDir));
-        list = (ListView) findViewById(R.id.listView1);
+        list = (ListView) findViewById(R.id.listViewFileChooser);
         adapter = new FileAdapter(getBaseContext(),folders);
         list.setAdapter(adapter);
         list.setOnItemClickListener(new OnItemClickListener() {
@@ -66,16 +69,87 @@ public class ImportExportArchiveActivity extends Activity {
 
     }
 
-    private void startFileImport(File archiveFile) {
-        if(password.equals("")){
-            Toast.makeText(getBaseContext(),"Importing archive...",Toast.LENGTH_SHORT).show();
-            APIFunctions.unpackArchiveFile(archiveFile);
-        }
-        else{
-            // TODO recognize if zip is encrypted by using mime-type
-            //APIFunctions.unpackEncryptedFile(password, downloadDestination);
-        }
+    private void startFileImport(final File archiveFile) {
 
+            if(Archiver.notEncryptedGOSFile(archiveFile)){
+                int value = APIFunctions.unpackArchiveFile(archiveFile);
+                switch (value) {
+                    case Constants.UNPACK_NO_ERROR:
+                        Toast.makeText(getBaseContext(),
+                                "File import finished",
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                        break;
+                    case Constants.UNPACK_INVALID_FILE:
+                        Toast.makeText(getBaseContext(),
+                                "Invalid File",
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                        break;
+                    case Constants.UNPACK_EXTRACTING_FAILED:
+                        Toast.makeText(getBaseContext(),
+                                "Extracting failed",
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                        break;
+                    case Constants.UNPACK_WRONG_KEY:
+                        Toast.makeText(getBaseContext(),
+                                "Wrong Password",
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                        break;
+
+                }
+            }
+            else {
+                AlertDialog.Builder alert = new AlertDialog.Builder(ImportExportArchiveActivity.this);
+
+                alert.setTitle("Please enter password:");
+                final EditText input = new EditText(ImportExportArchiveActivity.this);
+                alert.setView(input);
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        key = input.getText().toString();
+                        int value = Archiver.unpackEncryptedFile(key, archiveFile);
+                        switch (value) {
+                            case Constants.UNPACK_NO_ERROR:
+                                Toast.makeText(getBaseContext(),
+                                        "File import finished",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            case Constants.UNPACK_INVALID_FILE:
+                                Toast.makeText(getBaseContext(),
+                                        "Invalid File",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            case Constants.UNPACK_EXTRACTING_FAILED:
+                                Toast.makeText(getBaseContext(),
+                                        "Extracting failed",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            case Constants.UNPACK_WRONG_KEY:
+                                Toast.makeText(getBaseContext(),
+                                        "Wrong Password",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+
+                        }
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        finish();
+                    }
+                });
+                alert.setCancelable(false);
+                alert.show();
+            }
     }
 
     @Override
@@ -101,20 +175,24 @@ public class ImportExportArchiveActivity extends Activity {
         currentDirectoryTextView.setText("Current Folder: " + f.getName());
         if(f.canRead()){
             if(isExport&&f.canWrite()){
+                btnSave.setText("Upload SensorData");
             btnSave.setEnabled(true);
-            text.setVisibility(View.INVISIBLE);}
-        File[] dirs = f.listFiles();
-               for (File ff : dirs) {
-                if (ff.isDirectory()||ff.getName().endsWith(".zip"))
-                    dir.add(ff);
             }
-        Collections.sort(dir);
+            else{
+                if (isExport) {
+                    btnSave.setEnabled(false);
+                    btnSave.setText("No Write Permission");
+                }
+            }
+            File[] dirs = f.listFiles();
+            for (File ff : dirs) {
+                if (ff.isDirectory()||ff.getName().endsWith(".zip")) {
+                    dir.add(ff);
+                }
+            }
+            Collections.sort(dir);
         }
-        else{
-            if(isExport){
-            btnSave.setEnabled(false);
-            text.setVisibility(View.VISIBLE);}
-        }
+
 
         return dir;
     }
@@ -127,8 +205,10 @@ public class ImportExportArchiveActivity extends Activity {
             } else {
                 Archiver.createArchiveFile(tmp);
             }
-            Toast.makeText(getBaseContext(), "Exporting sensor archive...",
+            Toast.makeText(getBaseContext(), "Export finished",
                     Toast.LENGTH_SHORT).show();
+            finish();
+
 
     }
 }

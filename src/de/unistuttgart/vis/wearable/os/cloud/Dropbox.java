@@ -1,18 +1,18 @@
 package de.unistuttgart.vis.wearable.os.cloud;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.ProgressListener;
@@ -23,7 +23,7 @@ import com.dropbox.client2.session.Session;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
-import de.unistuttgart.vis.wearable.os.utils.Utils;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -42,7 +42,6 @@ public class Dropbox extends Activity {
     private Upload uploadTask;
     private Download downloadTask;
     private File tmp;
-    private List<String> fileList;
     private boolean finished = false;
     private FileInputStream inputStream;
     private FileOutputStream outputStream;
@@ -53,13 +52,20 @@ public class Dropbox extends Activity {
     private String currentDir;
     private List<String> dir;
     private Integer[] images;
+    private TextView pathView;
+    private String key;
+    private boolean abort = false;
+    private ProgressDialog progressDialog;
+    int startCount = 0;
 
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
 
 
+    /**
+     * Async Task for the upload
+     */
     private class Upload extends AsyncTask<Void, Long, Boolean> {
-        private final ProgressDialog progressDialog;
         private DropboxAPI.UploadRequest request = null;
 
         public Upload() {
@@ -75,23 +81,34 @@ public class Dropbox extends Activity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            class cancelUpload extends
-                                    AsyncTask<Void, Long, Boolean> {
+                           final Handler handler = new Handler();
 
-                                @Override
-                                protected Boolean doInBackground(Void... params) {
-                                    request.abort();
-                                    finished = false;
-                                    return false;
+                           final Runnable cancel = new Runnable() {
+                                public void run() {
+                                    try {
+                                        abort = true;
+                                        if (request!= null) {
+                                            request.abort();
+                                        }
+                                        if (inputStream!=null){
+                                            inputStream.close();
+                                        }
+                                        mDBApi.getSession().unlink();
+                                        Toast.makeText(context,
+                                                "File-Upload cancelled",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        // could not abort without exception
+                                        Toast.makeText(context,
+                                                "File-Upload cancelled",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
                                 }
-
-                            }
-                            try {
-                                inputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            new cancelUpload().execute(null, null, null);
+                           };
+                           handler.post(cancel);
                         }
                     });
             progressDialog.show();
@@ -121,7 +138,7 @@ public class Dropbox extends Activity {
 
                 try {
                     // set request for connectionEstablished to Dropbox
-                    request = mDBApi.putFileOverwriteRequest(currentDir+File.separator+"gos-sensors.zip", inputStream, tmp.length(),
+                    request = mDBApi.putFileRequest(currentDir + File.separator + "gos-sensors.zip", inputStream, tmp.length(), null, true,
                             new ProgressListener() {
 
                                 @Override
@@ -141,10 +158,12 @@ public class Dropbox extends Activity {
                         request.upload();
                         finished = true;
                         return true;
+
                     }
 
                 } catch (DropboxException e) {
-                    e.printStackTrace();
+                    // if dropboxconnection is unlinked
+                    abort = true;
                 }
             }
             return false;
@@ -152,29 +171,29 @@ public class Dropbox extends Activity {
 
         @Override
         protected void onProgressUpdate(Long... progress) {
+
             // set progress in percent
             int percent = (int) (100.0 * (double) progress[0] / tmp.length() + 0.5);
             progressDialog.setProgress(percent);
+
 
         }
 
         @Override
         protected void onPostExecute(final Boolean result) {
+
             tmp.delete();
             // print result
             runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    progressDialog.dismiss();
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
                     if (finished) {
                         Toast.makeText(context,
                                 "File uploaded",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        Toast.makeText(context,
-                                "File upload failed",
                                 Toast.LENGTH_SHORT).show();
                         finish();
                     }
@@ -184,16 +203,17 @@ public class Dropbox extends Activity {
         }
     }
 
+    /**
+     * AsyncTask for the download
+     */
     private class Download extends AsyncTask<Void, Long, Boolean> {
-        private final ProgressDialog progressDialog;
-        DropboxAPI.DropboxFileInfo info= null;
         long totalSize;
         File file;
 
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            // TODO add right path
+            // TODO add right pathView
             file = new File(Properties.exportDirectory, "tmp.zip");
             outputStream = null;
             try {
@@ -208,17 +228,7 @@ public class Dropbox extends Activity {
 
                             @Override
                             public void onProgress(long bytes, long total) {
-                                if (!isCancelled())
-                                    publishProgress(bytes, total);
-                                else {
-                                    if (outputStream != null) {
-                                        try {
-                                            outputStream.close();
-                                            finished =false;
-                                        } catch (IOException e) {
-                                        }
-                                    }
-                                }
+                                publishProgress(bytes,total);
                             }
                         });
                 if (info!=null){
@@ -234,10 +244,9 @@ public class Dropbox extends Activity {
             } finally {
                 if (outputStream != null) {
                     try {
-                        // TODO look for encryption
-                        APIFunctions.unpackArchiveFile(file);
                         outputStream.close();
                     } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -247,34 +256,110 @@ public class Dropbox extends Activity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            file.delete();
+
             // print result
             runOnUiThread(new Runnable() {
-
                 @Override
                 public void run() {
-                    progressDialog.dismiss();
-                    if (finished) {
-                        Toast.makeText(context,
-                                "File import finished",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        Toast.makeText(context,
-                                "File import failed",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
                     }
-                }
+                    if (outputStream != null) {
 
+
+                            if (!Archiver.notEncryptedGOSFile(file) && !abort) {
+
+                                AlertDialog.Builder alert = new AlertDialog.Builder(Dropbox.this);
+
+                                alert.setTitle("Please enter password:");
+                                final EditText input = new EditText(Dropbox.this);
+                                alert.setView(input);
+
+                                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        key = input.getText().toString();
+                                        int value =Archiver.unpackEncryptedFile(key, file);
+                                        switch (value) {
+                                            case Constants.UNPACK_NO_ERROR:
+                                                Toast.makeText(context,
+                                                        "File import finished",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+                                            case Constants.UNPACK_INVALID_FILE:
+                                                Toast.makeText(context,
+                                                        "Invalid File",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+                                            case Constants.UNPACK_EXTRACTING_FAILED:
+                                                Toast.makeText(context,
+                                                        "Extracting failed",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+                                            case Constants.UNPACK_WRONG_KEY:
+                                                Toast.makeText(context,
+                                                        "Wrong Password",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+
+                                        }
+                                    }
+                                });
+
+                                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        finished = false;
+                                        file.delete();
+                                        finish();
+                                    }
+                                });
+                                alert.setCancelable(false);
+                                alert.show();
+                            } else if (!abort) {
+                                int value = APIFunctions.unpackArchiveFile(file);
+
+                                switch (value) {
+                                    case Constants.UNPACK_NO_ERROR:
+                                        Toast.makeText(context,
+                                                "File import finished",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+                                    case Constants.UNPACK_INVALID_FILE:
+                                        Toast.makeText(context,
+                                                "Invalid File",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+                                    case Constants.UNPACK_EXTRACTING_FAILED:
+                                        Toast.makeText(context,
+                                                "Extracting failed",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+                                    case Constants.UNPACK_WRONG_KEY:
+                                        Toast.makeText(context,
+                                                "Wrong Password",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+
+                                }
+                            }
+                        }
+                    }
             });
+            file.delete();
+            return;
         }
 
         @Override
         protected void onProgressUpdate(Long... progress) {
-            // set progress in percent
-            int percent = (int) (100.0 * (double) progress[0]/totalSize + 0.5);
-            progressDialog.setProgress(percent);
+
+            progressDialog.setProgress((int)(progress[0]*100/progress[1]));
 
         }
 
@@ -291,22 +376,24 @@ public class Dropbox extends Activity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            class cancelDownload extends
-                                    AsyncTask<Void, Long, Boolean> {
-
-                                @Override
-                                protected Boolean doInBackground(Void... params) {
-                                    finished = false;
-                                    return false;
-                                }
-
-                            }
+                            finished =false;
+                            abort = true;
                             try {
                                 outputStream.close();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            new cancelDownload().execute(null, null, null);
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context,
+                                            "File-Download cancelled",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
+                            finish();
                         }
                     });
             progressDialog.show();
@@ -316,26 +403,40 @@ public class Dropbox extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // set text view for current path
+        pathView = (TextView) findViewById(R.id.textView_current_directory);
+
+        // set images for ListView
         images = new Integer[2];
         images[0] = R.drawable.folder;
         images[1] = R.drawable.file;
+
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // set the right content layout for import or export
         if (getIntent().getBooleanExtra("isExport",false)){
             setContentView(R.layout.activity_cloud_export);
-            button = (Button) findViewById(R.id.button1);
+            button = (Button) findViewById(R.id.btn_upload);
         } else {
             setContentView(R.layout.activity_cloud_import);
         }
         context = this.getBaseContext();
 
+        // start Dropbox Authentication if internet is avaible
         if (internetAvailable()) {
             // register keys
-            AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-            AndroidAuthSession session = new AndroidAuthSession(appKeys,
-                    ACCESS_TYPE);
-            // start Dropbox authentication
-            mDBApi = new DropboxAPI<AndroidAuthSession>(session);
-            mDBApi.getSession().startOAuth2Authentication(Dropbox.this);
+            if (mDBApi==null) {
+                AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+                AndroidAuthSession session = new AndroidAuthSession(appKeys,
+                        ACCESS_TYPE);
+                // start Dropbox authentication
+                mDBApi = new DropboxAPI<AndroidAuthSession>(session);
+                if (!mDBApi.getSession().authenticationSuccessful()) {
+                    mDBApi.getSession().startAuthentication(Dropbox.this);
+                }
+            }
 
         } else {
             Toast.makeText(getBaseContext(),
@@ -346,7 +447,10 @@ public class Dropbox extends Activity {
 
     }
 
+
+
     private void setFileList(final String path) {
+        //get path List from Android
         AsyncTask<String,String,String> aTask = new AsyncTask<String,String,String>() {
 
             @Override
@@ -383,11 +487,13 @@ public class Dropbox extends Activity {
                 if (dir.size()==0){
                     dir.add("No Content");
                 }
-                runOnUiThread(new Runnable(){
+
+                // show list in the Activity
+                runOnUiThread(new Runnable() {
                     public void run() {
 
-                        list = (ListView) findViewById(R.id.listView1);
-                        String [] tmpNames = new String[dir.size()];
+                        list = (ListView) findViewById(R.id.listViewFileChooser);
+                        String[] tmpNames = new String[dir.size()];
                         tmpNames = dir.toArray(tmpNames);
                         if (dir.get(0).equals("No Content")) {
                             list.setAdapter(new ArrayAdapter<String>(getBaseContext(),
@@ -404,17 +510,22 @@ public class Dropbox extends Activity {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view,
                                                         int position, long id) {
-                                    if (list.getItemAtPosition(position).toString().endsWith(".zip")){
-                                        finished =false;
+                                    if (list.getItemAtPosition(position).toString().endsWith(".zip")) {
+                                        finished = false;
+                                        abort = false;
                                         currentFilePath = currentEntry.path + File.separator + list.getItemAtPosition(position).toString();
                                         downloadTask = new Download();
-                                        downloadTask.execute(null,null,null);
+                                        downloadTask.execute(null, null, null);
                                     } else {
                                         setFileList(currentEntry.path + File.separator + list.getItemAtPosition(position).toString());
+                                        pathView.setText("Current Folder: " + currentEntry.path + File.separator + list.getItemAtPosition(position).toString());
                                     }
 
                                 }
                             });
+                        }
+                        if (getIntent().getBooleanExtra("isExport", false)) {
+                            button.setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -429,17 +540,27 @@ public class Dropbox extends Activity {
 
     @Override
     protected void onResume() {
+       startCount++;
        super.onResume();
+        pathView = (TextView) findViewById(R.id.textView_current_directory);
         if (mDBApi.getSession().authenticationSuccessful()) {
             try {
                 // complete the authentication
                 mDBApi.getSession().finishAuthentication();
-                String accessToken = mDBApi.getSession()
-                        .getOAuth2AccessToken();
-                setFileList("/");
+                if (getIntent().getBooleanExtra("isExport",false)) {
+                    button.setVisibility(View.INVISIBLE);
+                }
+                if(list==null) {
+                    pathView.setText("Current Folder: /");
+                    setFileList("/");
+                }
             } catch (IllegalStateException e) {
             }
 
+        } else {
+            if (startCount>1){
+                finish();
+            }
         }
 
 
@@ -452,6 +573,7 @@ public class Dropbox extends Activity {
         }
         if (currentEntry!=null&&!currentEntry.path.equals("/")) {
             setFileList(currentEntry.parentPath());
+            pathView.setText("Current Folder: "+currentEntry.parentPath());
         } else {
             super.onBackPressed();
         }
@@ -464,15 +586,12 @@ public class Dropbox extends Activity {
      * @param view
      */
     public void upload(View view) {
-        if (list==null){
-            Toast.makeText(getApplicationContext(),"Please accept Authentication",Toast.LENGTH_LONG).show();
-            onBackPressed();
-        } else {
             finished = false;
+            abort = true;
             uploadTask = new Upload();
             uploadTask.execute(null, null, null);
-        }
     }
+
 
 
     /**
