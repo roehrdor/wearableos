@@ -18,8 +18,8 @@ interface IGarmentInternalAPI {
 	// Internal API Function calls
 	//
 
-	void        API_unpackArchiveFile(String file);
-	void        API_unpackEncryptedArchiveFile(String file, String pw);
+	int         API_unpackArchiveFile(String file);
+	int         API_unpackEncryptedArchiveFile(String file, String pw);
 
 	PGarmentDriver[]    API_getDrivers();
 

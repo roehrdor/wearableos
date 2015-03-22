@@ -32,6 +32,7 @@ import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.sensors.Sensor;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.storage.SettingsStorage;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
@@ -52,18 +53,19 @@ public class Archiver {
 
 
     /**
-     * Check whether the given zip file is encrypted
+     * Tests whether the given file is a not encrypted file created by GarmentOS
      *
-     * @param file the file that needs to be checked
-     * @return true if the file is encrypted
+     * @param file the file to be checked
+     * @return true if the file has been creted by GarmentOS and is not encrypted, false otherwise
      */
-    public static boolean isFileEncrypted(File file) throws IOException {
-        RandomAccessFile raf;
-        byte[] buffer = new byte[4];
-        raf = new RandomAccessFile(file, "rw");
-        raf.read(buffer);
-        raf.close();
-        return buffer[0] != 0x50 || buffer[1] != 0x4B || buffer[2] != 0x03 || buffer[3] != 0x04;
+    public static boolean notEncryptedGOSFile(File file) {
+        try {
+            RandomAccessFile raf;
+            raf = new RandomAccessFile(file, "rw");
+            return raf.readInt() == Constants.GOS_FILE_START_BYTE;
+        } catch (IOException ioe) {
+            return false;
+        }
     }
 
     /**
@@ -96,9 +98,9 @@ public class Archiver {
      * @param key       the key to decrypt the archive file
      * @param inputFile the inputfile to be decrypted first and then unpacked
      */
-    public static void unpackEncryptedFile(String key, File inputFile) {
-        decryptFile(inputFile, key);
-        unpackArchiveFile(inputFile);
+    public static int unpackEncryptedFile(String key, File inputFile) {
+        int ret;
+        return (ret = decryptFile(inputFile, key)) == Constants.UNPACK_NO_ERROR ? unpack(inputFile) : ret;
     }
 
     /**
@@ -290,12 +292,50 @@ public class Archiver {
         return returnValue;
     }
 
+
+    /**
+     * Validate and extract the file. This function will return {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if
+     * the extraction process terminated successfully. If the file has not been created by GarmentOS the function will return
+     * {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_INVALID_FILE}
+     *
+     * @param inputFile the input file to validate and extract
+     * @return {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if extraction was successful
+     */
+    public static int unpack(File inputFile) {
+        int ret;
+        return (ret = validateAndChangeHeader(inputFile)) == Constants.UNPACK_NO_ERROR ? unpackArchiveFile(inputFile) : ret;
+    }
+
+    /**
+     * Validate the given file and check whether is has been created by GarmentOS. If this file has been created by
+     * GarmentOS prepare the file for extraction, otherwise return the specific error code.
+     *
+     * @param file the file to be validated and probably extracted
+     * @return an error code or 0 {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if the file has been successfully validated
+     */
+    protected static int validateAndChangeHeader(File file) {
+        RandomAccessFile raf;
+        int value = Constants.UNPACK_INVALID_FILE;
+        try {
+            raf = new RandomAccessFile(file, "rw");
+            if(raf.readInt() == Constants.GOS_FILE_START_BYTE) {
+                raf.seek(0);
+                raf.write(Constants.ZIP_FIRST_BYTE);
+                raf.close();
+                value = Constants.UNPACK_NO_ERROR;
+            }
+        } catch(IOException e) {
+        }
+        return value;
+    }
+
     /**
      * Unpack the packed archive file and merge the files as far as possible
      *
      * @param inputFile the input file to unpack
      */
-    public static void unpackArchiveFile(File inputFile) {
+    protected static int unpackArchiveFile(File inputFile) {
+        int value = Constants.UNPACK_NO_ERROR;
         Properties.FILE_STATUS_FIELDS_LOCK.lock();
         Properties.FILE_ARCHIVING.set(true);
         while(Properties.FILES_IN_USE.get() != 0) {
@@ -387,11 +427,14 @@ public class Archiver {
             zipInputStream.close();
         } catch(IOException ioe) {
             Log.i("GarmentOS", "Archiver:unpackArchiveFile() - IOE");
+            value = Constants.UNPACK_INVALID_FILE;
         } catch(ClassNotFoundException cnfe) {
             Log.i("GarmentOS", "Archiver:unpackArchiveFile() - CNFE");
+            value = Constants.UNPACK_EXTRACTING_FAILED;
         }
 
         Properties.FILE_ARCHIVING.set(false);
+        return value;
     }
 
 
@@ -459,6 +502,13 @@ public class Archiver {
             zos.finish();
             zos.close();
             fos.close();
+
+            //
+            // Change the first byte to remember that the file has been created by GarmentOS
+            //
+            RandomAccessFile raf = new RandomAccessFile(outputFile, "rw");
+            raf.writeInt(Constants.GOS_FILE_START_BYTE);
+            raf.close();
         } catch (IOException ioe) {
         }
 
@@ -586,7 +636,8 @@ public class Archiver {
      * @param pass
      *            the password to use for decryption
      */
-    public static void decryptFile(File fileName, String pass) {
+    public static int decryptFile(File fileName, String pass) {
+        int ret = Constants.UNPACK_NO_ERROR;
         byte[] encData;
         byte[] decData;
         try {
@@ -619,8 +670,11 @@ public class Archiver {
             target.close();
         } catch (GeneralSecurityException gse) {
             Log.i("GarmentOS", "Archiver:decryptFile() - GSE");
+            ret = Constants.UNPACK_WRONG_KEY;
         } catch (IOException IOE) {
             Log.i("GarmentOS", "Archiver:decryptFile() - IOE");
+            ret = Constants.UNPACK_WRONG_KEY;
         }
+        return ret;
     }
 }

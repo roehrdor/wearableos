@@ -319,7 +319,7 @@ public class DownloadResultCallbacks {
 			super.onPostExecute(result);
 			if(result){
                 if(password.equals("")){
-                    Archiver.unpackArchiveFile(downloadDestination);
+                    Archiver.unpack(downloadDestination);
                 }
                 else{
                     Archiver.unpackEncryptedFile(password,downloadDestination);

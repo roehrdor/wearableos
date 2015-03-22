@@ -41,13 +41,13 @@ import java.util.List;
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 
     @Override
-    public void API_unpackArchiveFile(String file) throws RemoteException {
-        Archiver.unpackArchiveFile(new File(file));
+    public int API_unpackArchiveFile(String file) throws RemoteException {
+        return Archiver.unpack(new File(file));
     }
 
     @Override
-    public void API_unpackEncryptedArchiveFile(String file, String pw) throws RemoteException {
-        Archiver.unpackEncryptedFile(pw, new File(file));
+    public int API_unpackEncryptedArchiveFile(String file, String pw) throws RemoteException {
+        return Archiver.unpackEncryptedFile(pw, new File(file));
     }
 
     @Override
