@@ -211,6 +211,7 @@ public class AddSensorActivity extends Activity {
                 android.R.layout.simple_spinner_item);
         adapter1.add("lightDriver");
         adapter1.add("stepDriver");
+        adapter1.add("heartbeatDriver");
 
         spinner4.setAdapter(adapter1);
         spinner4.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -294,7 +295,7 @@ public class AddSensorActivity extends Activity {
                     Toast.LENGTH_SHORT).show();
         }  else {
             de.unistuttgart.vis.wearable.os.internalapi.PSensor saveSensor = APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
-            Intent startBT = new Intent(this, GarmentOSBluetoothService.class);
+            //Intent startBT = new Intent(this, GarmentOSBluetoothService.class);
             //startBT.putExtra("btDevice", btMac);
             //startBT.putExtra("btId", saveSensor.getID());
             //startBT.putExtra("btDriver", sensorDriver);

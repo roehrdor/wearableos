@@ -406,7 +406,9 @@ public class GarmentOSBluetoothService extends Service{
                        // Read from the InputStream
                         bytes = input.read(buffer);
                         String test = new String(buffer, 0, bytes);
-                        Log.i("Size", Integer.toString(bytes));
+                        for (int i = 0;  i < bytes; i++) {
+                                String test2 = new String(buffer, i, 1);
+                        }
 
                         byte[] sendBuffer = Arrays.copyOfRange(buffer, 0, bytes);
                         float[] dataFloat = loadDriver(driver, buffer);
