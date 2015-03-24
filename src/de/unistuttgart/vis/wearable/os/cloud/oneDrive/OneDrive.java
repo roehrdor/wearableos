@@ -41,26 +41,44 @@ public class OneDrive extends Activity {
     private JSONObject parentDirectory = null;
     private JSONComparator jsonComparator= null;
     private OneDriveAdapter adapter = null;
+    private ArrayList<String> directoryList = null;
+    private TextView currentDirectoryTextView = null;
 
 
     @Override
     public void onBackPressed() {
+        // TODO update path textView in the thread where the new json objects are received
+        // Case when activity is started and no directory was selected
         if(parentDirectory == null||(parentDirectory.optString(Miscellaneous.PARENT_ID).equals(parentDirectory.optString(Miscellaneous.ID)))||parentDirectory.isNull(Miscellaneous.PARENT_ID)){
             super.onBackPressed();
         }
+        // Case where elements of ListView where selected
         else {
+            if(directoryList.size()>0){
+                directoryList.remove(directoryList.size()-1);
+                if(directoryList.size()==0){
+                    currentDirectoryTextView.setText("/");
+                }
+                else{
+                    String pathString ="";
+                    for(String currentDirectory:directoryList){
+                        pathString+="/"+currentDirectory;
+                    }
+                    currentDirectoryTextView.setText(pathString);
+                }
+            }
+            // Case where the root is displayed and previously an item was clicked and then the back-button was pressed
+            else{
+                currentDirectoryTextView.setText("/");
+            }
             getConnectClient().getAsync(parentDirectory.optString(Miscellaneous.PARENT_ID), new LiveOperationListener() {
                 JSONObject grandParentJsonObject = null;
                 JSONArray singleElementArray = null;
                 @Override
                 public void onComplete(LiveOperation operation) {
-
                         grandParentJsonObject = operation.getResult();
                         parentDirectory = grandParentJsonObject;
                         getArchiveList(parentDirectory);
-
-
-
 
                 }
 
@@ -77,9 +95,11 @@ public class OneDrive extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = OneDrive.this;
+        directoryList = new ArrayList<String>();
         this.auth = new LiveAuthClient(this, Miscellaneous.CLIENT_ID);
         setContentView(getIntent().getBooleanExtra("isExport",false)?R.layout.activity_cloud_export:R.layout.activity_cloud_import);
-        oneDriveFolderListView = (ListView)findViewById(R.id.listView1);
+        oneDriveFolderListView = (ListView)findViewById(R.id.listViewFileChooser);
+        currentDirectoryTextView = (TextView)findViewById(R.id.textView_current_directory);
         if(!getIntent().getBooleanExtra("isExport",false)) {
 
             isExport = false;
@@ -102,11 +122,21 @@ public class OneDrive extends Activity {
                     if (isExport) {
 
                         if (curJSONObject.optString(Miscellaneous.TYPE).equals("folder")) {
+                            directoryList.add(curJSONObject.optString(Miscellaneous.NAME));
+                            String pathString ="";
+                            for(String currentDirectory:directoryList){
+                                    pathString +="/"+currentDirectory;}
+                            currentDirectoryTextView.setText(pathString);
                             parentDirectory = curJSONObject;
                             getArchiveList(parentDirectory);
                         }
                     } else {
                         if (curJSONObject.optString(Miscellaneous.TYPE).equals("folder")) {
+                            directoryList.add(curJSONObject.optString(Miscellaneous.NAME));
+                            String pathString ="";
+                            for(String currentDirectory:directoryList){
+                                pathString +="/"+currentDirectory;}
+                            currentDirectoryTextView.setText(pathString);
                             parentDirectory = curJSONObject;
                             getArchiveList(parentDirectory);
                         } else {
@@ -123,12 +153,14 @@ public class OneDrive extends Activity {
         }
     }
 
-    private void getArchiveList(JSONObject parentDirectory) {
-
+    private void getArchiveList(final JSONObject parentDirectory) {
             getConnectClient().getAsync(parentDirectory==null?"me/skydrive/files":
                     parentDirectory.optString(Miscellaneous.ID)+"/files", new LiveOperationListener() {
                 @Override
                 public void onComplete(LiveOperation operation) {
+                    if(parentDirectory == null){
+                        currentDirectoryTextView.setText("/");
+                    }
                     childrenList.clear();
                     JSONObject currentJsonObject = null;
                     JSONArray fileListArray = fileListArray = operation.getResult().optJSONArray(Miscellaneous.DATA);

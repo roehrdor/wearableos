@@ -6,7 +6,20 @@ import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 
 public class Miscellaneous {
-	private static DriveFolder currentArchiveFolder = null;
+    static final int SIGN_IN_REQUEST_CODE_1 = 0;
+    static final int SIGN_IN_REQUEST_CODE_2 = 1;
+    static final int SIGN_IN__SUCCESSFUL_RESULT_CODE = 1;
+    private static final int SIGN_IN_FAILED_RESULT_CODE_1 = 0;
+    private static final int SIGN_IN_FAILED_RESULT_CODE_2 = -1;
+    static final int ARCHIVE_CREATION_SUCCESSFUL = 3;
+    static final int ARCHIVE_CREATION_FAILED = -3;
+    static final int ARCHIVE_IMPORT_SUCCESSFUL = 5;
+    static final int ARCHIVE_IMPORT_FAILED = -5;
+    static final int REQUEST_LIMIT_REACHED_1 = 10;
+    static final int REQUEST_LIMIT_REACHED_2 = 1507;
+    static final int LOADING_FILES_SUCCESSFUL = 10;
+    static final int LOADING_FILES_FAILED = -10;
+    private static DriveFolder currentArchiveFolder = null;
 	/**
 	 * Request code for auto Google Play Services error resolution.
 	 */

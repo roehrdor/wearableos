@@ -1,6 +1,7 @@
 package de.unistuttgart.vis.wearable.os.cloud.googleDrive;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +27,7 @@ import com.google.android.gms.drive.query.SearchableField;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
-
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class GoogleDrive extends Activity implements
     private static Context context;
     private static DriveFolder defaultCloudArchiveFolder;
     private static char mode = 'n';
-    private static String password ="";
+    private static String key ="";
     private boolean isExport = true;
     private boolean isConnected = false;
     private static DriveId currentDirectoryId = null;
@@ -54,10 +55,14 @@ public class GoogleDrive extends Activity implements
     // Thanks to very limited access for developers this is necessary to be able to get the parent directory,
     // updates of directory contents will be ignored
     private Stack<DriveId> directoryHistory = null;
+    private Stack<String>directoryNameHistory = null;
     private DriveFile currentCloudDBFile = null;
-    private static final int SIGN_IN_REQUEST_CODE = 0;
-    private static final int REQUEST_LIMIT_REACHED = 10;
     private float currentCloudArchiveFileSize = 0.0f;
+    private MetadataBuffer fileListBuffer = null;
+    private ProgressDialog progressDialog= null;
+    private String currentPath = "";
+    private String futurePath ="";
+    private TextView currentPathTextView = null;
 
     /**
      * Google API client, luckily it only stores the local information about the
@@ -65,14 +70,6 @@ public class GoogleDrive extends Activity implements
      * requestSync has to be executed
      */
     private static GoogleApiClient mGoogleApiClient = null;
-
-    private DownloadResultCallbacks downloadCallbackHelper = new DownloadResultCallbacks();
-
-    private UploadResultCallbacks uploadCallbackHelper = new UploadResultCallbacks();
-
-    public static String getPassword(){
-        return password;
-    }
 
     public static DriveFolder getDefaultCloudArchiveFolder() {
         return defaultCloudArchiveFolder;
@@ -84,11 +81,20 @@ public class GoogleDrive extends Activity implements
 
     @Override
     public void onBackPressed() {
-        // TODO handle case where currentParentId is null
-        if(currentDirectoryId.equals(Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId())){
+
+        if(currentDirectoryId==null||currentDirectoryId.equals(Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId())
+                ||directoryHistory.size()==0||directoryNameHistory.size()==0){
+            if(fileListBuffer!=null&&!fileListBuffer.isClosed()){
+                fileListBuffer.release();
+            }
         super.onBackPressed();}
         else {
             currentDirectoryId = directoryHistory.pop();
+            futurePath = directoryNameHistory.pop();
+            progressDialog = new ProgressDialog(getMainContext());
+            progressDialog.setCancelable(false);
+            progressDialog.setMessage("Loading parent Directory...");
+            progressDialog.show();
             getArchiveList(currentDirectoryId);
         }
     }
@@ -101,74 +107,6 @@ public class GoogleDrive extends Activity implements
         mGoogleApiClient = googleApiClient;
     }
 
-    /**
-     * Establishes the connection to Google Drive before doing any actions, the
-     * internal state of the client still has to be updated afterwards
-     */
-    public void signInToGoogleDrive() {
-        if (getGoogleApiClient() == null) {
-            // It's hilarious, but the app can only access self created folders
-            setGoogleApiClient(new GoogleApiClient.Builder(this)
-                    .addApi(Drive.API).addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build());
-            if (!getGoogleApiClient().isConnected()) {
-                Toast.makeText(this, "Connecting with Google Drive",
-                        Toast.LENGTH_SHORT).show();
-                getGoogleApiClient().connect();
-            } else {
-                checkForFolderInGoogleDrive();
-            }
-
-        } else if (!getGoogleApiClient().isConnected()) {
-            Toast.makeText(this, "Connecting with Google Drive",
-                    Toast.LENGTH_SHORT).show();
-            getGoogleApiClient().connect();
-        } else {
-            checkForFolderInGoogleDrive();
-        }
-    }
-
-    /**
-     * Method to initiate the download or upload process
-         **/
-     public void startImportExport(View view) {
-
-         setMode(isExport?'u':'d');
-
-            signInToGoogleDrive();
-
-    }
-
-    /**
-     * Called before uploading the database to Google Drive to prevent the
-     * creation of duplicate folders
-     */
-    public void checkForFolderInGoogleDrive() {
-        if (getGoogleApiClient() != null && getGoogleApiClient().isConnected()) {
-            // Search for folder and upload the file
-            DriveFolder drFolder = Drive.DriveApi
-                    .getRootFolder(getGoogleApiClient());
-            Query query = new Query.Builder().addFilter(
-                    Filters.and(Filters.eq(SearchableField.TITLE,
-                                    Miscellaneous.getCloudArchiveFolderName()), Filters.eq(
-                                    SearchableField.MIME_TYPE, DriveFolder.MIME_TYPE),
-                            Filters.eq(SearchableField.TRASHED, false)))
-                    .build();
-            if (getMode() == 'u') {
-                drFolder.queryChildren(getGoogleApiClient(), query)
-                        .setResultCallback(
-                                this.uploadCallbackHelper
-                                        .getFolderQueryResultCallback());
-            } else if (getMode() == 'd') {
-                drFolder.queryChildren(getGoogleApiClient(), query)
-                        .setResultCallback(
-                                downloadCallbackHelper
-                                        .getFolderQueryResultCallback());
-            }
-        }
-    }
-
     public void setAdapter(GoogleDriveAdapter adapter) {
         this.adapter = adapter;
     }
@@ -177,17 +115,19 @@ public class GoogleDrive extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         directoryHistory = new Stack<DriveId>();
+        directoryNameHistory = new Stack<String>();
         metadataArrayList = new ArrayList<Metadata>();
         isExport = getIntent().getBooleanExtra("isExport",false);
+        key = getIntent().getStringExtra("key")==null?"":getIntent().getStringExtra("key");
+
         setContentView(getIntent().getBooleanExtra("isExport",false)?R.layout.activity_cloud_export:R.layout.activity_cloud_import);
-        googleDriveFolderListView = (ListView)findViewById(R.id.listView1);
+        currentPathTextView = (TextView)findViewById(R.id.textView_current_directory);
+        googleDriveFolderListView = (ListView)findViewById(R.id.listViewFileChooser);
 
         setGoogleApiClient(new GoogleApiClient.Builder(this)
                 .addApi(Drive.API).addScope(Drive.SCOPE_FILE)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this).build());
-
-        password=getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
         context = this;
 
         if(internetAvailable()){
@@ -207,14 +147,24 @@ public class GoogleDrive extends Activity implements
 
                         if (curMetadata.isFolder()) {
                             directoryHistory.push(currentDirectoryId);
+                            futurePath = curMetadata.getTitle();
                             currentDirectoryId = curMetadata.getDriveId();
+                            progressDialog = new ProgressDialog(getMainContext());
+                            progressDialog.setCancelable(false);
+                            progressDialog.setMessage("Loading directories of "+curMetadata.getTitle());
+                            progressDialog.show();
                             getArchiveList(currentDirectoryId);
                         }
                     } else {
                         Log.d("gosDEBUG","Click in Import");
                         if (curMetadata.isFolder()) {
                             directoryHistory.push(currentDirectoryId);
+                            futurePath = curMetadata.getTitle();
                             currentDirectoryId = curMetadata.getDriveId();
+                            progressDialog = new ProgressDialog(getMainContext());
+                            progressDialog.setCancelable(false);
+                            progressDialog.setMessage("Loading directories of "+curMetadata.getTitle());
+                            progressDialog.show();
                             getArchiveList(currentDirectoryId);
                         } else {
                             Log.d("gosDEBUG","starting import");
@@ -229,7 +179,6 @@ public class GoogleDrive extends Activity implements
             Toast.makeText(getMainContext(),"Please enable WiFi or mobile data",Toast.LENGTH_SHORT).show();
             onBackPressed();
         }
-
     }
 
     public static Context getMainContext() {
@@ -271,38 +220,34 @@ public class GoogleDrive extends Activity implements
 
                     @Override
                     public void onResult(Status arg0) {
-
-                        if (arg0.isSuccess()) {
+                        if(isFileRequestValid(arg0)==1){
                             Toast.makeText(
                                     getBaseContext(),
                                     "Synchronisation with Google Drive successful",
                                     Toast.LENGTH_SHORT).show();
+                            currentDirectoryId = Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId();
+                            futurePath = "/";
+                            searchForDefaultDirectory();
+                        }
+                        else if(isFileRequestValid(arg0)==0){
+                            Toast.makeText(
+                                    getBaseContext(),
+                                    "Synchronisation with Google Drive successful, due to technical limitations the following list may be deprecated",
+                                    Toast.LENGTH_SHORT).show();
 
                             currentDirectoryId = Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId();
+                            futurePath="/";
                             searchForDefaultDirectory();
-
-                        } else {
-                            // Too many requests, thankfully this can't be avoided or duplicate files will be uploaded
-                            //if(arg0.getStatusCode()==REQUEST_LIMIT_REACHED){
-                                Toast.makeText(
-                                        getBaseContext(),
-                                        "Synchronisation with Google Drive successful",
-                                        Toast.LENGTH_SHORT).show();
-
-                                currentDirectoryId = Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId();
-                                searchForDefaultDirectory();
-                            //}
-                            //else{
-                           // Toast.makeText(
-                           //         getBaseContext(),
-                           //         "Synchronisation with Google Drive failed, "
-                           //                 + "\nlogging in again is necessary\n"+arg0.getStatusMessage()+"\n"+arg0.getStatusCode(),
-                           //         Toast.LENGTH_SHORT).show();
-                          //  setGoogleApiClient(null);}
                         }
+                        else{
+                           Toast.makeText(
+                                    getBaseContext(),
+                                    "Synchronisation with Google Drive failed, "
+                                            + "\nlogging in again is necessary\n"+arg0.getStatusMessage()+"\n"+arg0.getStatusCode(),
+                                    Toast.LENGTH_SHORT).show();
+                            setGoogleApiClient(null);}
                     }
                 });
-
     }
 
     @Override
@@ -359,14 +304,31 @@ public class GoogleDrive extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /* TODO handle the combination of request and result codes correctly
-         to only execute this after selecting the desired google account*/
-            //if(requestCode==SIGN_IN_REQUEST_CODE&& resultCode == Activity.RESULT_OK){
-             //   if(!isConnected){
-                    isConnected=true;
+
+        if ((requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_1 || requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_2) && resultCode == Miscellaneous.SIGN_IN__SUCCESSFUL_RESULT_CODE) {
+            if (!isConnected) {
+                Log.d("gosDEBUG", "Anfragencode: " + requestCode + " Ergebniscode: " + resultCode);
+                Log.d("gosDEBUG", " Ergebnisnachricht: " + data != null ? "" + data : "No data in intent");
+                isConnected = true;
                 getGoogleApiClient().connect();
-    //}
-           // }
+            } else {
+                Toast.makeText(getMainContext(), "Sign in failed", Toast.LENGTH_SHORT).show();
+                onBackPressed();
+
+            }
+        }
+        else {
+            switch (resultCode){
+                case Miscellaneous.ARCHIVE_CREATION_SUCCESSFUL:
+                    break;
+                case Miscellaneous.ARCHIVE_CREATION_FAILED:
+                    break;
+                case Miscellaneous.ARCHIVE_IMPORT_SUCCESSFUL:
+                    break;
+                case Miscellaneous.ARCHIVE_IMPORT_FAILED:
+                    break;
+            }
+        }
     }
 
     public void setMetadataArrayList(ArrayList<Metadata> metadataArrayList) {
@@ -387,9 +349,6 @@ public class GoogleDrive extends Activity implements
                         DriveFile.MODE_READ_ONLY, null).setResultCallback(readExistingFileCallback);
             }
         });
-
-
-
     }
 
     public void startFileExport(DriveId targetDirectoryId){
@@ -410,14 +369,13 @@ public class GoogleDrive extends Activity implements
                                         Miscellaneous.getZipMimeType())
                         ))
                 .build();
-        uploadCallbackHelper.setCurrentCloudDBFolder(Drive.DriveApi.getFolder(getGoogleApiClient(),currentDirectoryId));
+
         Drive.DriveApi.getFolder(getGoogleApiClient(),currentDirectoryId).queryChildren(
                 GoogleDrive
                         .getGoogleApiClient(),
                 query).setResultCallback(
                 fileQueryResultCallback);
-        //startFileExport(currentDirectoryId);
-    }
+        }
     protected void getArchiveList(DriveId parentDirectory){
         final DriveId curParentDirectory = parentDirectory;
         final boolean resultAvailable = false;
@@ -426,38 +384,61 @@ public class GoogleDrive extends Activity implements
                 GoogleDrive.getGoogleApiClient()).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(Status status) {
-                DriveFolder parentDriveFolder = Drive.DriveApi.getFolder(
-                        GoogleDrive.getGoogleApiClient(),
-                        curParentDirectory);
-                Query archiveConstraint = new Query.Builder().addFilter(
+                if(isFileRequestValid(status)>=0){
+                    DriveFolder parentDriveFolder = Drive.DriveApi.getFolder(
+                            GoogleDrive.getGoogleApiClient(),
+                            curParentDirectory);
+                    Query archiveConstraint = new Query.Builder().addFilter(
+                            Filters.eq(SearchableField.TRASHED, false))
+                            .build();
+                    parentDriveFolder.queryChildren(GoogleDrive.getGoogleApiClient(), archiveConstraint)
+                            .setResultCallback(
+                                    new ResultCallback<DriveApi.MetadataBufferResult>() {
+                                        @Override
+                                        public void onResult(DriveApi.MetadataBufferResult metadataBufferResult) {
+                                            try {
+                                                Log.d("gosDEBUG", "Finished loading directories and zip files");
+                                                if (isFileRequestValid(metadataBufferResult.getStatus()) >= 0) {
+                                                    metadataArrayList.clear();
+                                                    if (fileListBuffer != null && !fileListBuffer.isClosed()) {
+                                                        fileListBuffer.release();
+                                                    }
 
-                        Filters.eq(SearchableField.TRASHED, false))
-                        .build();
-                parentDriveFolder.queryChildren(GoogleDrive.getGoogleApiClient(), archiveConstraint)
-                        .setResultCallback(
-                                new ResultCallback<DriveApi.MetadataBufferResult>() {
-                                    @Override
-                                    public void onResult(DriveApi.MetadataBufferResult metadataBufferResult) {
-                                        Log.d("gosDEBUG", "Finished loading directories and zip files");
-                                        if (metadataBufferResult.getStatus().isSuccess()) {
-                                            Log.d("gosDEBUG","Files in this directory: "+metadataBufferResult.getMetadataBuffer().getCount());
-                                            metadataArrayList.clear();
-                                            for (Metadata currentFolder : metadataBufferResult.getMetadataBuffer()) {
-                                                if (currentFolder.isFolder() || (!currentFolder.isFolder()&&currentFolder.getTitle().endsWith(".zip")) ||
-                                                        (!currentFolder.isFolder()&&currentFolder.getMimeType().equals(Miscellaneous.getZipMimeType())))
-                                                    metadataArrayList.add(currentFolder);
+                                                    fileListBuffer = metadataBufferResult.getMetadataBuffer();
+                                                    Log.d("gosDEBUG", "Files in this directory: " + fileListBuffer.getCount());
+
+                                                    for (Metadata currentFolder : metadataBufferResult.getMetadataBuffer()) {
+                                                        if (currentFolder.isFolder() || (!currentFolder.isFolder() && currentFolder.getTitle().endsWith(".zip")) ||
+                                                                (!currentFolder.isFolder() && currentFolder.getMimeType().equals(Miscellaneous.getZipMimeType())))
+                                                            metadataArrayList.add(currentFolder);
+                                                    }
+                                                    Collections.sort(metadataArrayList, new MetadataComparator());
+                                                    if(!currentPath.equals("")){
+                                                    directoryNameHistory.push(currentPath);}
+                                                    currentPath = futurePath;
+                                                    stopLoadingScreen(metadataBufferResult.getStatus().getStatusCode());
+                                                    adapter.notifyDataSetChanged();
+                                                    currentPathTextView.setText(currentPath);
+                                                } else {
+                                                    stopLoadingScreen(metadataBufferResult.getStatus().getStatusCode());
+                                                    Toast.makeText(getMainContext(), "Couldn't get file list", Toast.LENGTH_SHORT).show();
+                                                }
+                                            } finally {
+                                                if (metadataBufferResult.getMetadataBuffer() != null) {
+
+                                                }
                                             }
-                                            Collections.sort(metadataArrayList, new MetadataComparator());
-                                            adapter.notifyDataSetChanged();
-
                                         }
-                                    }
-                                });
+                                    });
+                }
+                else{
+                    stopLoadingScreen(status.getStatusCode());
+                    Toast.makeText(getMainContext(),"Couldn't get file list due to connection problems.",Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+                                                                                          }
 
-
-
+        );
     }
 public void searchForDefaultDirectory(){
     Query query = new Query.Builder().addFilter(
@@ -468,7 +449,8 @@ public void searchForDefaultDirectory(){
             .build();
     Drive.DriveApi.getFolder(getGoogleApiClient(),currentDirectoryId).queryChildren(getGoogleApiClient(),query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
         @Override
-        public void onResult(DriveApi.MetadataBufferResult metadataBufferResult) {
+        public void onResult(final DriveApi.MetadataBufferResult metadataBufferResult) {
+            try{
             if(metadataBufferResult.getStatus().isSuccess()){
                 Log.d("gosDEBUG","Number of default directories: "+metadataBufferResult.getMetadataBuffer().getCount());
                 // Create default directory
@@ -480,12 +462,27 @@ public void searchForDefaultDirectory(){
                     Drive.DriveApi.getFolder(getGoogleApiClient(),currentDirectoryId).createFolder(getGoogleApiClient(),changeSet).setResultCallback(new ResultCallback<DriveFolder.DriveFolderResult>() {
                         @Override
                         public void onResult(DriveFolder.DriveFolderResult driveFolderResult) {
+                            progressDialog = new ProgressDialog(getMainContext());
+                            progressDialog.setCancelable(false);
+                            progressDialog.setMessage("Loading root Directory...");
+                            progressDialog.show();
                             getArchiveList(currentDirectoryId);
+
                         }
                     });
                 }
                 else{
+                    progressDialog = new ProgressDialog(getMainContext());
+                    progressDialog.setCancelable(false);
+                    progressDialog.setMessage("Loading root Directory...");
+                    progressDialog.show();
                     getArchiveList(currentDirectoryId);
+                }
+            }
+        }
+        finally {
+                if (metadataBufferResult.getMetadataBuffer() != null) {
+                    //metadataBufferResult.getMetadataBuffer().release();
                 }
             }
         }
@@ -547,9 +544,8 @@ public void searchForDefaultDirectory(){
                     }
 
                 } finally {
-                    if (fileMetadataBuffer != null
-                            && !fileMetadataBuffer.isClosed()) {
-                        fileMetadataBuffer.close();
+                    if (fileMetadataBuffer != null) {
+
                     }
                 }
             }
@@ -569,7 +565,8 @@ public void searchForDefaultDirectory(){
             }
             final DriveContents cloudDBFolderContents = arg0.getDriveContents();
 
-            new AsyncDriveFileUploadTask('u', GoogleDrive.getPassword()).execute(cloudDBFolderContents);
+
+            new AsyncDriveFileUploadTask('u',key).execute(cloudDBFolderContents);
 
         }
     };
@@ -593,7 +590,7 @@ public void searchForDefaultDirectory(){
 
             final DriveContents existingFileContents = arg0.getDriveContents();
 
-            new AsyncDriveFileUploadTask('o', GoogleDrive.getPassword()).execute(existingFileContents);
+            new AsyncDriveFileUploadTask('o', key).execute(existingFileContents);
 
         }
 
@@ -601,14 +598,12 @@ public void searchForDefaultDirectory(){
     private class AsyncDriveFileUploadTask extends
             AsyncTask<DriveContents, String, Boolean> {
         private File file = null;
-        private String password;
         private char mode = '_';
         private final ProgressDialog progressDialog;
         private boolean cancelRequest = false;
 
         public AsyncDriveFileUploadTask(char mode, String password) {
             this.mode = mode;
-            this.password = password;
             // create Progress Dialog to display the progress of upload
             progressDialog = new ProgressDialog(
                     GoogleDrive.getMainContext());
@@ -638,7 +633,9 @@ public void searchForDefaultDirectory(){
                                     null);
                         }
                     });
+
             progressDialog.show();
+
 
         }
 
@@ -663,7 +660,7 @@ public void searchForDefaultDirectory(){
 
             file = new File(getApplicationContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudArchiveName()+".zip");
 
-            if(password.equals("")){
+            if(key.equals("")){
                 if(file.exists()){
                     file.delete();
                 }
@@ -675,7 +672,7 @@ public void searchForDefaultDirectory(){
                     file.delete();
                 }
 
-                Archiver.createEncryptedArchiveFile(password,file);
+                Archiver.createEncryptedArchiveFile(key,file);
             }
             try {
 
@@ -711,18 +708,21 @@ public void searchForDefaultDirectory(){
                                     fileOutputStream.flush();
                                     fileOutputStream.close();
                                     driveFileContents.discard(GoogleDrive.getGoogleApiClient());
-                                    progressDialog.dismiss();
+                                    if(progressDialog.isShowing()){
+                                        progressDialog.dismiss();}
                                     publishProgress("Upload cancelled");
                                     break;
                                 } catch (IOException e) {
-                                    progressDialog.dismiss();
+                                    if(progressDialog.isShowing()){
+                                        progressDialog.dismiss();}
                                     publishProgress("Upload cancelled");
                                 }
                             }
                         }
                     }
                 } catch (IOException e) {
-                    progressDialog.dismiss();
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();}
                     publishProgress("Upload cancelled");
 
                 } finally {
@@ -730,15 +730,18 @@ public void searchForDefaultDirectory(){
                         fileInputStream.close();
                         fileOutputStream.flush();
                         fileOutputStream.close();
-                        progressDialog.dismiss();
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();}
                     } catch (IOException e) {
-                        progressDialog.dismiss();
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();}
                         publishProgress("Upload cancelled");
 
                     }
                 }
                 if (!cancelRequest) {
-                    progressDialog.dismiss();
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();}
 
 
                     MetadataChangeSet fileUploadChangeSet = new MetadataChangeSet.Builder()
@@ -769,7 +772,8 @@ public void searchForDefaultDirectory(){
                     }
                 }
             } catch (IOException e) {
-                progressDialog.dismiss();
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();}
                 publishProgress("Upload cancelled");
 
                 e.printStackTrace();
@@ -785,10 +789,8 @@ public void searchForDefaultDirectory(){
         private final ProgressDialog progressDialog;
         private boolean cancelRequest = false;
         File downloadDestination = null;
-        String password="";
-
-        public AsyncDriveFileDownloadTask(String password) {
-            this.password = password;
+        private boolean finished = false;
+        public AsyncDriveFileDownloadTask() {
             // create Progress Dialog to display the progress of upload
             progressDialog = new ProgressDialog(GoogleDrive.getMainContext());
             progressDialog.setMax(100);
@@ -846,11 +848,10 @@ public void searchForDefaultDirectory(){
                                 currentBytes+=streamStatus;
                                 progressDialog.setProgress((int) ((currentBytes / totalBytes) * 100));
 
-                                Log.i("gosDEBUG", "Writing Byte 340");
-                            } else if (streamStatus != -1 && cancelRequest) {
+                                } else if (streamStatus != -1 && cancelRequest) {
                                 contentInputStream.close();
                                 fileOutputStream.close();
-                                progressDialog.dismiss();
+
                                 break;
                             }
                         }
@@ -865,11 +866,11 @@ public void searchForDefaultDirectory(){
                             fileOutputStream.close();
                             publishProgress("Successfully downloaded file");
 
-                            progressDialog.dismiss();
+
                             return true;
 
                         } catch (IOException e) {
-                            progressDialog.dismiss();
+
                             publishProgress("Download failed...");
                             e.printStackTrace();
 
@@ -880,7 +881,7 @@ public void searchForDefaultDirectory(){
 
             }
             catch (Exception e) {
-                progressDialog.dismiss();
+
                 publishProgress("Couldn't access the file...");
                 e.printStackTrace();
             }
@@ -896,14 +897,89 @@ public void searchForDefaultDirectory(){
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
+            if(progressDialog.isShowing()){
+                progressDialog.dismiss();}
             if(result){
-                Log.d("gosDEBUG","Download successful");
-                if(password.equals("")){
-                    APIFunctions.unpackArchiveFile(downloadDestination);
-                }
-                else{
-                    // TODO handle encryption
-                    //APIFunctions.unpackEncryptedFile(password,downloadDestination);
+                if (!Archiver.notEncryptedGOSFile(downloadDestination)) {
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(GoogleDrive.this);
+                    alert.setTitle("Please enter password:");
+                    final EditText input = new EditText(GoogleDrive.this);
+                    alert.setView(input);
+
+                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String key = input.getText().toString();
+                            int value =Archiver.unpackEncryptedFile(key, downloadDestination);
+                            switch (value) {
+                                case Constants.UNPACK_NO_ERROR:
+                                    Toast.makeText(context,
+                                            "File import finished",
+                                            Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    break;
+                                case Constants.UNPACK_INVALID_FILE:
+                                    Toast.makeText(context,
+                                            "Invalid File",
+                                            Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    break;
+                                case Constants.UNPACK_EXTRACTING_FAILED:
+                                    Toast.makeText(context,
+                                            "Extracting failed",
+                                            Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    break;
+                                case Constants.UNPACK_WRONG_KEY:
+                                    Toast.makeText(context,
+                                            "Wrong Password",
+                                            Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    break;
+
+                            }
+                        }
+                    });
+
+                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            finished = false;
+                            downloadDestination.delete();
+                            finish();
+                        }
+                    });
+                    alert.setCancelable(false);
+                    alert.show();
+                } else {
+                    int value = APIFunctions.unpackArchiveFile(downloadDestination);
+
+                    switch (value) {
+                        case Constants.UNPACK_NO_ERROR:
+                            Toast.makeText(context,
+                                    "File import finished",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+                        case Constants.UNPACK_INVALID_FILE:
+                            Toast.makeText(context,
+                                    "Invalid File",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+                        case Constants.UNPACK_EXTRACTING_FAILED:
+                            Toast.makeText(context,
+                                    "Extracting failed",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+                        case Constants.UNPACK_WRONG_KEY:
+                            Toast.makeText(context,
+                                    "Wrong Password",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+
+                    }
                 }
             }
             else{
@@ -966,18 +1042,21 @@ public void searchForDefaultDirectory(){
 
         @Override
         public void onResult(Status arg0) {
-            if (!arg0.getStatus().isSuccess()) {
+            if(isFileRequestValid(arg0)<0){
                 Toast.makeText(
-                        GoogleDrive.getMainContext(),
-                        "Synchronisation failed, \nsigning in again is necessary",
-                        Toast.LENGTH_SHORT).show();
-
-            }
+                    GoogleDrive.getMainContext(),
+                    "Synchronisation failed, \nsigning in again is necessary",
+                    Toast.LENGTH_SHORT).show();}
+            else{
             Toast.makeText(GoogleDrive.getMainContext(),
                     "Finished synchronising the upload",
                     Toast.LENGTH_SHORT).show();
+                progressDialog = new ProgressDialog(getMainContext());
+                progressDialog.setCancelable(false);
+                progressDialog.setMessage("Loading directories of "+currentPath+"...");
+                progressDialog.show();
             getArchiveList(currentDirectoryId);
-
+            }
         }
     };
     /**
@@ -995,9 +1074,33 @@ public void searchForDefaultDirectory(){
             }
             final DriveContents existingFileContents = arg0.getDriveContents();
             Log.i("gosDEBUG", "Content available: " + (existingFileContents != null));
-            new AsyncDriveFileDownloadTask(GoogleDrive.getPassword()).execute(existingFileContents);
+            new AsyncDriveFileDownloadTask().execute(existingFileContents);
 
         }
 
     };
+
+    /**
+     *
+     * @param result The status obtained when logging in to Google Drive
+     * @return Indicates if the logging process was successful, even if a delay between deletions may occur due to limited sync rates for developers
+     */
+    public int isFileRequestValid(Status result){
+        if (result.isSuccess()) {
+            return 1;
+        } else {
+            // Too many requests, this can't be avoided or duplicate files will be uploaded
+            if(result.getStatusCode() == Miscellaneous.REQUEST_LIMIT_REACHED_1||result.getStatusCode()== Miscellaneous.REQUEST_LIMIT_REACHED_2||
+                    result.getStatusMessage().equals("Sync request rate limit exceeded.")){
+                return 0;
+            }
+            else{
+            return -1;
+            }
+        }
+    }
+private void stopLoadingScreen(int resultCode){
+    if(progressDialog!=null){
+    progressDialog.dismiss();}
+   }
 }
