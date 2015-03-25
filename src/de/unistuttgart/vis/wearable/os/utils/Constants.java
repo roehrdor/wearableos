@@ -22,7 +22,7 @@ public class Constants {
     public static final String CRYPTO_TRANSFORM = "AES";
 
     public static final int ZIP_FIRST_BYTE = 0x504B0304;
-    public static final int GOS_FILE_START_BYTE = 0x504B0304;
+    public static final int GOS_FILE_START_BYTE = 0x474F5346;
     public static final int UNPACK_NO_ERROR = 0x0;
     public static final int UNPACK_INVALID_FILE = 0x1;
     public static final int UNPACK_EXTRACTING_FAILED = 0x2;
