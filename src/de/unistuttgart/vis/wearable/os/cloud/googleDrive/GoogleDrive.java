@@ -81,7 +81,7 @@ public class GoogleDrive extends Activity implements
 
     @Override
     public void onBackPressed() {
-
+        if(internetAvailable()){
         if(currentDirectoryId==null||currentDirectoryId.equals(Drive.DriveApi.getRootFolder(getGoogleApiClient()).getDriveId())
                 ||directoryHistory.size()==0||directoryNameHistory.size()==0){
             if(fileListBuffer!=null&&!fileListBuffer.isClosed()){
@@ -93,9 +93,12 @@ public class GoogleDrive extends Activity implements
             futurePath = directoryNameHistory.pop();
             progressDialog = new ProgressDialog(getMainContext());
             progressDialog.setCancelable(false);
-            progressDialog.setMessage("Loading parent Directory...");
+            progressDialog.setMessage("Loading parent directory...");
             progressDialog.show();
             getArchiveList(currentDirectoryId);
+        }}
+        else{
+            Toast.makeText(getMainContext(),"Please enable WiFi or mobile data",Toast.LENGTH_SHORT).show();
         }
     }
 

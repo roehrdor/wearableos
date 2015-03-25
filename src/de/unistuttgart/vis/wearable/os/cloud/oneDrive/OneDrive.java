@@ -34,7 +34,7 @@ public class OneDrive extends Activity {
     private LiveAuthClient auth = null;
     public static LiveConnectClient client = null;
     private static Context context = null;
-    private static String password = "";
+    private static String key = "";
     private boolean isExport = true;
     private ListView oneDriveFolderListView = null;
     private ArrayList<JSONObject> childrenList = null;
@@ -43,39 +43,51 @@ public class OneDrive extends Activity {
     private OneDriveAdapter adapter = null;
     private ArrayList<String> directoryList = null;
     private TextView currentDirectoryTextView = null;
+    private ProgressDialog progressDialog = null;
+    private String futurePath = "";
 
 
     @Override
     public void onBackPressed() {
         // TODO update path textView in the thread where the new json objects are received
         // Case when activity is started and no directory was selected
+        if(internetAvailable()){
         if(parentDirectory == null||(parentDirectory.optString(Miscellaneous.PARENT_ID).equals(parentDirectory.optString(Miscellaneous.ID)))||parentDirectory.isNull(Miscellaneous.PARENT_ID)){
             super.onBackPressed();
         }
         // Case where elements of ListView where selected
         else {
+            progressDialog = new ProgressDialog(getMainContext());
+            progressDialog.setCancelable(false);
+            progressDialog.setMessage("Loading parent directory...");
             if(directoryList.size()>0){
                 directoryList.remove(directoryList.size()-1);
                 if(directoryList.size()==0){
-                    currentDirectoryTextView.setText("/");
+
+                    futurePath = "/";
+                    //currentDirectoryTextView.setText("/");
                 }
                 else{
                     String pathString ="";
                     for(String currentDirectory:directoryList){
                         pathString+="/"+currentDirectory;
                     }
-                    currentDirectoryTextView.setText(pathString);
+                    futurePath = pathString;
+                    //currentDirectoryTextView.setText(pathString);
                 }
             }
             // Case where the root is displayed and previously an item was clicked and then the back-button was pressed
             else{
-                currentDirectoryTextView.setText("/");
+                futurePath = "/";
+                //currentDirectoryTextView.setText("/");
             }
+            progressDialog.show();
             getConnectClient().getAsync(parentDirectory.optString(Miscellaneous.PARENT_ID), new LiveOperationListener() {
                 JSONObject grandParentJsonObject = null;
                 JSONArray singleElementArray = null;
                 @Override
                 public void onComplete(LiveOperation operation) {
+
                         grandParentJsonObject = operation.getResult();
                         parentDirectory = grandParentJsonObject;
                         getArchiveList(parentDirectory);
@@ -84,16 +96,21 @@ public class OneDrive extends Activity {
 
                 @Override
                 public void onError(LiveOperationException exception, LiveOperation operation) {
-
+                    progressDialog.dismiss();
+                    Toast.makeText(getMainContext(),"Couldn't load parent directory list due to connectivity issues",Toast.LENGTH_SHORT).show();
                 }
             });
 
         }
     }
+    else{
+        Toast.makeText(getMainContext(),"Please enable WiFi or mobile data",Toast.LENGTH_SHORT).show();}
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(internetAvailable()){
         context = OneDrive.this;
         directoryList = new ArrayList<String>();
         this.auth = new LiveAuthClient(this, Miscellaneous.CLIENT_ID);
@@ -104,10 +121,10 @@ public class OneDrive extends Activity {
 
             isExport = false;
         }
-        password=getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
+        key =getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
         jsonComparator = new JSONComparator();
         childrenList = new ArrayList<JSONObject>();
-        if(internetAvailable()){
+
             adapter = new OneDriveAdapter(getMainContext(), childrenList);
             oneDriveFolderListView.setAdapter(adapter);
             oneDriveFolderListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -119,6 +136,10 @@ public class OneDrive extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                    JSONObject curJSONObject = (JSONObject) oneDriveFolderListView.getItemAtPosition(position);
+                    progressDialog = new ProgressDialog(getMainContext());
+                    progressDialog.setMessage("Loading directory list of "+curJSONObject.optString(Miscellaneous.NAME)+"...");
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
                     if (isExport) {
 
                         if (curJSONObject.optString(Miscellaneous.TYPE).equals("folder")) {
@@ -126,7 +147,8 @@ public class OneDrive extends Activity {
                             String pathString ="";
                             for(String currentDirectory:directoryList){
                                     pathString +="/"+currentDirectory;}
-                            currentDirectoryTextView.setText(pathString);
+                            futurePath = pathString;
+                            //currentDirectoryTextView.setText(pathString);
                             parentDirectory = curJSONObject;
                             getArchiveList(parentDirectory);
                         }
@@ -136,7 +158,8 @@ public class OneDrive extends Activity {
                             String pathString ="";
                             for(String currentDirectory:directoryList){
                                 pathString +="/"+currentDirectory;}
-                            currentDirectoryTextView.setText(pathString);
+                            futurePath = pathString;
+                            //currentDirectoryTextView.setText(pathString);
                             parentDirectory = curJSONObject;
                             getArchiveList(parentDirectory);
                         } else {
@@ -161,6 +184,9 @@ public class OneDrive extends Activity {
                     if(parentDirectory == null){
                         currentDirectoryTextView.setText("/");
                     }
+                    else{
+                        currentDirectoryTextView.setText(futurePath);
+                    }
                     childrenList.clear();
                     JSONObject currentJsonObject = null;
                     JSONArray fileListArray = fileListArray = operation.getResult().optJSONArray(Miscellaneous.DATA);
@@ -182,17 +208,19 @@ public class OneDrive extends Activity {
 
                     Collections.sort(childrenList,jsonComparator);
                     adapter.notifyDataSetChanged();
+                    progressDialog.dismiss();
                 }
 
                 @Override
                 public void onError(LiveOperationException exception, LiveOperation operation) {
-
+                    progressDialog.dismiss();
+                    Toast.makeText(getMainContext(),"Couldn't load parent directory list due to connectivity issues",Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
     private void startFileImport(JSONObject curJSONObject) {
-        new OneDriveAsyncDownloadTask(getPassword()).execute(curJSONObject);
+        new OneDriveAsyncDownloadTask(getKey()).execute(curJSONObject);
 
     }
 
@@ -220,6 +248,10 @@ public class OneDrive extends Activity {
                                     Toast.makeText(getApplicationContext(),
                                             "Signed in to One Drive", Toast.LENGTH_SHORT).show();
                                     client = new LiveConnectClient(session);
+                                    progressDialog = new ProgressDialog(getMainContext());
+                                    progressDialog.setMessage("Loading root directory...");
+                                    progressDialog.setCancelable(false);
+                                    progressDialog.show();
                                     getArchiveList(parentDirectory);
 
                                 } else {
@@ -292,7 +324,7 @@ public class OneDrive extends Activity {
                 if (getConnectClient() != null
                         && !getConnectClient().getSession().isExpired()) {
 
-                    new OneDriveAsyncUploadTask(getPassword()).execute(parentDirectory);
+                    new OneDriveAsyncUploadTask(getKey()).execute(parentDirectory);
 
             } else {
                 Toast.makeText(
@@ -311,8 +343,8 @@ public class OneDrive extends Activity {
             }
     }
 
-    public static String getPassword(){
-        return password;
+    public static String getKey(){
+        return key;
     }
     private class OneDriveAsyncDownloadTask extends AsyncTask<JSONObject, String, Long> {
         private String password = "";
@@ -416,7 +448,7 @@ public class OneDrive extends Activity {
                             }
                             else{
                                 // TODO recognize if zip is encrypted by using mime-type
-                                //APIFunctions.unpackEncryptedFile(password, downloadDestination);
+                                //APIFunctions.unpackEncryptedFile(key, downloadDestination);
                             }
                             downloadDestination.delete();
                             progressDialog.dismiss();
