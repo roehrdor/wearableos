@@ -307,8 +307,8 @@ public class GoogleDrive extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if ((requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_1 || requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_2) && resultCode == Miscellaneous.SIGN_IN__SUCCESSFUL_RESULT_CODE) {
+        Log.d("gosDEBUG","Anfragecode: "+requestCode+" Ergebniscode: "+resultCode);
+        if ((requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_1 || requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_2) && (resultCode == Miscellaneous.SIGN_IN__SUCCESSFUL_RESULT_CODE_1||resultCode == Miscellaneous.SIGN_IN__SUCCESSFUL_RESULT_CODE_2)) {
             if (!isConnected) {
                 Log.d("gosDEBUG", "Anfragencode: " + requestCode + " Ergebniscode: " + resultCode);
                 Log.d("gosDEBUG", " Ergebnisnachricht: " + data != null ? "" + data : "No data in intent");
@@ -322,14 +322,10 @@ public class GoogleDrive extends Activity implements
         }
         else {
             switch (resultCode){
-                case Miscellaneous.ARCHIVE_CREATION_SUCCESSFUL:
-                    break;
-                case Miscellaneous.ARCHIVE_CREATION_FAILED:
-                    break;
-                case Miscellaneous.ARCHIVE_IMPORT_SUCCESSFUL:
-                    break;
-                case Miscellaneous.ARCHIVE_IMPORT_FAILED:
-                    break;
+                case Miscellaneous.SIGN_IN__CANCELLED_RESULT_CODE_1:{
+                    Toast.makeText(getMainContext(),isExport?"Export cancelled":"Import cancelled",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
         }
     }
@@ -342,7 +338,7 @@ public class GoogleDrive extends Activity implements
 
     }
     public void startFileImport(DriveId zipFileId){
-        Log.d("gosDEBUG","starting import");
+
         final DriveFile cloudArchiveFile = Drive.DriveApi.getFile(getGoogleApiClient(), zipFileId);
         cloudArchiveFile.getMetadata(getGoogleApiClient()).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
             @Override
@@ -400,7 +396,7 @@ public class GoogleDrive extends Activity implements
                                         @Override
                                         public void onResult(DriveApi.MetadataBufferResult metadataBufferResult) {
                                             try {
-                                                Log.d("gosDEBUG", "Finished loading directories and zip files");
+
                                                 if (isFileRequestValid(metadataBufferResult.getStatus()) >= 0) {
                                                     metadataArrayList.clear();
                                                     if (fileListBuffer != null && !fileListBuffer.isClosed()) {
@@ -408,7 +404,7 @@ public class GoogleDrive extends Activity implements
                                                     }
 
                                                     fileListBuffer = metadataBufferResult.getMetadataBuffer();
-                                                    Log.d("gosDEBUG", "Files in this directory: " + fileListBuffer.getCount());
+
 
                                                     for (Metadata currentFolder : metadataBufferResult.getMetadataBuffer()) {
                                                         if (currentFolder.isFolder() || (!currentFolder.isFolder() && currentFolder.getTitle().endsWith(".zip")) ||
@@ -455,7 +451,7 @@ public void searchForDefaultDirectory(){
         public void onResult(final DriveApi.MetadataBufferResult metadataBufferResult) {
             try{
             if(metadataBufferResult.getStatus().isSuccess()){
-                Log.d("gosDEBUG","Number of default directories: "+metadataBufferResult.getMetadataBuffer().getCount());
+
                 // Create default directory
                 if(metadataBufferResult.getMetadataBuffer().getCount()==0){
 
@@ -517,9 +513,7 @@ public void searchForDefaultDirectory(){
 
                 try {
                     fileMetadataBuffer = arg0.getMetadataBuffer();
-                    Log.i("Test-App",
-                            "Number of files fulfilling constraints: "
-                                    + fileMetadataBuffer.getCount());
+
                     if (fileMetadataBuffer.getCount() > 0) {
                         cloudFileMetaData = Miscellaneous
                                 .getLatestMetadata(fileMetadataBuffer);
@@ -1072,11 +1066,11 @@ public void searchForDefaultDirectory(){
         public void onResult(DriveApi.DriveContentsResult arg0) {
 
             if (!arg0.getStatus().isSuccess()) {
-                Log.i("gosDEBUG", "Couldn't get contents");
+
                 return;
             }
             final DriveContents existingFileContents = arg0.getDriveContents();
-            Log.i("gosDEBUG", "Content available: " + (existingFileContents != null));
+
             new AsyncDriveFileDownloadTask().execute(existingFileContents);
 
         }
