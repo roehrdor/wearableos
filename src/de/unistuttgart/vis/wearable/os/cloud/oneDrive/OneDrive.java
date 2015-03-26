@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import com.microsoft.live.*;
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +51,6 @@ public class OneDrive extends Activity {
 
     @Override
     public void onBackPressed() {
-        // TODO update path textView in the thread where the new json objects are received
         // Case when activity is started and no directory was selected
         if(internetAvailable()){
         if(parentDirectory == null||(parentDirectory.optString(Miscellaneous.PARENT_ID).equals(parentDirectory.optString(Miscellaneous.ID)))||parentDirectory.isNull(Miscellaneous.PARENT_ID)){
@@ -65,7 +66,7 @@ public class OneDrive extends Activity {
                 if(directoryList.size()==0){
 
                     futurePath = "/";
-                    //currentDirectoryTextView.setText("/");
+
                 }
                 else{
                     String pathString ="";
@@ -73,18 +74,17 @@ public class OneDrive extends Activity {
                         pathString+="/"+currentDirectory;
                     }
                     futurePath = pathString;
-                    //currentDirectoryTextView.setText(pathString);
+
                 }
             }
             // Case where the root is displayed and previously an item was clicked and then the back-button was pressed
             else{
                 futurePath = "/";
-                //currentDirectoryTextView.setText("/");
+
             }
             progressDialog.show();
             getConnectClient().getAsync(parentDirectory.optString(Miscellaneous.PARENT_ID), new LiveOperationListener() {
                 JSONObject grandParentJsonObject = null;
-                JSONArray singleElementArray = null;
                 @Override
                 public void onComplete(LiveOperation operation) {
 
@@ -148,7 +148,7 @@ public class OneDrive extends Activity {
                             for(String currentDirectory:directoryList){
                                     pathString +="/"+currentDirectory;}
                             futurePath = pathString;
-                            //currentDirectoryTextView.setText(pathString);
+
                             parentDirectory = curJSONObject;
                             getArchiveList(parentDirectory);
                         }
@@ -159,7 +159,7 @@ public class OneDrive extends Activity {
                             for(String currentDirectory:directoryList){
                                 pathString +="/"+currentDirectory;}
                             futurePath = pathString;
-                            //currentDirectoryTextView.setText(pathString);
+
                             parentDirectory = curJSONObject;
                             getArchiveList(parentDirectory);
                         } else {
@@ -176,20 +176,32 @@ public class OneDrive extends Activity {
         }
     }
 
-    private void getArchiveList(final JSONObject parentDirectory) {
-            getConnectClient().getAsync(parentDirectory==null?"me/skydrive/files":
-                    parentDirectory.optString(Miscellaneous.ID)+"/files", new LiveOperationListener() {
+    private void getArchiveList(final JSONObject currentParentDirectory) {
+            getConnectClient().getAsync(currentParentDirectory==null?"me/skydrive/files":
+                    currentParentDirectory.optString(Miscellaneous.ID)+"/files", new LiveOperationListener() {
                 @Override
                 public void onComplete(LiveOperation operation) {
-                    if(parentDirectory == null){
+                    if(currentParentDirectory == null){
+                        getConnectClient().getAsync("me/skydrive", new LiveOperationListener() {
+                            @Override
+                            public void onComplete(LiveOperation operation) {
+                                parentDirectory = operation.getResult();
+
+                            }
+
+                            @Override
+                            public void onError(LiveOperationException exception, LiveOperation operation) {
+
+                            }
+                        });
                         currentDirectoryTextView.setText("/");
                     }
                     else{
                         currentDirectoryTextView.setText(futurePath);
                     }
                     childrenList.clear();
-                    JSONObject currentJsonObject = null;
-                    JSONArray fileListArray = fileListArray = operation.getResult().optJSONArray(Miscellaneous.DATA);
+                    JSONObject currentJsonObject;
+                    JSONArray fileListArray = operation.getResult().optJSONArray(Miscellaneous.DATA);
                     for (int i = 0; i < fileListArray.length(); i++) {
                         try {
                             currentJsonObject = fileListArray.getJSONObject(i);
@@ -208,8 +220,9 @@ public class OneDrive extends Activity {
 
                     Collections.sort(childrenList,jsonComparator);
                     adapter.notifyDataSetChanged();
-                    progressDialog.dismiss();
-                }
+                    if(progressDialog!=null){
+                        progressDialog.dismiss();}
+                    }
 
                 @Override
                 public void onError(LiveOperationException exception, LiveOperation operation) {
@@ -220,7 +233,7 @@ public class OneDrive extends Activity {
         }
 
     private void startFileImport(JSONObject curJSONObject) {
-        new OneDriveAsyncDownloadTask(getKey()).execute(curJSONObject);
+        new OneDriveAsyncDownloadTask().execute(curJSONObject);
 
     }
 
@@ -276,14 +289,14 @@ public class OneDrive extends Activity {
             }
     }
 
-    @Override
-    protected void onStop() {
-        // suboptimal solution to handle standby
-        if (client != null) {
-            client = null;
-        }
-        super.onStop();
-    }
+//    @Override
+//    protected void onStop() {
+//        // suboptimal solution to handle standby
+//        if (client != null) {
+//            client = null;
+//        }
+//        super.onStop();
+//    }
 
     @Override
     protected void onResume() {
@@ -347,14 +360,14 @@ public class OneDrive extends Activity {
         return key;
     }
     private class OneDriveAsyncDownloadTask extends AsyncTask<JSONObject, String, Long> {
-        private String password = "";
+
         private final ProgressDialog progressDialog;
         private boolean cancelRequest = false;
         private JSONObject downloadJsonObject = null;
         File downloadDestination = null;
 
-        public OneDriveAsyncDownloadTask(String password) {
-            this.password = password;
+        public OneDriveAsyncDownloadTask() {
+
             // create Progress Dialog to display the progress of upload
             progressDialog = new ProgressDialog(getMainContext());
             progressDialog.setMax(100);
@@ -442,13 +455,86 @@ public class OneDrive extends Activity {
                         @Override
                         public void onDownloadCompleted(LiveDownloadOperation operation) {
                             publishProgress("Successfully downloaded archive");
-                            if(password.equals("")){
+                            if (!Archiver.notEncryptedGOSFile(downloadDestination)) {
 
-                               APIFunctions.unpackArchiveFile(downloadDestination);
-                            }
-                            else{
-                                // TODO recognize if zip is encrypted by using mime-type
-                                //APIFunctions.unpackEncryptedFile(key, downloadDestination);
+                                AlertDialog.Builder alert = new AlertDialog.Builder(OneDrive.this);
+                                alert.setTitle("Please enter password:");
+                                final EditText input = new EditText(OneDrive.this);
+                                alert.setView(input);
+
+                                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        String key = input.getText().toString();
+                                        int value =Archiver.unpackEncryptedFile(key, downloadDestination);
+                                        switch (value) {
+                                            case Constants.UNPACK_NO_ERROR:
+                                                Toast.makeText(context,
+                                                        "File import finished",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+                                            case Constants.UNPACK_INVALID_FILE:
+                                                Toast.makeText(context,
+                                                        "Invalid File",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+                                            case Constants.UNPACK_EXTRACTING_FAILED:
+                                                Toast.makeText(context,
+                                                        "Extracting failed",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+                                            case Constants.UNPACK_WRONG_KEY:
+                                                Toast.makeText(context,
+                                                        "Wrong Password",
+                                                        Toast.LENGTH_SHORT).show();
+                                                finish();
+                                                break;
+
+                                        }
+                                    }
+                                });
+
+                                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                                        downloadDestination.delete();
+                                        finish();
+                                    }
+                                });
+                                alert.setCancelable(false);
+                                alert.show();
+                            } else {
+                                int value = APIFunctions.unpackArchiveFile(downloadDestination);
+
+                                switch (value) {
+                                    case Constants.UNPACK_NO_ERROR:
+                                        Toast.makeText(context,
+                                                "File import finished",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+                                    case Constants.UNPACK_INVALID_FILE:
+                                        Toast.makeText(context,
+                                                "Invalid File",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+                                    case Constants.UNPACK_EXTRACTING_FAILED:
+                                        Toast.makeText(context,
+                                                "Extracting failed",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+                                    case Constants.UNPACK_WRONG_KEY:
+                                        Toast.makeText(context,
+                                                "Wrong Password",
+                                                Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        break;
+
+                                }
                             }
                             downloadDestination.delete();
                             progressDialog.dismiss();
