@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.app.SensorDetailActivity;
 import android.R;
 import android.content.Context;

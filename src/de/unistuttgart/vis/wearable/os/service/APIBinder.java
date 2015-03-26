@@ -8,7 +8,7 @@
 package de.unistuttgart.vis.wearable.os.service;
 
 import android.os.RemoteException;
-import de.unistuttgart.vis.wearable.os.activity.Activity;
+import de.unistuttgart.vis.wearable.os.activityRecognition.Activity;
 import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionModule;
 import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.driver.DriverManager;

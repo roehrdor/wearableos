@@ -1,11 +1,21 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.app;
 
 import de.unistuttgart.vis.wearable.os.R;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +25,6 @@ import android.widget.TextView;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 
 /**
- * TODO add info text
  * @author Tobias
  *
  */
@@ -31,49 +40,95 @@ public class HARActivity extends Activity {
 		setContentView(R.layout.activity_har);
 
 		harStatusTxt = (TextView) findViewById(R.id.har_textView_status);
-	    
+		harStatusTxt.setMovementMethod(new ScrollingMovementMethod());
+
 		trainBtn = (Button) findViewById(R.id.button_har_train);
-		// TODO no hard coded string
-		if (APIFunctions.isTraining()) {
-			trainBtn.setText("Stop training");
-		} else {
-			trainBtn.setText("Start training");
+		try {
+			if (APIFunctions.isTraining()) {
+				trainBtn.setText(R.string.har_button_stop);
+			} else {
+				trainBtn.setText(R.string.btn_start_trainingHAR);
+			}
+		} catch (RuntimeException e) {
+			Log.e("har",
+					"RuntimeException in onCreate: " + e.getLocalizedMessage());
 		}
 
-		switch (APIFunctions.getNeuralNetworkStatus()) {
-		case NOTINITIALIZED:
-			harStatusTxt.setText(R.string.notinitialized);
-			trainBtn.setVisibility(View.GONE);;
-			break;
-		case INITIALIZED:
-			harStatusTxt.setText(R.string.initialized);
-			trainBtn.setVisibility(View.VISIBLE);
-			break;
-		case TRAINED:
-			harStatusTxt.setText(R.string.initialized);
-			trainBtn.setVisibility(View.VISIBLE);
-			break;
+		try {
+			switch (APIFunctions.getNeuralNetworkStatus()) {
+			case NOTINITIALIZED:
+				trainBtn.setVisibility(View.GONE);
+				harStatusTxt.setText(R.string.notinitialized);
+				break;
+			case INITIALIZED:
+				trainBtn.setVisibility(View.VISIBLE);
+				harStatusTxt.setText(R.string.initialized);
+				break;
+			case TRAINED:
+				trainBtn.setVisibility(View.VISIBLE);
+				harStatusTxt.setText(R.string.initialized);
+				break;
+			case IDLING:
+				trainBtn.setVisibility(View.VISIBLE);
+				harStatusTxt.setText(R.string.initialized);
+			default:
+				break;
+			}
+		} catch (RuntimeException e) {
+			Log.e("har",
+					"RuntimeException in onCreate: " + e.getLocalizedMessage());
 		}
 
 		trainBtn.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				if (APIFunctions.isTraining()) {
-                    APIFunctions.stopTraining();
+				if (APIFunctions.getSupportedActivities().size() < 1) {
+					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+							context);
+					alertDialogBuilder
+							.setTitle("Error")
+							.setMessage("No Activities selected")
+							.setPositiveButton("Ok",
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.cancel();
+										}
+
+									}).show();
 				} else {
-					Intent intent = new Intent(context,
-							HARActivityTraining.class);
-					startActivity(intent);
+					try {
+						if (APIFunctions.isTraining()) {
+							APIFunctions.stopTraining();
+							rectrate();
+						} else {
+							Intent intent = new Intent(context,
+									HARActivityTraining.class);
+							startActivity(intent);
+						}
+					} catch (RuntimeException e) {
+						Log.e("har",
+								"RuntimeException in onCreate: "
+										+ e.getLocalizedMessage());
+					}
 				}
+
 			}
 
 		});
 	}
-	
 
+	protected void rectrate() {
+		this.recreate();
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onStart()
 	 */
 	@Override
@@ -82,9 +137,9 @@ public class HARActivity extends Activity {
 		this.onCreate(null);
 	}
 
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
@@ -93,15 +148,14 @@ public class HARActivity extends Activity {
 		this.onCreate(null);
 	}
 
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, Menu.NONE, Menu.NONE,
-				R.string.action_settings);
+		menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.action_settings);
 		return true;
 	}
 

@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.app;
 
 import java.text.DateFormat;
@@ -316,27 +323,35 @@ public class HARActivityTraining extends Activity {
 		});
 
 		// activity
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(HARActivityTraining.this,
-				android.R.layout.simple_spinner_item,
-				APIFunctions.getSupportedActivities());
-		activitySpinner = (Spinner) findViewById(R.id.har_train_activity_spinner);
-		activitySpinner.setAdapter(adapter);
-		activitySpinner
-				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		ArrayAdapter<String> adapter;
+		try {
+			adapter = new ArrayAdapter<String>(HARActivityTraining.this,
+					android.R.layout.simple_spinner_item,
+					APIFunctions.getSupportedActivities());
+			activitySpinner = (Spinner) findViewById(R.id.har_train_activity_spinner);
+			activitySpinner.setAdapter(adapter);
+			activitySpinner
+					.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-					@Override
-					public void onItemSelected(AdapterView<?> parent,
-							View view, int position, long id) {
-						activitySpinner.setSelection(position);
-						activity = activitySpinner.getSelectedItem().toString();
-					}
+						@Override
+						public void onItemSelected(AdapterView<?> parent,
+								View view, int position, long id) {
+							activitySpinner.setSelection(position);
+							activity = activitySpinner.getSelectedItem()
+									.toString();
+						}
 
-					@Override
-					public void onNothingSelected(AdapterView<?> parent) {
-						// TODO Auto-generated method stub
+						@Override
+						public void onNothingSelected(AdapterView<?> parent) {
+							// TODO Auto-generated method stub
 
-					}
-				});
+						}
+					});
+		} catch (RuntimeException e) {
+			Log.e("har",
+					"RuntimeException in onCreate: " + e.getLocalizedMessage());
+		}
+		
 
 		// window length
 		millisecondsETx = (EditText) findViewById(R.id.har_train_editText1);
@@ -368,6 +383,7 @@ public class HARActivityTraining extends Activity {
 												dialog.cancel();
 											}
 										}).show();
+						millisecondsETx.setText("");
 					}
 					return true;
 				}
@@ -467,7 +483,11 @@ public class HARActivityTraining extends Activity {
 
 							@Override
 							protected Void doInBackground(Void... params) {
-								APIFunctions.train(activity, windowLength);
+								try {
+									APIFunctions.train(activity, windowLength);
+								} catch (RuntimeException e) {
+									Log.e("har", "RuntimeException in onCreate: " + e.getLocalizedMessage());
+								}
 								return null;
 							}
 						}.execute();
@@ -478,8 +498,12 @@ public class HARActivityTraining extends Activity {
 
 							@Override
 							protected Void doInBackground(Void... params) {
-								APIFunctions.train(activity, windowLength,
-										startDate.getTime(), endDate.getTime());
+								try {
+									APIFunctions.train(activity, windowLength,
+											startDate.getTime(), endDate.getTime());
+								} catch (RuntimeException e) {
+									Log.e("har", "RuntimeException in onCreate: " + e.getLocalizedMessage());
+								}
 								return null;
 							}
 						}.execute();

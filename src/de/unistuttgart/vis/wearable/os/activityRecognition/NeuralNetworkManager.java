@@ -16,7 +16,8 @@ import android.util.Log;
 import de.unistuttgart.vis.wearable.os.activityRecognition.TimeWindow;
 
 /**
- * TODO update comments
+ * This class holds the neural network and additional data which is needed for
+ * the neural network to work.
  * 
  * @author Tobias
  *
@@ -24,7 +25,7 @@ import de.unistuttgart.vis.wearable.os.activityRecognition.TimeWindow;
 public class NeuralNetworkManager {
 
 	public static enum Status {
-		NOTINITIALIZED, INITIALIZED, TRAINED;
+		NOTINITIALIZED, INITIALIZED, TRAINED, IDLING;
 	}
 
 	private final double LONG_MAX = 4294967296.0;
@@ -39,11 +40,10 @@ public class NeuralNetworkManager {
 	// list with all currently supported sensors
 	private List<String> sensors = new ArrayList<String>();
 	private int inputNeurons = 0;
-	private byte savePeriode = 0;
+	private short savePeriode = 0;
 	private String file = "";
-	private final String NN_FILE = "nn";
-	private final String NNM_FILE = "nnm";
-	private final String N_FILE = "n";
+	private final String NN_FILE = "_nn";
+	private final String NNM_FILE = "_nnm";
 
 	/**
 	 * Tries to load an existing neural network with the given configuration.
@@ -51,28 +51,12 @@ public class NeuralNetworkManager {
 	 * @param file
 	 *            String with the path
 	 */
-	public NeuralNetworkManager(String file) {
-		this.file = file + "/NeuralNetwork/";
+	public NeuralNetworkManager(File file) {
+		this.file = file.getAbsolutePath() + File.separator;
 		try {
-			load(true);
+			load();
 		} catch (FileNotFoundException e) {
-			Log.e("har",
-					"FileNotFoundException in constructor: "
-							+ e.getLocalizedMessage());
 		}
-	}
-
-	/**
-	 * Creates a hash from all sensor IDs.
-	 * 
-	 * @return
-	 */
-	private int sensorsHash() {
-		String hash = "";
-		for (String s : sensors) {
-			hash += hash + s + "_";
-		}
-		return hash.hashCode();
 	}
 
 	/**
@@ -92,61 +76,41 @@ public class NeuralNetworkManager {
 			throw new IllegalArgumentException(
 					"The number of input neurons must be higher than 1!");
 		}
-		for (File files : (new File(file)).listFiles()) {
-			if (sensorsHash() == Integer.valueOf(files.getName().split("_")[0])) {
-				try {
-					load(false);
-					return true;
-				} catch (FileNotFoundException e) {
-					Log.e("har",
-							"FileNotFoundException in create: "
-									+ e.getLocalizedMessage());
-				}
-			}
-		}
 		this.inputNeurons = inputNeurons;
 		neuralNetwork = new NeuralNetwork(new int[] { inputNeurons,
 				inputNeurons / 2, 1 });
 		status = Status.INITIALIZED;
 		try {
-			save();
+			if(save()) {
+				close();
+			}
 		} catch (FileNotFoundException e) {
 			Log.e("har",
 					"FileNotFoundException in create: "
 							+ e.getLocalizedMessage());
-			close();
-			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Saves the neural network and the information in two separate files (nn
-	 * and nnm)
+	 * Saves the neural network and the information in two separate files
 	 * 
 	 * @return true if the data was saved correctly false else
 	 */
 	public boolean save() throws FileNotFoundException {
-		Log.i("har", "save path: " + file + sensorsHash());
-		neuralNetwork.saveNetwork(file + sensorsHash() + NN_FILE);
+		if(status == Status.IDLING) {
+			load();
+		}
+		neuralNetwork.saveNetwork(file + NN_FILE);
+		close();
 		ObjectOutputStream oos;
 		try {
-			oos = new ObjectOutputStream(new FileOutputStream(file
-					+ sensorsHash() + NNM_FILE));
+			oos = new ObjectOutputStream(new FileOutputStream(file + NNM_FILE));
+			oos.writeInt(inputNeurons);
 			oos.writeObject(status);
 			oos.writeObject(activities);
 			oos.writeObject(trainings);
 			oos.writeObject(sensors);
-			oos.flush();
-			oos.close();
-		} catch (IOException e) {
-			Log.e("har", "IOException in save: " + e.getLocalizedMessage());
-			return false;
-		}
-		try {
-			Log.i("har", "save current nn");
-			oos = new ObjectOutputStream(new FileOutputStream(file + N_FILE));
-			oos.writeInt(sensorsHash());
 			oos.flush();
 			oos.close();
 		} catch (IOException e) {
@@ -162,35 +126,24 @@ public class NeuralNetworkManager {
 	 * @return true if the data was loaded correctly false else
 	 * @throws FileNotFoundException
 	 */
-	@SuppressWarnings("unchecked")
-	public boolean load(boolean startUp) throws FileNotFoundException {
-		int sensorsHash = sensorsHash();
-		// If the System just got started, read the last used neural network in
-		// the N file
-		if (startUp) {
-			if ((new File(file + N_FILE)).exists()) {
-				ObjectInputStream ois;
-				try {
-					Log.i("har", "load current nn");
-					ois = new ObjectInputStream(new FileInputStream(file
-							+ N_FILE));
-					sensorsHash = ois.readInt();
-				} catch (IOException e) {
-					Log.e("har",
-							"IOException in load: " + e.getLocalizedMessage());
-				}
-			}
-		}
-		if (!(new File(file + sensorsHash + NN_FILE)).exists()) {
-			Log.e("har", "File not found: " + file + sensorsHash + NN_FILE);
+	@SuppressWarnings({ "unchecked", "resource" })
+	public boolean load() throws FileNotFoundException {
+		if (!(new File(file + NN_FILE)).exists()) {
 			throw new FileNotFoundException();
 		}
-		Log.i("har", "load path: " + file + sensorsHash + NN_FILE);
-		neuralNetwork = new NeuralNetwork(file + sensorsHash + NN_FILE);
+		neuralNetwork = new NeuralNetwork(file + NN_FILE);
+		if (status == Status.IDLING) {
+			if (!trainings.contains(0)) {
+				status = Status.TRAINED;
+			} else {
+				status = Status.INITIALIZED;
+			}
+			return true;
+		}
 		ObjectInputStream ois;
 		try {
-			ois = new ObjectInputStream(new FileInputStream(file + sensorsHash
-					+ NNM_FILE));
+			ois = new ObjectInputStream(new FileInputStream(file + NNM_FILE));
+			this.inputNeurons = ois.readInt();
 			this.status = (Status) ois.readObject();
 			this.activities = (List<String>) ois.readObject();
 			this.trainings = (List<Integer>) ois.readObject();
@@ -210,17 +163,7 @@ public class NeuralNetworkManager {
 							+ e.getLocalizedMessage());
 			return false;
 		}
-		ObjectOutputStream oos;
-		try {
-			Log.i("har", "save current nn");
-			oos = new ObjectOutputStream(new FileOutputStream(file + N_FILE));
-			oos.writeInt(sensorsHash());
-			oos.flush();
-			oos.close();
-		} catch (IOException e) {
-			Log.e("har", "IOException in save: " + e.getLocalizedMessage());
-			return false;
-		}
+		close();
 		return true;
 	}
 
@@ -252,20 +195,29 @@ public class NeuralNetworkManager {
 					"Feature set size does not match number of input neurons!");
 		}
 
-		double[] features = new double[inputNeurons];
-		double[] target = new double[1];
+		double[] input = new double[inputNeurons];
+		double[] output = new double[1];
 
 		int i = 0;
 		for (Entry<String, Double> entry : timeWindow.getFeatureSet()
 				.entrySet()) {
-			features[i] = entry.getValue() / LONG_MAX;
-			if (Math.abs(features[i]) >= 1) {
-				throw new IllegalArgumentException(
-						"A feature did not match -1 <= x <= 1!");
+			input[i] = entry.getValue() / LONG_MAX;
+			if (Math.abs(input[i]) >= 1) {
+				throw new IllegalArgumentException("Feature " + i
+						+ " did not match -1 <= x <= 1!");
 			}
-			neuralNetwork.classifiy(features, target);
+			if (Double.isNaN(input[i])) {
+				throw new IllegalArgumentException("Feature " + i + " is NaN!");
+			}
+			if (Double.isInfinite(input[i])) {
+				throw new IllegalArgumentException("Feature " + i
+						+ " is infinity!");
+			}
+			i++;
 		}
-		return target[0];
+		neuralNetwork.input(input);
+		neuralNetwork.result(output);
+		return output[0];
 	}
 
 	/**
@@ -292,8 +244,8 @@ public class NeuralNetworkManager {
 			throw new IllegalArgumentException(
 					"Feature set size does not match number of input neurons!");
 		}
-
 		double[] features = new double[inputNeurons];
+		double[] output = new double[1];
 		double[] target = { timeWindow.getActivityLabel().hashCode() / LONG_MAX };
 
 		int i = 0;
@@ -301,18 +253,27 @@ public class NeuralNetworkManager {
 				.entrySet()) {
 			features[i] = entry.getValue() / LONG_MAX;
 			if (Math.abs(features[i]) >= 1) {
-				throw new IllegalArgumentException(
-						"A feature did not match -1 <= x <= 1!");
+				throw new IllegalArgumentException("Feature " + i
+						+ " did not match -1 <= x <= 1!");
 			}
-			neuralNetwork.train(features, target);
+			if (Double.isNaN(features[i])) {
+				throw new IllegalArgumentException("Feature " + i + " is NaN!");
+			}
+			if (Double.isInfinite(features[i])) {
+				throw new IllegalArgumentException("Feature " + i
+						+ " is infinity!");
+			}
 			i++;
 		}
+		neuralNetwork.input(features);
+		neuralNetwork.result(output);
+		neuralNetwork.backProp(target);
 		int currentActivity = activities.indexOf(timeWindow.getActivityLabel());
 		trainings.set(currentActivity, trainings.get(currentActivity) + 1);
-		if (status.equals(Status.NOTINITIALIZED) && !trainings.contains(0)) {
+		if (status.equals(Status.INITIALIZED) && !trainings.contains(0)) {
 			status = Status.TRAINED;
 		}
-		if (savePeriode == Byte.MAX_VALUE) {
+		if (savePeriode == 256) {
 			try {
 				save();
 			} catch (FileNotFoundException e) {
@@ -330,8 +291,11 @@ public class NeuralNetworkManager {
 	 * Deletes the neural network from the memory.
 	 */
 	public void close() {
-		neuralNetwork.delete();
-		status = Status.NOTINITIALIZED;
+		if (!(neuralNetwork == null)) {
+			neuralNetwork.delete();
+		}
+		neuralNetwork = null;
+		status = Status.IDLING;
 	}
 
 	/**
@@ -341,13 +305,16 @@ public class NeuralNetworkManager {
 	 * @throws FileNotFoundException
 	 */
 	public void delete() throws FileNotFoundException {
-		neuralNetwork.delete();
+		(new File(file + NN_FILE)).delete();
+		(new File(file + NNM_FILE)).delete();
+		if (!(neuralNetwork == null)) {
+			neuralNetwork.delete();
+		}
+		neuralNetwork = null;
 		activities.clear();
+		trainings.clear();
 		sensors.clear();
 		status = Status.NOTINITIALIZED;
-		new File(file + N_FILE).delete();
-		new File(file + sensorsHash() + NN_FILE).delete();
-		new File(file + sensorsHash() + NNM_FILE).delete();
 	}
 
 	/**
@@ -380,7 +347,6 @@ public class NeuralNetworkManager {
 		if (activities.contains(activity)) {
 			return;
 		}
-		Log.i("har", "activity added " + activity);
 		activities.add(activity);
 		trainings.add(0);
 	}
@@ -390,14 +356,17 @@ public class NeuralNetworkManager {
 	 *            to remove
 	 */
 	public void removeActivity(String activity) {
-		Log.i("har", "activity removed " + activity);
+		if (activities.size() == 0) {
+			return;
+		}
 		int location = activities.indexOf(activity);
-		activities.remove(activity);
-		trainings.remove(location);
+		if (activities.remove(activity)) {
+			trainings.remove(location);
+		}
 	}
 
 	/**
-	 * @return the activities
+	 * @return the supported sensors
 	 */
 	public List<String> getSensors() {
 		return sensors;
@@ -411,7 +380,13 @@ public class NeuralNetworkManager {
 		if (sensors.contains(sensor)) {
 			return;
 		}
-		Log.i("har", "sensor added " + sensor);
+		try {
+			delete();
+		} catch (FileNotFoundException e) {
+			Log.e("har",
+					"FileNotFoundException in addSensor: "
+							+ e.getLocalizedMessage());
+		}
 		sensors.add(sensor);
 		Collections.sort(sensors);
 	}
@@ -421,11 +396,17 @@ public class NeuralNetworkManager {
 	 *            to remove
 	 */
 	public void removeSensor(String sensor) {
-
-		if (activities.remove(sensor)) {
-			Log.i("har", "sensor removed " + sensor);
-		} else {
-			Log.i("har", "sensor not removed " + sensor);
+		if (sensors.size() == 0) {
+			return;
+		}
+		if (sensors.remove(sensor)) {
+			try {
+				delete();
+			} catch (FileNotFoundException e) {
+				Log.e("har",
+						"FileNotFoundException in removeSensor: "
+								+ e.getLocalizedMessage());
+			}
 		}
 	}
 }

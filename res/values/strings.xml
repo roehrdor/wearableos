@@ -73,7 +73,7 @@
     <string name="btn_goBack">Cancel</string>
     <string name="title_activity_har">Activity Recognition</string>
     <string name="har_status">HAR status: </string>
-    <string name="har_currenactivity">Current Activity: </string>
+    <string name="har_button_stop">Stop training</string>
     <string name="btn_start_trainingHAR">Training</string>
     <string name="har_popup_text">Select the activity</string>
     <string name="btn_popup_close">Start training</string>

@@ -1,4 +1,4 @@
-package de.unistuttgart.vis.wearable.os.activity;
+package de.unistuttgart.vis.wearable.os.activityRecognition;
 
 import java.util.Locale;
 
