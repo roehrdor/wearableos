@@ -146,7 +146,7 @@ public class GoogleDrive extends Activity implements
                                         int position, long id) {
                     Metadata curMetadata = (Metadata) googleDriveFolderListView.getItemAtPosition(position);
                     if (isExport) {
-                        Log.d("gosDEBUG","Click in Export");
+
 
                         if (curMetadata.isFolder()) {
                             directoryHistory.push(currentDirectoryId);
@@ -159,7 +159,7 @@ public class GoogleDrive extends Activity implements
                             getArchiveList(currentDirectoryId);
                         }
                     } else {
-                        Log.d("gosDEBUG","Click in Import");
+
                         if (curMetadata.isFolder()) {
                             directoryHistory.push(currentDirectoryId);
                             futurePath = curMetadata.getTitle();
@@ -170,7 +170,7 @@ public class GoogleDrive extends Activity implements
                             progressDialog.show();
                             getArchiveList(currentDirectoryId);
                         } else {
-                            Log.d("gosDEBUG","starting import");
+
                             startFileImport(curMetadata.getDriveId());
                         }
                     }
@@ -307,11 +307,10 @@ public class GoogleDrive extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("gosDEBUG","Anfragecode: "+requestCode+" Ergebniscode: "+resultCode);
+
         if ((requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_1 || requestCode == Miscellaneous.SIGN_IN_REQUEST_CODE_2) && (resultCode == Miscellaneous.SIGN_IN__SUCCESSFUL_RESULT_CODE_1||resultCode == Miscellaneous.SIGN_IN__SUCCESSFUL_RESULT_CODE_2)) {
             if (!isConnected) {
-                Log.d("gosDEBUG", "Anfragencode: " + requestCode + " Ergebniscode: " + resultCode);
-                Log.d("gosDEBUG", " Ergebnisnachricht: " + data != null ? "" + data : "No data in intent");
+
                 isConnected = true;
                 getGoogleApiClient().connect();
             } else {
