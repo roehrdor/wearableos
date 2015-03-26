@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.app;
 
 import java.io.FileNotFoundException;
@@ -6,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import android.app.Activity;
@@ -14,11 +21,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class HARActivityManager extends Activity {
 
@@ -101,9 +106,6 @@ public class HARActivityManager extends Activity {
 			if (pSensor.isEnabled()) {
 				sensorsList.add(pSensor.getDisplayedSensorName() + " \nID: "
 						+ pSensor.getID() + " (enabled)");
-			} else {
-				sensorsList.add(pSensor.getDisplayedSensorName() + " \nID: "
-						+ pSensor.getID() + " (disabled)");
 			}
 		}
 		final String[] sensors = Arrays.copyOf(sensorsList.toArray(),
@@ -134,13 +136,10 @@ public class HARActivityManager extends Activity {
 									// If the user checked the item, add
 									// it to the selected items
 									checkedSensors[which] = true;
-									// sensorsList.add(sensors[which].split(" ")[2]);
 								} else {
 									// Else, if the item is already in
 									// the array, remove it
 									checkedSensors[which] = false;
-									// sensorsList.remove(sensors[which]
-									// .split(" ")[2]);
 								}
 							}
 						})
@@ -152,15 +151,15 @@ public class HARActivityManager extends Activity {
 							if (checkedSensors[i]) {
 								if (!APIFunctions.getSensors().contains(
 										sensors[i].split(" ")[2])) {
-									APIFunctions.addSensor(
-											sensors[i].split(" ")[2]);
+									APIFunctions.addSensor(sensors[i]
+											.split(" ")[2]);
 								}
 							} else {
-//								APIFunctions.removeSensor(
-//										(sensors[i].split(" ")[2]));
+								APIFunctions.removeSensor((sensors[i]
+										.split(" ")[2]));
 							}
 						}
-						Log.i("har", "currently supported sensors: " + APIFunctions.getSensors().toString());
+						rectrate();
 						dialog.cancel();
 					}
 				})
@@ -223,17 +222,14 @@ public class HARActivityManager extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						for (int i = 0; i < activities.length; i++) {
 							if (checkedActivities[i]) {
-								if (!APIFunctions.getSupportedActivities().contains(
-										activities[i])) {
-									APIFunctions.addActivity(
-											activities[i]);
+								if (!APIFunctions.getSupportedActivities()
+										.contains(activities[i])) {
+									APIFunctions.addActivity(activities[i]);
 								}
 							} else {
-//								APIFunctions.removeActivity(
-//										(activities[i]));
+								APIFunctions.removeActivity((activities[i]));
 							}
 						}
-						Log.i("har", "currently supported activities: " + APIFunctions.getSupportedActivities().toString());
 						dialog.cancel();
 					}
 				})
@@ -248,14 +244,29 @@ public class HARActivityManager extends Activity {
 						}).show();
 	}
 
+	protected void rectrate() {
+		this.recreate();
+	}
+
 	protected void saveBtn() {
 		try {
 			APIFunctions.saveNeuralNetwork();
 		} catch (FileNotFoundException e) {
 			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 					context);
-			alertDialogBuilder.setTitle("ERROR").setMessage(e.getLocalizedMessage())
-					.show();
+			alertDialogBuilder
+					.setTitle("ERROR")
+					.setMessage(e.getLocalizedMessage())
+					.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+
+							}).show();
 		}
 	}
 
@@ -266,8 +277,21 @@ public class HARActivityManager extends Activity {
 		} catch (FileNotFoundException e) {
 			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 					context);
-			alertDialogBuilder.setTitle("ERROR").setMessage(e.getLocalizedMessage())
-					.show();
+			alertDialogBuilder
+					.setTitle("Error")
+					.setMessage(
+							"No neural network found with"
+									+ " the current configuration!")
+					.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+
+							}).show();
 		}
 	}
 
@@ -278,26 +302,44 @@ public class HARActivityManager extends Activity {
 		} catch (FileNotFoundException e) {
 			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 					context);
-			alertDialogBuilder.setTitle("ERROR").setMessage(e.getLocalizedMessage())
-					.show();
+			alertDialogBuilder
+					.setTitle("Error")
+					.setMessage(
+							"No neural network found with"
+									+ " the current configuration!")
+					.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+
+							}).show();
 		}
 	}
 
 	protected void createBtn() {
 		try {
-			if (APIFunctions.createNeuralNetwork()) {
-				this.recreate();
-				Toast.makeText(context, "Neural network created",
-						Toast.LENGTH_SHORT);
-			} else {
-				Toast.makeText(context, "Neural network not created",
-						Toast.LENGTH_SHORT);
-			}
+			APIFunctions.createNeuralNetwork();
+			this.recreate();
 		} catch (IllegalArgumentException e) {
 			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 					context);
-			alertDialogBuilder.setTitle("ERROR").setMessage(e.getLocalizedMessage())
-					.show();
+			alertDialogBuilder
+					.setTitle("ERROR")
+					.setMessage(e.getLocalizedMessage())
+					.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+
+							}).show();
 		}
 	}
 }

@@ -161,7 +161,7 @@
         android:layout_below="@+id/har_train_textView4"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:enabled="false">
+        android:enabled="true">
 
         <requestFocus />
     </EditText>

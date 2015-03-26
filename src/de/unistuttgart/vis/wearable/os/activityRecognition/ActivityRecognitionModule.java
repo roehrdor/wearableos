@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.activityRecognition;
 
 import java.io.FileNotFoundException;
@@ -12,23 +19,22 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetworkManager.Status;
-import de.unistuttgart.vis.wearable.os.activity.Activity;
-import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.activityRecognition.FeatureSet;
 import de.unistuttgart.vis.wearable.os.activityRecognition.TimeWindow;
 import de.unistuttgart.vis.wearable.os.api.ActivityChangedCallback;
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
+import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
+import de.unistuttgart.vis.wearable.os.storage.ActivityLoad;
+import de.unistuttgart.vis.wearable.os.storage.ActivityStorage;
 
 /**
- * TODO AutoSave when training and recognition stops
  * @author Tobias
  *
  */
@@ -46,13 +52,8 @@ public class ActivityRecognitionModule {
 		} catch(Exception e) {
 			throw new RuntimeException("Exception occured in creating singleton instance!");
 		}
-		// TODO
-		instance.neuralNetworkManager = new NeuralNetworkManager(
-				/*Environment.getExternalStorageDirectory().toString());*/
-				GarmentOSService.getContext().getFilesDir().getAbsolutePath());
-		(instance.currentActivity = new Activity()).setActivityEnum(ActivityEnum.NOACTIVITY);
+		instance.neuralNetworkManager = new NeuralNetworkManager(Properties.storageDirectory);
 		instance.loadActivities();
-		Log.i("har", "ActivityRecognitionModule loaded: " + Environment.getExternalStorageDirectory().toString());
 	}
 	
 	private final double LONG_MAX = 4294967296.0;
@@ -83,7 +84,13 @@ public class ActivityRecognitionModule {
 			Activity activity = new Activity();
 			activity.setActivityEnum(activityEnum);
 			activities.add(activity);
+			if(activity.getActivityEnum() == ActivityEnum.NOACTIVITY) {
+				currentActivity = activity;
+			}
 		}
+		ActivityLoad activityLoad = new ActivityLoad(activities);
+		activityLoad.work();
+		
 	}
 	
 	/**
@@ -105,10 +112,17 @@ public class ActivityRecognitionModule {
 			
 			int sensorDimension = SensorManager.getSensorByID(
 					Integer.valueOf(sid)).getRawData().get(0).getDimension();
+			if(sensorDimension < 1) {
+				timeWindow.setActivityLabel("dead (sensor dimension is smaller than 1)");
+				return timeWindow;
+			}
 			Vector<SensorData> vector = SensorManager.getSensorByID(
 					Integer.valueOf(sid)).getRawData(begin, end);
-			float[][] values = new float[sensorDimension][vector.size() / sensorDimension];
-			
+			if(vector.size() < 1) {
+				timeWindow.setActivityLabel("dead (sensor data is smaller than 1)");
+				return timeWindow;
+			}
+			float[][] values = new float[sensorDimension][vector.size()];
 			int counter = 0;
 			for (SensorData sensorData : vector) {
 
@@ -129,10 +143,23 @@ public class ActivityRecognitionModule {
 	}
 	
 	/**
-	 * TODO comments
+	 * This method tries to guess the currently performed activity and saves it to the
+	 * current activity.
 	 * @param windowLength
+	 * 				the time window length
 	 */
-	public void recognize(final int windowLength) {
+	public void recognize(final int windowLength) throws IllegalStateException {
+		if(recognizing) {
+			throw new IllegalStateException("Recognition is already executing!");
+		}
+		try {
+			loadNeuralNetwork();
+		} catch (FileNotFoundException e) {
+			Log.e("har",
+					"FileNotFoundException in recognize: "
+							+ e.getLocalizedMessage());
+			return;
+		}
 		recognizing = true;
 		scheduler = Executors.newScheduledThreadPool(4);
 		try {
@@ -144,26 +171,32 @@ public class ActivityRecognitionModule {
 						Looper.prepare();
 					}
 					
-					Date end = new Date();;
+					Date end = new Date();
 					Date begin = new Date();
 					begin.setTime(end.getTime() - windowLength);
-					TimeWindow timeWindow = createTimeWindow("unlabeled", begin, end);
-					
+					TimeWindow timeWindow;
+					try {
+						timeWindow = createTimeWindow("unlabeled", begin, end);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						Log.e("har", "ArrayIndexOutOfBoundsException in train: " + e.getLocalizedMessage());
+						return;
+					}
 					double recognizedActivity = 0;
 					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						try {
 							recognizedActivity = neuralNetworkManager.recognise(timeWindow);
 						} catch (NullPointerException e) {
+							Log.e("har", "NullPointerException in recognize: " + e.getLocalizedMessage());
 							return;
 						} catch (IllegalArgumentException e) {
+							Log.e("har", "IllegalArgumentException in recognize: " + e.getLocalizedMessage());
 							return;
 						}
 					}
-					
 					String closestActivity = closestActivity(recognizedActivity);
 					if(!closestActivity.equals(getCurrentActivity())) {
 						boolean firstActivity = false;
-						if(getCurrentActivity().equals(ActivityEnum.NOACTIVITY.name())) {
+						if(getCurrentActivity().getActivityEnum().name().equals(ActivityEnum.NOACTIVITY.name())) {
 							setBeginActivity(new Date());
 							firstActivity = true;
 						}
@@ -172,6 +205,7 @@ public class ActivityRecognitionModule {
 						if (!firstActivity) {
 							getCurrentActivity().addPeriod(beginActivity,
 									endActivity);
+							getCurrentActivity().saveActivity();
 							firstActivity = false;
 						}
 						setBeginActivity(new Date());
@@ -182,15 +216,21 @@ public class ActivityRecognitionModule {
 					}
 				}
 				
-			}, 5000, windowLength / 2, TimeUnit.MILLISECONDS);
+			}, 1000, windowLength, TimeUnit.MILLISECONDS);
 			
 			recognitionFuture.get();
 		} catch(InterruptedException e) {
 			Log.e("har", "InterruptedException in recognize: " + e.getLocalizedMessage());
+			recognizing = false;
+			closeNeuralNetwork();
 		} catch(CancellationException e) {
 			Log.e("har", "CancellationException in recognize: " + e.getLocalizedMessage());
+			recognizing = false;
+			closeNeuralNetwork();
 		} catch(ExecutionException e) {
 			Log.e("har", "ExecutionException in recognize: " + e.getLocalizedMessage());
+			recognizing = false;
+			closeNeuralNetwork();
 		}
 	}
 
@@ -232,13 +272,27 @@ public class ActivityRecognitionModule {
 	}
 	
 	/**
-	 * TODO comments
+	 * This method trains the neural network live.
 	 * @param activity
+	 * 			the activity that should be trained
 	 * @param windowLength
+	 * 			the time window length
 	 */
-	public void train(final String activity, final int windowLength) throws IllegalArgumentException {
+	public void train(final String activity, final int windowLength)
+			throws IllegalArgumentException, IllegalStateException {
+		if (training) {
+			throw new IllegalStateException("Training is already executing!");
+		}
 		if(!ActivityEnum.contains(activity)) {
 			throw new IllegalArgumentException("Activity not defined in activity enum!");
+		}
+		try {
+			loadNeuralNetwork();
+		} catch (FileNotFoundException e) {
+			Log.e("har",
+					"FileNotFoundException in recognize: "
+							+ e.getLocalizedMessage());
+			return;
 		}
 		training = true;
 		scheduler = Executors.newScheduledThreadPool(4);
@@ -253,82 +307,129 @@ public class ActivityRecognitionModule {
 					Date end = new Date();
 					Date begin = new Date();
 					begin.setTime(end.getTime() - windowLength);
-					TimeWindow timeWindow = createTimeWindow(activity, begin, end);
+					TimeWindow timeWindow;
+					try {
+						timeWindow = createTimeWindow(activity, begin, end);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						Log.e("har", "ArrayIndexOutOfBoundsException in train: " + e.getLocalizedMessage());
+						return;
+					}
 					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						try {
 							neuralNetworkManager.train(timeWindow);
 						} catch (NullPointerException e) {
+							Log.e("har", "NullPointerException in train: " + e.getLocalizedMessage());
 							return;
 						} catch (IllegalArgumentException e) {
+							Log.e("har", "IllegalArgumentException in train: " + e.getLocalizedMessage());
 							return;
 						}
 					}
 				}
 				
-			}, 5000, windowLength / 2, TimeUnit.MILLISECONDS);
+			}, 1000, windowLength / 4, TimeUnit.MILLISECONDS);
 			trainingFuture.get();
 		} catch(InterruptedException e) {
 			Log.e("har", "InterruptedException in train: " + e.getLocalizedMessage());
+			training = false;
+			closeNeuralNetwork();
 		} catch(CancellationException e) {
 			Log.e("har", "CancellationException in train: " + e.getLocalizedMessage());
+			training = false;
+			closeNeuralNetwork();
 		} catch(ExecutionException e) {
 			Log.e("har", "ExecutionException in train: " + e.getLocalizedMessage());
+			training = false;
+			closeNeuralNetwork();
 		}
 	}
 	
 	/**
-	 * TODO comments
+	 * This method trains the neural network from already saved data.
 	 * @param activity
+	 * 			the activity that should be trained
 	 * @param windowLength
+	 * 			the time window length
+	 * @param begin
+	 * 			the start time of the saved data
+	 * @param end
+	 * 			the end time of the saved data
 	 */
 	public void train(final String activity, final int windowLength, final Date begin, 
-			final Date end) {
+			final Date end) throws IllegalArgumentException, IllegalStateException {
+		if (training) {
+			throw new IllegalStateException("Training is already executing!");
+		}
 		if(!ActivityEnum.contains(activity)) {
 			throw new IllegalArgumentException("Activity not defined in activity enum!");
+		}
+		try {
+			loadNeuralNetwork();
+		} catch (FileNotFoundException e) {
+			Log.e("har",
+					"FileNotFoundException in recognize: "
+							+ e.getLocalizedMessage());
+			return;
 		}
 		trainingNumber = 0;
 		training = true;
 		scheduler = Executors.newScheduledThreadPool(4);
 		try {
-			trainingFuture = scheduler.schedule(new Runnable() {
+			trainingFuture = scheduler.submit(new Runnable() {
 
 				@Override
 				public void run() {
 					if(Looper.myLooper() == null) {
 						Looper.prepare();
 					}
-					Date timeWindowBegin = new Date();
-					timeWindowBegin.setTime(begin.getTime() + windowLength * trainingNumber);
-					Date timeWindowEnd = new Date();
-					timeWindowEnd.setTime(timeWindowBegin.getTime() + windowLength);
-					if(timeWindowEnd.getTime() >= end.getTime()) {
-						trainingFuture.cancel(false);
-						return;
-					}
-					TimeWindow timeWindow = createTimeWindow(activity, timeWindowBegin, timeWindowEnd);
-					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
-						try {
-							neuralNetworkManager.train(timeWindow);
-							incTrainingNumber();
-						} catch (NullPointerException e) {
-							return;
-						} catch (IllegalArgumentException e) {
+					boolean finnished = false;
+					while (!finnished) {
+						Date timeWindowBegin = new Date();
+						timeWindowBegin.setTime(begin.getTime() + (windowLength / 4)
+								* trainingNumber);
+						Date timeWindowEnd = new Date();
+						timeWindowEnd.setTime(timeWindowBegin.getTime()
+								+ windowLength);
+						if (timeWindowEnd.getTime() >= end.getTime()) {
+							finnished = true;
+							training = false;
+							closeNeuralNetwork();
 							return;
 						}
+						TimeWindow timeWindow = createTimeWindow(activity,
+								timeWindowBegin, timeWindowEnd);
+						if (!timeWindow.getActivityLabel().substring(0, 4)
+								.equals("dead")) {
+							try {
+								neuralNetworkManager.train(timeWindow);
+							} catch (NullPointerException e) {
+							} catch (IllegalArgumentException e) {
+							}
+						}
+						incTrainingNumber();
 					}
 				}
 				
-			}, windowLength / 2, TimeUnit.MILLISECONDS);
+			});
 			trainingFuture.get();
 		} catch(InterruptedException e) {
 			Log.e("har", "InterruptedException in train: " + e.getLocalizedMessage());
+			training = false;
+			closeNeuralNetwork();
 		} catch(CancellationException e) {
 			Log.e("har", "CancellationException in train: " + e.getLocalizedMessage());
+			training = false;
+			closeNeuralNetwork();
 		} catch(ExecutionException e) {
 			Log.e("har", "ExecutionException in train: " + e.getLocalizedMessage());
+			training = false;
+			closeNeuralNetwork();
 		}
 	}
 	
+	/**
+	 * TODO delete
+	 */
 	private synchronized void incTrainingNumber() {
 		trainingNumber++;
 	}
@@ -406,7 +507,7 @@ public class ActivityRecognitionModule {
 	 * @throws FileNotFoundException 
 	 */
 	public void loadNeuralNetwork() throws FileNotFoundException {
-		neuralNetworkManager.load(false);
+		neuralNetworkManager.load();
 	}
 	
 	public void saveNeuralNetwork() throws FileNotFoundException {
@@ -421,6 +522,13 @@ public class ActivityRecognitionModule {
 		neuralNetworkManager.delete();
 	}
 	
+	/**
+	 * Creates a new neural network with the right number of input neurons.
+	 * @return
+	 * 		true if the neural network was created successfully
+	 * 		false otherwise
+	 * @throws IllegalArgumentException
+	 */
 	public boolean createNeuralNetwork() throws IllegalArgumentException {
 		if (getSensors().size() < 1) {
 			throw new IllegalArgumentException(
@@ -438,7 +546,7 @@ public class ActivityRecognitionModule {
 				} else {
 					inputNeurons += SensorManager
 							.getSensorByID(Integer.valueOf(sid)).getRawData()
-							.get(0).getDimension() * 12;
+							.get(0).getDimension() * 10;
 				}
 			} else {
 				inputNeurons += SensorManager
@@ -483,17 +591,22 @@ public class ActivityRecognitionModule {
 		neuralNetworkManager.removeActivity(activity);
 	}
 
+	/**
+	 * @return
+	 * 		true if the system is currently training
+	 * 		false otherwise
+	 */
 	public boolean isTraining() {
 		return training;
 	}
 
+	/**
+	 * @return
+	 * 		true if the system is currently recognizing
+	 * 		false otherwise
+	 */
 	public boolean isRecognizing() {
 		return recognizing;
 	}
-	
-	// TODO
-//	public int getNumberOfTrainings() {
-//		neuralNetworkManager.getTrainings();
-//	}
 
 }

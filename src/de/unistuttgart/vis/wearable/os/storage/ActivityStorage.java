@@ -1,6 +1,6 @@
 package de.unistuttgart.vis.wearable.os.storage;
 
-import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 

@@ -8,7 +8,7 @@
 package de.unistuttgart.vis.wearable.os.api;
 
 import android.os.Parcel;
-import de.unistuttgart.vis.wearable.os.activity.ActivityEnum;
+import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
 
 /**
  * @author roehrdor

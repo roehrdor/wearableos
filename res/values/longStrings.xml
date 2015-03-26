@@ -2,69 +2,31 @@
 <resources>
     
     <string name="notinitialized">
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text. 
-		Random test Text. Random test Text. Random test Text.
+        Please read!\nThis is the human activity recognition module.
+		The neural network for classification of activities is 
+		currently not initialized.\nIn the settings the sensors and activities can be selected, 
+		which should be supported by the activity recognition. Only enabeled Sensors are shown.
+		Once selected, a new neural network can be created, 
+		which is saved automaticlly.\nIf everything is done correctly the neural network can be 
+		trained on this page.\nAttention: After creating and saving a neural network, changing 
+		the sensors	will cause a deletion of the beforehand saved neural 
+		network!
 	</string>
-	
-    <string name="initialized">
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        Random test Text2. Random test Text2. Random test Text2.
-        
-    </string>
+	    <string name="initialized">		Please read!\nThe neural network is ready to get trained. In the training 
+        menu it is possible to choose between live and previous 
+        recorded data.\nIt is also possible to choose a time window - which 
+        contains all the data - length, its standard value is 2000 
+        milliseonds.\nIn the live training the neural network will be trained with 
+        data which is currently recorded. The training starts 5 seconds 
+        after pressting "Start training".\nTo train previous recorded data a period of time is needed, in 
+        which the activity to train was performed. It is importat that
+        all data in this periode of time completely, i.e. all sensors 
+        that are supported now were collecting data in this specific 
+        time periode too.\nThe training completely runs in the background and can be stopped 
+        anytime on this screen. Also it will auto save the neural network 
+        every 256 training epochs.\nPlease be aware of the fact, that once a training is done and 
+        saved, it cannot be undone!\nAttention: After creating and saving a neural network, changing 
+		the sensors	will cause a deletion of the beforehand saved neural 
+		network!</string>
     
 </resources>

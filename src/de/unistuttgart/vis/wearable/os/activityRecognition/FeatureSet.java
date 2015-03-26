@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Garment OS Project. For any details concerning use 
+ * of this project in source or binary form please refer to the provided license
+ * file.
+ * 
+ * (c) 2014-2015 GarmentOS
+ */
 package de.unistuttgart.vis.wearable.os.activityRecognition;
 
 import java.util.LinkedHashMap;
@@ -51,28 +58,28 @@ public class FeatureSet extends LinkedHashMap<String, Double> {
 							stat.getStandardDeviationMean());
 					this.put(key + "_standardDeviationMedian_" + dimension,
 							stat.getStandardDeviationMedian());
-					try {
-						if (values.length > 1) {
-							if (dimension + 1 < values.length) {
-								this.put(
-										key + "_correlationMean_" + dimension,
-										stat.getCorrelationMean(values[dimension + 1]));
-								this.put(
-										key + "_correlationMedian_" + dimension,
-										stat.getCorrelationMedian(values[dimension + 1]));
-							} else {
-								this.put(key + "_correlationMean_" + dimension,
-										stat.getCorrelationMean(values[0]));
-								this.put(key + "_correlationMedian_"
-										+ dimension,
-										stat.getCorrelationMedian(values[0]));
-							}
-						}
-					} catch (IllegalStateException e) {
-						timeWindow.setActivityLabel("dead ("
-								+ e.getLocalizedMessage() + ")");
-						return;
-					}
+//					try {
+//						if (values.length > 1) {
+//							if (dimension + 1 < values.length) {
+//								this.put(
+//										key + "_correlationMean_" + dimension,
+//										stat.getCorrelationMean(values[dimension + 1]));
+//								this.put(
+//										key + "_correlationMedian_" + dimension,
+//										stat.getCorrelationMedian(values[dimension + 1]));
+//							} else {
+//								this.put(key + "_correlationMean_" + dimension,
+//										stat.getCorrelationMean(values[0]));
+//								this.put(key + "_correlationMedian_"
+//										+ dimension,
+//										stat.getCorrelationMedian(values[0]));
+//							}
+//						}
+//					} catch (IllegalStateException e) {
+//						timeWindow.setActivityLabel("dead ("
+//								+ e.getLocalizedMessage() + ")");
+//						return;
+//					}
 				}
 			} else {
 
@@ -104,10 +111,6 @@ public class FeatureSet extends LinkedHashMap<String, Double> {
 			}
 		}
 	}
-
-	// private void calculateFeatures() {
-	//
-	// }
 
 	/**
 	 * @return the polynomDegree
