@@ -7,7 +7,6 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 //import com.garmentos.sensor.SensorType;
 //import com.garmentos.sensor.VirtualSensor;
@@ -16,6 +15,10 @@ import android.content.Context;
 
 import android.graphics.Color;
 
+
+/**
+ * @author Sophie Ogando
+ */
 public abstract class BasisModule extends GridLayout {
 
 	public enum State {
@@ -34,6 +37,8 @@ public abstract class BasisModule extends GridLayout {
 	protected String beginTime;
 	protected String endTime;
 	protected TextView content;
+	
+	private PopupWindow popupWindow;
 
 	// protected VirtualSensor virtualSensor;
 
@@ -49,7 +54,7 @@ public abstract class BasisModule extends GridLayout {
 		super(context, attrs, defStyle);
 	}
 
-	private ImageButton firstButton;
+	private ImageButton popupButton;
 	private ImageButton secondButton;
 
 	protected void createLayout(Context context, View content, int imageResId,
@@ -92,50 +97,40 @@ public abstract class BasisModule extends GridLayout {
 		this.addView(rightLinearLayout);
 
 		// add Buttons
-		firstButton = new ImageButton(context);
-		firstButton.setMinimumWidth(BUTTON_SIZE);
-		firstButton.setMinimumHeight(BUTTON_SIZE);
-		firstButton.setMaxHeight(BUTTON_SIZE);
-		firstButton.setMaxWidth(BUTTON_SIZE);
-		firstButton.setBackgroundColor(Color.parseColor("#606060"));
-		firstButton.setImageResource(android.R.drawable.ic_menu_more);
-		rightLinearLayout.addView(firstButton);
+		popupButton = new ImageButton(context);
+		popupButton.setMinimumWidth(BUTTON_SIZE);
+		popupButton.setMinimumHeight(BUTTON_SIZE);
+		popupButton.setMaxHeight(BUTTON_SIZE);
+		popupButton.setMaxWidth(BUTTON_SIZE);
+		popupButton.setBackgroundColor(Color.parseColor("#606060"));
+		popupButton.setImageResource(android.R.drawable.ic_menu_more);
+		rightLinearLayout.addView(popupButton);
 
-		firstButton.setOnClickListener(new OnClickListener() {
+		popupButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(final View view) {
 
 				System.out.println("clicked");
-				final PopupWindow pwindow = new PopupWindow(view.getContext());
+				final android.widget.PopupWindow pwindow = new android.widget.PopupWindow(view.getContext());
 
 				pwindow.setHeight(BasisModule.this.getHeight() * 2);
 				pwindow.setWidth((int) (BasisModule.this.getWidth() * 1.1));
-
-				// pwindow.setContentView(BasisModule.this.getPopupContent(item.getItemId(),
-				// view.getContext()));
-
-				// pwindow.update();
-
-				// pwindow.setBackgroundDrawable(null);
 
 				pwindow.setFocusable(true);
 
 				pwindow.setAnimationStyle(-1);
 
-				pwindow.setContentView(getPopupContent(view.getContext(),
+				pwindow.setContentView(popupWindow.getPopupContent(view.getContext(),
 						pwindow));
 
-				pwindow.showAsDropDown(firstButton);
-
-				// return true;
+				pwindow.showAsDropDown(popupButton);
 
 			}
 		});
-		//
-		// popup.show(); // showing popup menu
-		// }
-		// // });
+		
+		//popup button only visible when popupWindow is set
+		popupButton.setVisibility(INVISIBLE);
 
 		secondButton = new ImageButton(context);
 		secondButton.setMinimumWidth(BUTTON_SIZE);
@@ -186,9 +181,16 @@ public abstract class BasisModule extends GridLayout {
 
 		this.addView(content);
 	}
-
-	protected abstract View getPopupContent(final Context context,
-			final PopupWindow pWindow);
+	
+	public void setPopupWindow(PopupWindow popupWindow) {
+		this.popupWindow = popupWindow;
+		//set popupButton visibility according to popupWindow != null
+		popupButton.setVisibility(popupWindow != null ? VISIBLE : INVISIBLE);
+	}
+	
+	public PopupWindow getPopupWindow() {
+		return popupWindow;
+	}
 	
 
 	protected void OnPauseButton(State state) {

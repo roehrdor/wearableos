@@ -8,11 +8,10 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 /**
  * @author Sophie Ogando
  */
-public class HeartrateModule extends LiveTextSensorModule {
+public class ProximityModule extends LiveTextSensorModule {
 
-
-	public HeartrateModule(Context context, AttributeSet attrs) {
-		super(context, attrs, SensorType.HEARTRATE, R.drawable.graph, "Heartrate");
+	public ProximityModule(Context context, AttributeSet attrs) {
+		super(context, attrs, SensorType.PROXIMITY, R.drawable.proximity, "Proximity");
 	}
 
 }

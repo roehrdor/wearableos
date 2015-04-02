@@ -16,23 +16,31 @@ import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.api.IGarmentCallback;
 import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
+import de.unistuttgart.vis.wearable.os.developmentModule.SelectSensorPopupMenu.SelectedSensorChangedListener;
 import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
 
-public class GraphModuleSensors extends PopupModuleSensors {
+
+//TODO use AbstractLiveGraph
+
+/**
+ * @author Sophie Ogando
+ */
+public class GraphModuleSensors extends BasisModule implements SelectedSensorChangedListener {
 
 	private LinearLayout chart;
 
 	private PSensor sensor;
 	private IGarmentCallback igcb;
 	private final int NUMBER_OF_VALUES = 300;
-	GraphRenderer graphRenderer = new GraphRenderer();
+	private GraphRenderer graphRenderer = new GraphRenderer();
 
+	//for xml or code
 	public GraphModuleSensors(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		chart = new LinearLayout(context);
-
+		
+		
 		if (APIHandle.isServiceBound()) {
 			PSensor[] sensors = APIFunctions.getAllSensors();
 			if (sensors.length > 0) {
@@ -41,6 +49,43 @@ public class GraphModuleSensors extends PopupModuleSensors {
 		}
 
 		super.createLayout(context, chart, R.drawable.graph, "Graphs");
+		
+		
+		//user can select sensor
+		SelectSensorPopupMenu sensorPopup = new SelectSensorPopupMenu();
+		sensorPopup.addSelectedSensorChangedListener(this);
+		super.setPopupWindow(sensorPopup);
+	}
+	
+	//for code
+	public GraphModuleSensors(Context context, AttributeSet attrs, PSensor sensor) {
+		super(context, attrs);
+		chart = new LinearLayout(context);
+		
+		this.sensor = sensor;
+
+		super.createLayout(context, chart, R.drawable.graph, "Graphs");
+	}
+	
+	public void setSensorStatic(PSensor sensor) {
+		if(getPopupWindow() != null) {
+			((SelectSensorPopupMenu)getPopupWindow()).removeSelectedSensorChangedListener(this);
+			setPopupWindow(null);
+		}
+		
+		setSensor(sensor);
+	}
+	
+	@Override
+	public void onSelectedSensorChanged(PSensor selecedSensor) {
+		setSensor(selecedSensor);
+	}
+	
+	private void setSensor(PSensor sensor) {
+		if (igcb != null)
+			APIFunctions.unregisterCallback(igcb, CallbackFlags.VALUE_CHANGED);
+		this.sensor = sensor;
+		fillChart();
 	}
 
 	@Override
@@ -66,8 +111,8 @@ public class GraphModuleSensors extends PopupModuleSensors {
 			public void callback(BaseCallbackObject value)
 					throws RemoteException {
 				if (value instanceof ValueChangedCallback) {
-					final SensorData data = ((ValueChangedCallback) value)
-							.toSensorData();
+//					final SensorData data = ((ValueChangedCallback) value)
+//							.toSensorData();
 
 					((Activity) getContext()).runOnUiThread(new Runnable() {
 						@Override
@@ -88,14 +133,11 @@ public class GraphModuleSensors extends PopupModuleSensors {
 			return;
 		}
 		lastUpdate = new Date().getTime();
-
-		GraphRenderer.ChartThreadTuple tuple = graphRenderer.createGraph(
-				sensor, getContext(), NUMBER_OF_VALUES, loadFromStorage);
-
 	
 		chart.removeAllViews();
 		
-		View view = tuple.getChart();
+		View view = graphRenderer.createGraph(
+				sensor, getContext(), NUMBER_OF_VALUES, loadFromStorage);
 		
 		chart.addView(view);
 		
@@ -104,18 +146,7 @@ public class GraphModuleSensors extends PopupModuleSensors {
 		layoutParams.width = 250;
 		layoutParams.height = 140;
 	}
-
-	@Override
-	protected void onSensorChanged(PSensor selecedSensor) {
-		if (igcb != null)
-			APIFunctions.unregisterCallback(igcb, CallbackFlags.VALUE_CHANGED);
-
-		sensor = selecedSensor;
-
-		fillChart();
-
-		super.onSensorChanged(selecedSensor);
-	}
+	
 
 	@Override
 	protected void OnPauseButton(State state) {

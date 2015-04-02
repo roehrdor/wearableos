@@ -19,10 +19,9 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorData;
  * @author pfaehlfd
  */
 public abstract class AbstractLiveTextField {
-    PSensor sensor;
-    IGarmentCallback igcb;
-    private long lastUpdate = 0;
-    Context context;
+    private PSensor sensor;
+    private IGarmentCallback igcb;
+    private Context context;
 
     /**
      * Registers a value changed callback for the given PSensor.
@@ -52,11 +51,18 @@ public abstract class AbstractLiveTextField {
             @Override
             public void callback(BaseCallbackObject value) throws RemoteException {
                 if (value instanceof ValueChangedCallback) {
-                    final SensorData data = ((ValueChangedCallback) value).toSensorData();
+                    //final SensorData data = ((ValueChangedCallback) value).toSensorData();
+                 
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            getText(data);
+                            //getText(data);
+                        
+                        	//TODO workaround
+                        	List<SensorData> _data = sensor.getRawData(1, true);
+                            if (_data.size() > 0) {
+                                getText(_data.get(_data.size() - 1));
+                            }
                         }
                     });
                 }

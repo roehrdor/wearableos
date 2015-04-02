@@ -1,51 +1,54 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
 
-import de.unistuttgart.vis.wearable.os.api.APIFunctions;
-import de.unistuttgart.vis.wearable.os.api.PSensor;
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.Context;
 import android.graphics.Color;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+import de.unistuttgart.vis.wearable.os.api.APIFunctions;
+import de.unistuttgart.vis.wearable.os.api.PSensor;
 
-public abstract class PopupModuleSensors extends BasisModule {
+/**
+ * @author Sophie Ogando
+ */
+public class SelectSensorPopupMenu extends PopupWindow {
 	
+	public static interface SelectedSensorChangedListener {
+		public void onSelectedSensorChanged(PSensor sensor);
+	}
 	
+	private Set<SelectedSensorChangedListener> listeners = new HashSet<SelectedSensorChangedListener>();
 	
-	public PopupModuleSensors(Context context) {
-		super(context);
+	public void addSelectedSensorChangedListener(SelectedSensorChangedListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeSelectedSensorChangedListener(SelectedSensorChangedListener listener) {
+		listeners.remove(listener);
 	}
 
-	public PopupModuleSensors(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-	}
-
-	public PopupModuleSensors(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
-
-	private ListView listView;
-
+	
 	protected View getPopupContent(final Context context,
-			final PopupWindow pWindow) {
+			final android.widget.PopupWindow pWindow) {
 
 		
 		LinearLayout layout = new LinearLayout(context);
-		layout.setOrientation(VERTICAL);
+		layout.setOrientation(LinearLayout.VERTICAL);
 
 		LinearLayout upperLayout = new LinearLayout(context);
-		upperLayout.setOrientation(VERTICAL);
+		upperLayout.setOrientation(LinearLayout.VERTICAL);
 		upperLayout.setGravity(Gravity.TOP);
 
 		LinearLayout downLayout = new LinearLayout(context);
-		upperLayout.setOrientation(HORIZONTAL);
+		upperLayout.setOrientation(LinearLayout.HORIZONTAL);
 		upperLayout.setGravity(Gravity.CENTER);
 
 		// text view
@@ -62,7 +65,7 @@ public abstract class PopupModuleSensors extends BasisModule {
 
 		// list view
 
-		listView = new ListView(context);
+		final ListView listView = new ListView(context);
 
 		listView.setId(android.R.layout.simple_list_item_1);
 
@@ -80,7 +83,6 @@ public abstract class PopupModuleSensors extends BasisModule {
 				onSensorChanged((PSensor) listView.getItemAtPosition(position));
 			     
 				pWindow.dismiss();
-			
 			}
 		});
 
@@ -92,32 +94,8 @@ public abstract class PopupModuleSensors extends BasisModule {
 		return layout;
 	}
 	
-	protected void onSensorChanged(PSensor selecedSensor) {
-		
+	private void onSensorChanged(PSensor sensor) {
+		for(SelectedSensorChangedListener listener : listeners)
+			listener.onSelectedSensorChanged(sensor);
 	}
-
 }
-
-//
-//
-//@Override
-//protected void onCreate(Bundle savedInstanceState) {
-//    super.onCreate(savedInstanceState);
-//    setContentView(R.layout.activity_sensorlist);
-//
-//    ListView listView = (ListView) findViewById(R.id.listView1);
-//    sensors = APIFunctions.API_getAllSensors();
-//    listViewOptions(listView);
-//}
-//
-//private class SensorListAdapter extends ArrayAdapter<PSensor> {
-//
-//    private final Activity context;
-//    private final PSensor[] sensors;
-//    private Switch mySwitch;
-//
-//    public SensorListAdapter(Activity context, PSensor[] sensors) {
-//        super(context, R.layout.custom_list_layout, sensors);
-//        this.context = context;
-//        this.sensors = sensors;
-//    }

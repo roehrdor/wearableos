@@ -29,25 +29,6 @@ public class GraphRenderer {
 		public GraphData[] getData();
 	}
 
-	public static class ChartThreadTuple {
-		private Thread thread;
-		private View chart;
-
-		public ChartThreadTuple(Thread thread, View chart) {
-
-			this.thread = thread;
-			this.chart = chart;
-		}
-
-		public View getChart() {
-			return chart;
-		}
-
-		public Thread getThread() {
-			return thread;
-		}
-	}
-
 	public GraphRenderer() {
 	}
 
@@ -56,7 +37,7 @@ public class GraphRenderer {
 	private static int backgroundColor = 0x444444;
 	private static float lineWidth = 3.0f;
 
-	private static ChartThreadTuple createView(Context context, String title,
+	private static View createView(Context context, String title,
 			GraphType type, final GraphDataGenerator generator) {
 		// List for multiple data and renderer
 		final List<TimeSeries> series = new ArrayList<TimeSeries>();
@@ -122,38 +103,7 @@ public class GraphRenderer {
 					"HH:mm:ss");
 		}
 
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-
-				while (!isInterrupted()) {
-
-					try {
-						Thread.sleep(UPDATE_INTERVAL);
-					} catch (InterruptedException e) {
-					}
-
-					Iterator<TimeSeries> iterator = series.iterator();
-					for (GraphData d : generator.getData()) {
-						TimeSeries currentTimeSeries = iterator.next();
-
-						currentTimeSeries.clear();
-
-						Date[] x = d.getX();
-						double[] y = d.getY();
-
-						for (int i = 0; i < x.length; ++i) {
-							currentTimeSeries.add(x[i], y[i]);
-						}
-					}
-
-					view.repaint();
-
-				}
-			};
-		};
-
-		return new ChartThreadTuple(thread, view);
+		return view;
 	}
 
     private GraphType graphType;
@@ -165,7 +115,7 @@ public class GraphRenderer {
      * @param numberOfValuesToBeShown the number of values to show in the graph
      * @param loadFromStorage if the data can also be from the storage or just from the memory
      */
-	public ChartThreadTuple createGraph(final PSensor sensor,
+	public View createGraph(final PSensor sensor,
 			Context context, final int numberOfValuesToBeShown, final boolean loadFromStorage) {
             if (loadFromStorage) {
                 lastData = new Vector<SensorData>();

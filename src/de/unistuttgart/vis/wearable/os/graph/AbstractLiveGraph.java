@@ -83,8 +83,7 @@ public abstract class AbstractLiveGraph {
 
         try {
             acceptGraph(
-                    graphRenderer.createGraph(sensor, context, numberOfValuesToShow, loadFromStorage)
-                            .getChart());
+                    graphRenderer.createGraph(sensor, context, numberOfValuesToShow, loadFromStorage));
         } catch (Exception e) {
             unRegisterCallback();
         }
