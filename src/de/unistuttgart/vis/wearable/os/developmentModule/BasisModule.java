@@ -1,5 +1,6 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
 
+import de.unistuttgart.vis.wearable.os.R;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -12,7 +13,7 @@ import android.widget.TextView;
 //import com.garmentos.sensor.VirtualSensor;
 //import com.garmentos.garmentOSLib.SettingsModule;
 import android.content.Context;
-
+import android.content.res.TypedArray;
 import android.graphics.Color;
 
 
@@ -20,7 +21,6 @@ import android.graphics.Color;
  * @author Sophie Ogando
  */
 public abstract class BasisModule extends GridLayout {
-
 	public enum State {
 		PLAYING, PAUSE
 	};
@@ -40,7 +40,7 @@ public abstract class BasisModule extends GridLayout {
 	
 	private PopupWindow popupWindow;
 
-	// protected VirtualSensor virtualSensor;
+	private String overrideTitle;
 
 	public BasisModule(Context context) {
 		super(context);
@@ -48,10 +48,26 @@ public abstract class BasisModule extends GridLayout {
 
 	public BasisModule(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		
+		useAttributes(context, attrs);
 	}
 
 	public BasisModule(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		
+		useAttributes(context, attrs);
+	}
+	
+	private void useAttributes(Context context, AttributeSet attrs) {
+		TypedArray a = context.getTheme().obtainStyledAttributes
+				(attrs, R.styleable.Module, 0, 0);
+		
+		try{
+			overrideTitle = a.getString(R.styleable.Module_title);
+		} finally {
+			a.recycle();
+		}
+		
 	}
 
 	private ImageButton popupButton;
@@ -63,6 +79,9 @@ public abstract class BasisModule extends GridLayout {
 		setRowCount(2);
 
 		setAlignmentMode(ALIGN_BOUNDS);
+		
+		if(overrideTitle != null)
+			title = overrideTitle;
 
 		// add Title row
 		LinearLayout titleLinearLayout = new LinearLayout(context);

@@ -2,6 +2,7 @@ package de.unistuttgart.vis.wearable.os.developmentModule;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.RemoteException;
 import android.util.AttributeSet;
 import android.view.View;
@@ -19,6 +20,7 @@ import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 import de.unistuttgart.vis.wearable.os.developmentModule.SelectSensorPopupMenu.SelectedSensorChangedListener;
 import de.unistuttgart.vis.wearable.os.graph.GraphRenderer;
 import de.unistuttgart.vis.wearable.os.handle.APIHandle;
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
 
 //TODO use AbstractLiveGraph
@@ -39,22 +41,40 @@ public class GraphModuleSensors extends BasisModule implements SelectedSensorCha
 	public GraphModuleSensors(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		chart = new LinearLayout(context);
-		
-		
-		if (APIHandle.isServiceBound()) {
-			PSensor[] sensors = APIFunctions.getAllSensors();
-			if (sensors.length > 0) {
-				sensor = sensors[0];
-			}
-		}
 
 		super.createLayout(context, chart, R.drawable.graph, "Graphs");
 		
+		TypedArray a = context.getTheme().obtainStyledAttributes
+				(attrs, R.styleable.Module, 0, 0);
 		
-		//user can select sensor
-		SelectSensorPopupMenu sensorPopup = new SelectSensorPopupMenu();
-		sensorPopup.addSelectedSensorChangedListener(this);
-		super.setPopupWindow(sensorPopup);
+		try{
+			//look if sensor type is defined
+			int enumId = a.getInt(R.styleable.Module_sensor, -1);
+			if(enumId != -1) {
+				SensorType type = SensorType.values()[enumId];
+				
+				//use sensor type
+				if (APIHandle.isServiceBound()) {
+					PSensor[] sensors = APIFunctions.getAllSensors(type);
+					if (sensors.length > 0) {
+						sensor = sensors[0];
+					}
+				}
+			} else {
+				if (APIHandle.isServiceBound()) {
+					PSensor[] sensors = APIFunctions.getAllSensors();
+					if (sensors.length > 0) {
+						sensor = sensors[0];
+					}
+				}
+				//user can select sensor
+				SelectSensorPopupMenu sensorPopup = new SelectSensorPopupMenu();
+				sensorPopup.addSelectedSensorChangedListener(this);
+				super.setPopupWindow(sensorPopup);
+			}
+		} finally {
+			a.recycle();
+		}
 	}
 	
 	//for code

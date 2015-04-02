@@ -1,6 +1,7 @@
 package de.unistuttgart.vis.wearable.os.developmentModule;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.TextView;
 import de.unistuttgart.vis.wearable.os.R;
@@ -56,19 +57,39 @@ public class LiveTextSensorModule extends BasisModule implements SelectedSensorC
 		content = new TextView(context);
 		content.setText("no sensor");
 		
-		if (APIHandle.isServiceBound()) {
-			PSensor[] sensors = APIFunctions.getAllSensors();
-			if (sensors.length > 0) {
-				sensor = sensors[0];
-			}
-		}
-		
 		super.createLayout(context, content, R.drawable.graph, "Sensor Value");
 		
-		//user can select sensor
+		TypedArray a = context.getTheme().obtainStyledAttributes
+				(attrs, R.styleable.Module, 0, 0);
+		
+		try{
+			//look if sensor type is defined
+			int enumId = a.getInt(R.styleable.Module_sensor, -1);
+			if(enumId != -1) {
+				SensorType type = SensorType.values()[enumId];
+				
+				//use sensor type
+				if (APIHandle.isServiceBound()) {
+					PSensor[] sensors = APIFunctions.getAllSensors(type);
+					if (sensors.length > 0) {
+						sensor = sensors[0];
+					}
+				}
+			} else {
+				if (APIHandle.isServiceBound()) {
+					PSensor[] sensors = APIFunctions.getAllSensors();
+					if (sensors.length > 0) {
+						sensor = sensors[0];
+					}
+				}
+				//user can select sensor
 				SelectSensorPopupMenu sensorPopup = new SelectSensorPopupMenu();
 				sensorPopup.addSelectedSensorChangedListener(this);
 				super.setPopupWindow(sensorPopup);
+			}
+		} finally {
+			a.recycle();
+		}
 	}
 	
 	@Override

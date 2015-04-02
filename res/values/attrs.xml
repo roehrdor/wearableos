@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Module">
+        <attr name="title" format="string" />
+        <attr name="sensor" format="enum">
+            <enum name="HEARTRATE" value="0" />
+            <enum name="ACCELEROMETER" value="1" />
+            <enum name="MAGNETIC_FIELD" value="2" />
+            <enum name="GYROSCOPE" value="3" />
+            <enum name="LIGHT" value="4" />
+            <enum name="PRESSURE" value="5" />
+            <enum name="PROXIMITY" value="6" />
+            <enum name="GRAVITY" value="7" />
+            <enum name="ROTATION_VECTOR" value="8" />
+            <enum name="RELATIVE_HUMIDITY" value="9" />
+            <enum name="TEMPERATURE" value="10" />
+            <enum name="GPS_SENSOR" value="11" />
+        </attr>
+    </declare-styleable>
+</resources>
