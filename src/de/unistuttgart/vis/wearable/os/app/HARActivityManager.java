@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class HARActivityManager extends Activity {
 
@@ -101,8 +102,45 @@ public class HARActivityManager extends Activity {
 	}
 
 	protected void sensorBtn() {
-		sensorsList = new ArrayList<String>();
-		for (PSensor pSensor : APIFunctions.API_getAllSensors()) {
+        PSensor[] pSensors;
+        try {
+            pSensors = APIFunctions.API_getAllSensors();
+        } catch(RuntimeException e) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+            alertDialogBuilder
+                    .setTitle("Connection Error")
+                    .setMessage("An error occurred while trying to communicate" +
+                            " with the internal API. Please try again. If it " +
+                            "swill won't work an App restart may help.")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+            return;
+        }
+        if(pSensors.length < 1) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+            alertDialogBuilder
+                    .setTitle("Error")
+                    .setMessage("No enabled Sensors found. Please enable them first.")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+            return;
+        }
+        sensorsList = new ArrayList<String>();
+        for (PSensor pSensor : pSensors) {
 			if (pSensor.isEnabled()) {
 				sensorsList.add(pSensor.getDisplayedSensorName() + " \nID: "
 						+ pSensor.getID() + " (enabled)");
@@ -111,7 +149,27 @@ public class HARActivityManager extends Activity {
 		final String[] sensors = Arrays.copyOf(sensorsList.toArray(),
 				sensorsList.size(), String[].class);
 		sensorsList.clear();
-		sensorsList = APIFunctions.getSensors();
+        try {
+            sensorsList = APIFunctions.getSensors();
+        } catch(RuntimeException e) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+            alertDialogBuilder
+                    .setTitle("Connection Error")
+                    .setMessage("An error occurred while trying to communicate" +
+                            " with the internal API. Please try again. If it " +
+                            "swill won't work an App restart may help.")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+            return;
+        }
+
 		final boolean[] checkedSensors = new boolean[sensors.length];
 		int i = 0;
 		for (String s : sensors) {
@@ -147,19 +205,26 @@ public class HARActivityManager extends Activity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+                        boolean changed = false;
 						for (int i = 0; i < sensors.length; i++) {
 							if (checkedSensors[i]) {
 								if (!APIFunctions.getSensors().contains(
 										sensors[i].split(" ")[2])) {
 									APIFunctions.addSensor(sensors[i]
 											.split(" ")[2]);
+                                    changed = true;
 								}
 							} else {
 								APIFunctions.removeSensor((sensors[i]
 										.split(" ")[2]));
 							}
 						}
-						rectrate();
+						reBuild();
+                        if(changed) {
+                            Toast.makeText(context, "Sensors updated", Toast.LENGTH_SHORT);
+                        } else {
+                            Toast.makeText(context, "Sensors not updated", Toast.LENGTH_SHORT);
+                        }
 						dialog.cancel();
 					}
 				})
@@ -183,7 +248,26 @@ public class HARActivityManager extends Activity {
 				i++;
 			}
 		}
-		activitiesList = APIFunctions.getSupportedActivities();
+        try {
+            activitiesList = APIFunctions.getSupportedActivities();
+        } catch(RuntimeException e) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    context);
+            alertDialogBuilder
+                    .setTitle("Connection Error")
+                    .setMessage("An error occurred while trying to communicate" +
+                            " with the internal API. Please try again. If it " +
+                            "swill won't work an App restart may help.")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+            return;
+        }
 		final boolean[] checkedActivities = new boolean[activities.length];
 		i = 0;
 		for (String s : activities) {
@@ -220,17 +304,24 @@ public class HARActivityManager extends Activity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+                        boolean changed = false;
 						for (int i = 0; i < activities.length; i++) {
 							if (checkedActivities[i]) {
 								if (!APIFunctions.getSupportedActivities()
 										.contains(activities[i])) {
 									APIFunctions.addActivity(activities[i]);
+                                    changed = true;
 								}
 							} else {
 								APIFunctions.removeActivity((activities[i]));
 							}
 						}
-						dialog.cancel();
+                        if(changed) {
+                            Toast.makeText(context, "Activities updated", Toast.LENGTH_SHORT);
+                        } else {
+                            Toast.makeText(context, "Activities not updated", Toast.LENGTH_SHORT);
+                        }
+                        dialog.cancel();
 					}
 				})
 				.setNegativeButton("Cancel",
@@ -244,7 +335,7 @@ public class HARActivityManager extends Activity {
 						}).show();
 	}
 
-	protected void rectrate() {
+	protected void reBuild() {
 		this.recreate();
 	}
 
