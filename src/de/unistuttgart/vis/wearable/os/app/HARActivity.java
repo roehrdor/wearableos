@@ -22,6 +22,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 
 /**
@@ -104,13 +106,15 @@ public class HARActivity extends Activity {
 					try {
 						if (APIFunctions.isTraining()) {
 							APIFunctions.stopTraining();
-							rectrate();
+                            Toast.makeText(context, "Training stopped", Toast.LENGTH_SHORT);
+							reBuild();
 						} else {
 							Intent intent = new Intent(context,
 									HARActivityTraining.class);
 							startActivity(intent);
 						}
 					} catch (RuntimeException e) {
+                        Toast.makeText(context, "Training not stopped", Toast.LENGTH_SHORT);
 						Log.e("har",
 								"RuntimeException in onCreate: "
 										+ e.getLocalizedMessage());
@@ -122,7 +126,7 @@ public class HARActivity extends Activity {
 		});
 	}
 
-	protected void rectrate() {
+	protected void reBuild() {
 		this.recreate();
 	}
 

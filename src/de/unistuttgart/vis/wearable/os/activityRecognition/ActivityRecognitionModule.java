@@ -109,7 +109,12 @@ public class ActivityRecognitionModule {
 		TimeWindow timeWindow = new TimeWindow(activity, begin, end);
 		
 		for(String sid : neuralNetworkManager.getSensors()) {
-			
+
+            if(!SensorManager.getSensorByID(Integer.valueOf(sid)).isEnabled()) {
+                timeWindow.setActivityLabel("dead (sensor disabled)");
+                return timeWindow;
+            }
+
 			int sensorDimension = SensorManager.getSensorByID(
 					Integer.valueOf(sid)).getRawData().get(0).getDimension();
 			if(sensorDimension < 1) {
@@ -182,6 +187,10 @@ public class ActivityRecognitionModule {
 						return;
 					}
 					double recognizedActivity = 0;
+                    if(timeWindow.getActivityLabel().equals(
+                            "dead (sensor disabled)")) {
+                        throw new CancellationException("sensor is disabled");
+                    }
 					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						try {
 							recognizedActivity = neuralNetworkManager.recognise(timeWindow);
@@ -314,6 +323,10 @@ public class ActivityRecognitionModule {
 						Log.e("har", "ArrayIndexOutOfBoundsException in train: " + e.getLocalizedMessage());
 						return;
 					}
+                    if(timeWindow.getActivityLabel().equals(
+                            "dead (sensor disabled)")) {
+                        throw new CancellationException("sensor is disabled");
+                    }
 					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
 						try {
 							neuralNetworkManager.train(timeWindow);
@@ -398,6 +411,10 @@ public class ActivityRecognitionModule {
 						}
 						TimeWindow timeWindow = createTimeWindow(activity,
 								timeWindowBegin, timeWindowEnd);
+                        if(timeWindow.getActivityLabel().equals(
+                                "dead (sensor disabled)")) {
+                            throw new CancellationException("sensor is disabled");
+                        }
 						if (!timeWindow.getActivityLabel().substring(0, 4)
 								.equals("dead")) {
 							try {
