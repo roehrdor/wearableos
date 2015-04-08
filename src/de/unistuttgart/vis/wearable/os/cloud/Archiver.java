@@ -62,7 +62,7 @@ public class Archiver {
         try {
             RandomAccessFile raf;
             raf = new RandomAccessFile(file, "rw");
-            return raf.readInt() == Constants.GOS_FILE_START_BYTE;
+            return raf.readInt() == Constants.GOS_FILE_START_BYTES;
         } catch (IOException ioe) {
             return false;
         }
@@ -318,14 +318,15 @@ public class Archiver {
         int value = Constants.UNPACK_INVALID_FILE;
         try {
             raf = new RandomAccessFile(file, "rw");
-            if(raf.readInt() == Constants.GOS_FILE_START_BYTE) {
+            if(raf.readInt() == Constants.GOS_FILE_START_BYTES) {
                 raf.seek(0);
-                raf.write(Constants.ZIP_FIRST_BYTE);
+                raf.writeInt(Constants.ZIP_FIRST_BYTES);
                 raf.close();
                 value = Constants.UNPACK_NO_ERROR;
             }
         } catch(IOException e) {
         }
+        Log.d("orDEBUG", "Returning from validateAndChangeHeader " + value);
         return value;
     }
 
@@ -507,7 +508,7 @@ public class Archiver {
             // Change the first byte to remember that the file has been created by GarmentOS
             //
             RandomAccessFile raf = new RandomAccessFile(outputFile, "rw");
-            raf.writeInt(Constants.GOS_FILE_START_BYTE);
+            raf.writeInt(Constants.GOS_FILE_START_BYTES);
             raf.close();
         } catch (IOException ioe) {
         }
