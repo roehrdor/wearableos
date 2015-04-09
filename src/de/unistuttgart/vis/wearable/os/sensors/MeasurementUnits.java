@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author pfaehlfd
  */
 public enum MeasurementUnits {
-    NONE(new MeasurementSystems[]{MeasurementSystems.RADIAN, MeasurementSystems.PERCENT, MeasurementSystems.TEMPERATURE, MeasurementSystems.LUX, MeasurementSystems.GPS}, 1, false, ""),
+    NONE(new MeasurementSystems[]{MeasurementSystems.RADIAN, MeasurementSystems.PERCENT, MeasurementSystems.TEMPERATURE, MeasurementSystems.LUX, MeasurementSystems.GPS, MeasurementSystems.HERTZ}, 1, false, ""),
     HECTO(new MeasurementSystems[]{MeasurementSystems.PASCAL}, 0.01, false, "h"),
     DEKA(new MeasurementSystems[]{MeasurementSystems.PASCAL}, 0.1, false, "da"),
     KILO(new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.PASCAL, MeasurementSystems.TESLA}, 0.001, false, "K"),

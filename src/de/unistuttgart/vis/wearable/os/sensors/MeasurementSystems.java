@@ -16,5 +16,6 @@ public enum MeasurementSystems {
 	PASCAL,
 	PERCENT,
 	TEMPERATURE,
-	GPS;
+	GPS,
+    HERTZ;
 }

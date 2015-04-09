@@ -19,7 +19,7 @@ import de.unistuttgart.vis.wearable.os.graph.GraphType;
  * @author pfaehlfd
  */
 public enum SensorType {
-	HEARTRATE(1, new MeasurementSystems[]{}, R.drawable.heartrate),
+	HEARTRATE(1, new MeasurementSystems[]{MeasurementSystems.HERTZ}, R.drawable.heartrate),
 	ACCELEROMETER(3, new MeasurementSystems[]{MeasurementSystems.METRICAL, MeasurementSystems.ANGLOSAXON}, R.drawable.accelerometer),
 	MAGNETIC_FIELD(3, new MeasurementSystems[]{MeasurementSystems.TESLA}, R.drawable.magnetic_field),
 	GYROSCOPE(3, new MeasurementSystems[]{MeasurementSystems.RADIAN}, R.drawable.gyroscope),
