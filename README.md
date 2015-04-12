@@ -24,3 +24,12 @@
 2. android update project -p . -l LiveSDK 
 3. ant clean
 4. ant debug
+
+#### 4. Reset Git Repository
+Since we alter the src folder of the LiveSDK we need to reset it to make further commits or changes to version control    
+
+1. cd .\LiveSDK
+2. Windows: rmdir /s /q src     
+   Unix: rm -rf ./src
+3. cd ..
+4. git reset --hard HEAD
