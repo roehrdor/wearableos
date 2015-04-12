@@ -647,6 +647,15 @@ public class APIFunctions {
     // Function calls forward to Sensor object
     //
     // =====================================================================
+
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link PSensor#isEnabled()}
+     */
     public static boolean SENSORS_SENSOR_isEnabled(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -657,6 +666,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getDisplayedSensorName()}
+     */
     public static String SENSORS_SENSOR_getDisplayedSensorName(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -667,6 +684,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getSampleRate()}
+     */
     public static int SENSORS_SENSOR_getSampleRate(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -677,6 +702,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getSavePeriod()}
+     */
     public static int SENSORS_SENSOR_getSavePeriod(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -687,6 +720,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getSmoothness()}
+     */
     public static float SENSORS_SENSOR_getSmoothness(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -697,6 +738,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getSensorType()}
+     */
     public static int SENSORS_SENSOR_getSensorType(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -707,6 +756,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getGraphType()}
+     */
     public static int SENSORS_SENSOR_getGraphType(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -717,6 +774,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link PSensor#getDisplayedMeasurementUnit()}
+     */
     public static int SENSORS_SENSOR_getDisplayedMeasurementUnit(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -727,6 +792,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link PSensor#getDisplayedMeasurementSystem()}
+     */
     public static int SENSORS_SENSOR_getDisplayedMeasurementSystem(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -738,6 +811,14 @@ public class APIFunctions {
     }
 
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link de.unistuttgart.vis.wearable.os.api.PSensor#getRawData()}
+     */
     public static PSensorData SENSORS_SENSOR_getRawData(int sid) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -748,6 +829,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link PSensor#getRawData(java.util.Date, boolean)}
+     */
     public static PSensorData SENSORS_SENSOR_getRawDataIB(int sid, long time, boolean plusMinusOneSecond) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -758,6 +847,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link PSensor#getRawData(java.util.Date, java.util.Date)}
+     */
     public static PSensorData SENSORS_SENSOR_getRawDataII(int sid, long start, long end) {
         if (APIHandle.isServiceBound()) {
             try {
@@ -768,6 +865,14 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * THIS FUNCTION SHALL NOT BE CALLED DIRECTLY
+     *
+     * To keep the object orientated approach by using AIDL we need to make an external function
+     * for the class method
+     *
+     * {@link PSensor#getRawData(int, boolean)}
+     */
     public static PSensorData SENSORS_SENSOR_getRawDataN(int sid, int numberOfValues, boolean fromStorage) {
         if(APIHandle.isServiceBound()) {
             try {

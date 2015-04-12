@@ -63,6 +63,12 @@ public class APIFunctions {
 	//
 	// =============================================================================
 
+    /**
+     * Unpack the given GarmentOS Archive file
+     *
+     * @param file the to be extracted
+     * @return {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if the extraction completed successfully
+     */
     public static int unpackArchiveFile(java.io.File file) {
         if(APIHandle.isInternalServiceBound()) {
             try {
@@ -73,6 +79,13 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Unpack the given encrypted GarmentOS Archive file
+     *
+     * @param file the file to be encrypted and than extracted
+     * @param key  the key to use for the encryption
+     * @return {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if the extraction completed successfully
+     */
     public static int unpackEncryptedArchiveFile(java.io.File file, String key) {
         if(APIHandle.isInternalServiceBound()) {
             try {
@@ -83,28 +96,11 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-    public static void registerCallback(IGarmentCallback callback, int cause) {
-        if(APIHandle.isServiceBound()) {
-            try {
-                APIHandle.getGarmentAPIHandle().registerCallback(APIHandle.getAppPackageID(), callback, cause);
-                return;
-            } catch(android.os.RemoteException e) {
-            }
-        }
-        throw new RuntimeException("Connection failed");
-    }
-
-    public static void unregisterCallback(IGarmentCallback callback, int cause) {
-        if(APIHandle.isServiceBound()) {
-            try {
-                APIHandle.getGarmentAPIHandle().unregisterCallback(APIHandle.getAppPackageID(), callback, cause);
-                return;
-            } catch(android.os.RemoteException e) {
-            }
-        }
-        throw new RuntimeException("Connection failed");
-    }
-
+    /**
+     * Get all the available sensor types, duplicated Sensor Types will not be listed
+     *
+     * @return an array including all the available sensor types
+     */
     public static SensorType[] getAvailableSensorTypes() {
         if(APIHandle.isServiceBound()) {
             try {
@@ -120,6 +116,21 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Add a new Sensor to the system
+     *
+     * @param sampleRate                 the sample rate of the sensor
+     * @param savePeriod                 the save period of the sensor
+     * @param smoothness                 the smoothness factor to use fot the sensor
+     * @param displayedSensorName        the displatyed sensor name
+     * @param sensorType                 the sensor type
+     * @param bluetoothID                the bluetooth id
+     * @param rawDataMeasurementSystem   the raw data measurement system
+     * @param rawDataMeasurementUnit     the raw data measurement unit
+     * @param displayedMeasurementSystem the displayed measurement system
+     * @param displayedMeasurementUnit   the displayed measurement unit
+     * @return a sensor object representing the newly added sensor
+     */
     public static PSensor addNewSensor(int sampleRate, int savePeriod, float smoothness,
                              String displayedSensorName, SensorType sensorType, String bluetoothID,
                              MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
@@ -136,6 +147,22 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Add a new sensor to the system
+     *
+     * @param driverID                   the driver id to use for the sensor
+     * @param sampleRate                 the sample rate of the sensor
+     * @param savePeriod                 the save period of the sensor
+     * @param smoothness                 the smoothness factor to use fot the sensor
+     * @param displayedSensorName        the displatyed sensor name
+     * @param sensorType                 the sensor type
+     * @param bluetoothID                the bluetooth id
+     * @param rawDataMeasurementSystem   the raw data measurement system
+     * @param rawDataMeasurementUnit     the raw data measurement unit
+     * @param displayedMeasurementSystem the displayed measurement system
+     * @param displayedMeasurementUnit   the displayed measurement unit
+     * @return a sensor object representing the newly added sensor
+     */
     public static PSensor addNewSensor(int driverID, int sampleRate, int savePeriod, float smoothness,
                                        String displayedSensorName, SensorType sensorType, String bluetoothID,
                                        MeasurementSystems rawDataMeasurementSystem, MeasurementUnits rawDataMeasurementUnit,
@@ -152,6 +179,12 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Remove the sensor with the given ID from the system. If the sensor ID provided
+     * to this function is invalid nothing will happen.
+     *
+     * @param sensorID the sensor ID to be removed
+     */
     public static void removeSensor(int sensorID) {
         if (APIHandle.isInternalServiceBound()) {
             try {
@@ -163,7 +196,12 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
-	public static String[] getRegisteredApplications() {
+    /**
+     * Get all the registered Applications to Garment OS
+     *
+     * @return an array containing all the names of the registered applications
+     */
+    public static String[] getRegisteredApplications() {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().API_getRegisteredApplications();
@@ -172,7 +210,12 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");
 	}
-	
+
+    /**
+     * Get all the registered Applications to Garment OS
+     *
+     * @return an array containing all the UserApps registered to GarmentOS
+     */
 	public static PUserApp[] API_getRegisteredUserApplications() {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
@@ -182,8 +225,14 @@ public class APIFunctions {
 		}
 		throw new RuntimeException("Connection failed");
 	}
-	
-	public static PUserApp API_getRegisteredUserAppByName(String name) {
+
+    /**
+     * Get the UserApp by its name
+     *
+     * @param name the name to get the app for
+     * @return the User App if there is one registered for the given name, null otherwise
+     */
+    public static PUserApp API_getRegisteredUserAppByName(String name) {
 		if (APIHandle.isInternalServiceBound()) {
 			try {
 				return APIHandle.getGarmentInternalAPIHandle().API_getRegisteredUserAppByName(name);
@@ -193,6 +242,11 @@ public class APIFunctions {
 		throw new RuntimeException("Connection failed");
 	}
 
+    /**
+     * Get all the Sensor names. Note duplicates can occur here.
+     *
+     * @return an array containing all the sensor names
+     */
     public static String[] API_getSensorNames() {
         if (APIHandle.isInternalServiceBound()) {
             try {
@@ -203,6 +257,11 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Get all sensors. Since we have objects right now, duplicates can no longer occur.
+     *
+     * @return an array containing all the sensors as objects.
+     */
     public static PSensor[] API_getAllSensors() {
         if (APIHandle.isInternalServiceBound()) {
             try {
@@ -213,6 +272,12 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Get all sensors from the given sensor type
+     *
+     * @param sensorType the sensor type to get sensors fro
+     * @return an array containing all the sensors with the given type
+     */
     public static PSensor[] getAllSensors(SensorType sensorType) {
         if(APIHandle.isServiceBound()) {
             try {
@@ -225,6 +290,12 @@ public class APIFunctions {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Get the sensor with the given ID
+     *
+     * @param id the sensor id
+     * @return the sensor with the given id or null if the sensor id was not found
+     */
     public static PSensor API_getSensorById(int id) {
         if (APIHandle.isInternalServiceBound()) {
             try {

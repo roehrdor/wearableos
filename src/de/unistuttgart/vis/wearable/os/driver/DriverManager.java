@@ -10,6 +10,7 @@ package de.unistuttgart.vis.wearable.os.driver;
 import android.util.SparseArray;
 import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 import de.unistuttgart.vis.wearable.os.internalapi.PGarmentDriver;
+import de.unistuttgart.vis.wearable.os.utils.Constants;
 
 import java.util.concurrent.Semaphore;
 
@@ -29,17 +30,20 @@ public class DriverManager {
      * @return the id of the driver
      */
     public static int addDriver(IGarmentDriver driver) {
+        int num = Constants.ILLEGAL_VALUE;
         lock.acquireUninterruptibly();
-        int num = ++maxID;
-        String name = null;
-        try {
-            driver.setID(num);
-            name = driver.getDriverName();
-        } catch(android.os.RemoteException e) {
-        }
-        if(name != null) {
-            drivers.put(num, driver);
-            pdrivers.put(num, new PGarmentDriver(num, name));
+        if(driver != null) {
+            num = ++maxID;
+            String name = null;
+            try {
+                driver.setID(num);
+                name = driver.getDriverName();
+            } catch (android.os.RemoteException e) {
+            }
+            if (name != null) {
+                drivers.put(num, driver);
+                pdrivers.put(num, new PGarmentDriver(num, name));
+            }
         }
         lock.release();
         return num;
@@ -73,7 +77,7 @@ public class DriverManager {
      *
      * @return all the drivers in an array
      */
-    public static IGarmentDriver[] getDrivers() {
+    public static IGarmentDriver[]  getDrivers() {
         final int LEN = drivers.size();
         IGarmentDriver[] garmentDrivers = new IGarmentDriver[LEN];
         for(int i = 0; i != LEN; ++i)
