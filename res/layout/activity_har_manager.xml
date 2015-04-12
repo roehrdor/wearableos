@@ -35,16 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="#606060"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp" />
-
-    <Button
-        android:id="@+id/har_manager_load"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="#606060"
-        android:text="@string/har_button_manager_load"
+        android:text="Create new neural network"
         android:textColor="#FFFFFF"
         android:textSize="25sp" />
 

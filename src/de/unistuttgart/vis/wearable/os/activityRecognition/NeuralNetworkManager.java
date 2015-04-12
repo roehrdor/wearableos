@@ -1,5 +1,7 @@
 package de.unistuttgart.vis.wearable.os.activityRecognition;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,9 +14,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
-import android.util.Log;
-import de.unistuttgart.vis.wearable.os.activityRecognition.TimeWindow;
-
 /**
  * This class holds the neural network and additional data which is needed for
  * the neural network to work.
@@ -25,7 +24,7 @@ import de.unistuttgart.vis.wearable.os.activityRecognition.TimeWindow;
 public class NeuralNetworkManager {
 
 	public static enum Status {
-		NOTINITIALIZED, INITIALIZED, TRAINED, IDLING;
+		NOTINITIALIZED, INITIALIZED, TRAINED, IDLING
 	}
 
 	private final double LONG_MAX = 4294967296.0;
@@ -244,6 +243,12 @@ public class NeuralNetworkManager {
 			throw new IllegalArgumentException(
 					"Feature set size does not match number of input neurons!");
 		}
+        if(status == Status.IDLING) {
+            try {
+                load();
+            } catch (FileNotFoundException e) {
+            }
+        }
 		double[] features = new double[inputNeurons];
 		double[] output = new double[1];
 		double[] target = { timeWindow.getActivityLabel().hashCode() / LONG_MAX };
@@ -373,26 +378,19 @@ public class NeuralNetworkManager {
 	}
 
 	/**
-	 * @param activity
+	 * @param sensor
 	 *            to add
 	 */
 	public void addSensor(String sensor) {
 		if (sensors.contains(sensor)) {
 			return;
 		}
-		try {
-			delete();
-		} catch (FileNotFoundException e) {
-			Log.e("har",
-					"FileNotFoundException in addSensor: "
-							+ e.getLocalizedMessage());
-		}
 		sensors.add(sensor);
 		Collections.sort(sensors);
 	}
 
 	/**
-	 * @param activity
+	 * @param sensor
 	 *            to remove
 	 */
 	public void removeSensor(String sensor) {

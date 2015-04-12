@@ -49,9 +49,9 @@ public class HARActivityTraining extends Activity {
 			.getTimeInstance(DateFormat.SHORT);
 
 	final Context context = this;
-	private RadioGroup rg;
-	private Button cancelBtn;
-	private Button startBtn;
+	RadioGroup rg;
+	Button cancelBtn;
+	Button startBtn;
 	private Button startDateBtn;
 	private Button startTimeBtn;
 	private Button endDateBtn;
@@ -112,8 +112,8 @@ public class HARActivityTraining extends Activity {
 										|| (year == cyear
 												&& monthOfYear == cmonth && dayOfMonth > cday)) {
 
-									AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-											context);
+									AlertDialog.Builder alertDialogBuilder =
+                                            new AlertDialog.Builder(context);
 									alertDialogBuilder
 											.setTitle("Wrong Date")
 											.setMessage(
@@ -160,15 +160,16 @@ public class HARActivityTraining extends Activity {
 								// check if start time is set correct
 								if ((startDate.get(Calendar.YEAR) == cyear
 										&& startDate.get(Calendar.MONTH) == cmonth
-										&& startDate.get(Calendar.DAY_OF_MONTH) == cday && hourOfDay > chour)
+										&& startDate.get(Calendar.DAY_OF_MONTH) == cday && hourOfDay
+                                        > chour)
 										|| startDate.get(Calendar.YEAR) == cyear
 										&& startDate.get(Calendar.MONTH) == cmonth
 										&& startDate.get(Calendar.DAY_OF_MONTH) == cday
 										&& hourOfDay == chour
 										&& minute > cminute) {
 
-									AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-											context);
+									AlertDialog.Builder alertDialogBuilder =
+                                            new AlertDialog.Builder(context);
 									alertDialogBuilder
 											.setTitle("Wrong Time")
 											.setMessage(
@@ -220,11 +221,12 @@ public class HARActivityTraining extends Activity {
 												.get(Calendar.MONTH) > monthOfYear)
 										|| (startDate.get(Calendar.YEAR) == year
 												&& startDate
-														.get(Calendar.MONTH) == monthOfYear && startDate
+														.get(Calendar.MONTH) == monthOfYear
+                                        && startDate
 												.get(Calendar.DAY_OF_MONTH) > dayOfMonth)) {
 
-									AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-											context);
+									AlertDialog.Builder alertDialogBuilder =
+                                            new AlertDialog.Builder(context);
 									alertDialogBuilder
 											.setTitle("Wrong Date")
 											.setMessage(
@@ -285,11 +287,12 @@ public class HARActivityTraining extends Activity {
 														.get(Calendar.DAY_OF_MONTH) == endDate
 														.get(Calendar.DAY_OF_MONTH)
 												&& startDate
-														.get(Calendar.HOUR_OF_DAY) == hourOfDay && startDate
+														.get(Calendar.HOUR_OF_DAY) == hourOfDay
+                                        && startDate
 												.get(Calendar.MINUTE) > minute)) {
 
-									AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-											context);
+									AlertDialog.Builder alertDialogBuilder =
+                                            new AlertDialog.Builder(context);
 									alertDialogBuilder
 											.setTitle("Wrong Time")
 											.setMessage(
@@ -439,7 +442,7 @@ public class HARActivityTraining extends Activity {
 						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 								context);
 						alertDialogBuilder
-								.setTitle("Sensors are diabled!")
+								.setTitle("Sensors are disabled!")
 								.setMessage(
 										"Enable them in the sensor settings first.")
 								.setPositiveButton("Ok",
@@ -486,7 +489,8 @@ public class HARActivityTraining extends Activity {
 								try {
 									APIFunctions.train(activity, windowLength);
 								} catch (RuntimeException e) {
-									Log.e("har", "RuntimeException in onCreate: " + e.getLocalizedMessage());
+									Log.e("har", "RuntimeException in onCreate: " +
+                                            e.getLocalizedMessage());
 								}
 								return null;
 							}
@@ -502,7 +506,8 @@ public class HARActivityTraining extends Activity {
 									APIFunctions.train(activity, windowLength,
 											startDate.getTime(), endDate.getTime());
 								} catch (RuntimeException e) {
-									Log.e("har", "RuntimeException in onCreate: " + e.getLocalizedMessage());
+									Log.e("har", "RuntimeException in onCreate: " +
+                                            e.getLocalizedMessage());
 								}
 								return null;
 							}
@@ -515,5 +520,5 @@ public class HARActivityTraining extends Activity {
 			}
 
 		});
-	};
+	}
 }
