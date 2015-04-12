@@ -25,6 +25,10 @@ import de.unistuttgart.vis.wearable.os.storage.SensorDataSerializer;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
+ * Administrates the parameters of a hardware Sensor.
+ * Holds the recent values of the Sensor.
+ * Every hardware Sensor is represented by one Sensor object.
+ *
  * @author pfaehlfd
  */
 public class Sensor implements Externalizable {

@@ -15,6 +15,7 @@ import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.api.ValueChangedCallback;
 
 /**
+ * Can create a livegraph for a specific PSensor
  * @author pfaehlfd
  */
 public abstract class AbstractLiveGraph {

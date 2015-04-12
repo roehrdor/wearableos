@@ -10,6 +10,10 @@ package de.unistuttgart.vis.wearable.os.sensors;
 import java.util.Arrays;
 
 /**
+ * Sustains all multiplicities.
+ * Every multiplicity holds the legal MeasurementSystems
+ * and a multiplier to get the fundamental unit.
+ *
  * @author pfaehlfd
  */
 public enum MeasurementUnits {

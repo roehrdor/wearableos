@@ -7,6 +7,11 @@
  */
 package de.unistuttgart.vis.wearable.os.sensors;
 
+/**
+ * sustains all the units
+ *
+ * @author pfaehlfd
+ */
 public enum MeasurementSystems {
 	METRICAL,
 	ANGLOSAXON,

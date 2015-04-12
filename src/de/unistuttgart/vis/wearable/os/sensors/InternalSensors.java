@@ -23,6 +23,9 @@ import java.util.Vector;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
+ * Links the android.hardware.Sensors to Sensor objects.
+ * Saves the incomeing values to the corresponding Sensor Object.
+ *
  * @author pfaehlfd
  */
 public class InternalSensors implements SensorEventListener {
