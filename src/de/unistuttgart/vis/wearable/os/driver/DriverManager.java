@@ -20,7 +20,7 @@ import java.util.concurrent.Semaphore;
 public class DriverManager {
     private static final SparseArray<IGarmentDriver> drivers = new SparseArray<IGarmentDriver>();
     private static final SparseArray<PGarmentDriver> pdrivers = new SparseArray<PGarmentDriver>();
-    private static int maxID = 0;
+    private static int maxID = -1 ;
     private static final Semaphore lock = new Semaphore(1);
 
     /**
@@ -33,14 +33,17 @@ public class DriverManager {
         int num = Constants.ILLEGAL_VALUE;
         lock.acquireUninterruptibly();
         if(driver != null) {
-            num = ++maxID;
             String name = null;
             try {
-                driver.setID(num);
-                name = driver.getDriverName();
+                if(driver.getID() == Constants.ILLEGAL_VALUE) {
+                    num = ++maxID;
+                    driver.setID(num);
+                    name = driver.getDriverName();
+                }
             } catch (android.os.RemoteException e) {
             }
-            if (name != null) {
+            if (name != null && num != Constants.ILLEGAL_VALUE) {
+
                 drivers.put(num, driver);
                 pdrivers.put(num, new PGarmentDriver(num, name));
             }
