@@ -138,6 +138,10 @@ public final class SensorManager {
         return sensorsToReturn.values();
     }
 
+    /**
+     * Remove the sensor with the given sensor id. If the sensor id is not found nothing will happen
+     * @param id the sensor id to be removed
+     */
     public static void removeSensor(int id) {
         allSensors.remove(id);
     }

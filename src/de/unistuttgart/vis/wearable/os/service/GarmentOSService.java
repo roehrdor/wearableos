@@ -13,13 +13,10 @@ import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityRecognitionMo
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
-import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 import de.unistuttgart.vis.wearable.os.bluetoothservice.GarmentOSBluetoothService;
-import de.unistuttgart.vis.wearable.os.driver.DriverManager;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
-import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * The Garment OS Service

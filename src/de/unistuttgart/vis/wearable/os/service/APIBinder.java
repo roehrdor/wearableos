@@ -32,10 +32,9 @@ import java.util.HashSet;
 class APIBinder extends IGarmentAPI.Stub {
 
     /**
-     *
-     * @param driver
-     * @return
-     * @throws RemoteException
+     * Register a new Driver to the system
+     * @param driver the driver that is to be registered
+     * @return the driver id assigned to the driver
      */
     @Override
     public int registerDriver(IGarmentDriver driver) throws RemoteException {

@@ -40,21 +40,47 @@ import java.util.List;
  */
 public class APIInternalBinder extends IGarmentInternalAPI.Stub {
 
+    /**
+     * Validate and extract the file. This function will return {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if
+     * the extraction process terminated successfully. If the file has not been created by GarmentOS the function will return
+     * {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_INVALID_FILE}
+     *
+     * @param file the input file to validate and extract
+     * @return {@link de.unistuttgart.vis.wearable.os.utils.Constants#UNPACK_NO_ERROR} if extraction was successful
+     */
     @Override
     public int API_unpackArchiveFile(String file) throws RemoteException {
         return Archiver.unpack(new File(file));
     }
 
+    /**
+     * Unpack the encrypted archive
+     *
+     * @param file      the inputfile to be decrypted first and then unpacked
+     * @param pw        the key to decrypt the archive file
+     */
     @Override
     public int API_unpackEncryptedArchiveFile(String file, String pw) throws RemoteException {
         return Archiver.unpackEncryptedFile(pw, new File(file));
     }
 
+    /**
+     * Get the parcelable driver objects that contain the name and id of the driver
+     *
+     * @return the parcelable driver object
+     */
     @Override
     public PGarmentDriver[] API_getDrivers() throws RemoteException {
         return DriverManager.getPDrivers();
     }
 
+    /**
+     * Creates a new Sensor, assigns the given values
+     * and adds the Sensor to the SensorManagers sensor list.
+     * The new Sensor will have the lowest external sensorID,
+     * which is not forgiven yet.
+     * Use only for external Sensors
+     */
     @Override
     public PSensor API_addNewSensor(int driverID, int sampleRate, int savePeriod, float smoothness, String displayedSensorName,
                                  int sensorType, String bluetoothID, int rawDataMeasurementSystem,
@@ -71,36 +97,69 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         }
     }
 
+    /**
+     * Remove the sensor with the given sensor id. If the sensor id is not found nothing will happen
+     * @param sensorID the sensor id to be removed
+     */
     @Override
     public void API_removeSensor(int sensorID) throws RemoteException {
         SensorManager.removeSensor(sensorID);
     }
 
+    /**
+     * Return all the applications names
+     *
+     * @return all the applications names as array
+     */
 	@Override
 	public String[] API_getRegisteredApplications() throws RemoteException {
 		return PrivacyManager.instance.getAllAppNames();
 	}
 
+    /**
+     * Return all the user applications
+     *
+     * @return all the user applications
+     */
 	@Override
 	public PUserApp[] API_getRegisteredUserApplications() throws RemoteException {
 		UserApp[] aua = PrivacyManager.instance.getAllApps();
 		PUserApp[] apua = new PUserApp[aua.length];
 		for(int i = 0; i != apua.length; ++i) {
-			apua[i] = aua[i].toParcelable();			
-		}		
-		return apua; 				
+			apua[i] = aua[i].toParcelable();
+		}
+		return apua;
 	}
 
+    /**
+     * Get the application by the name, returns null if application unknown
+     *
+     * @param name
+     *            the name of the application
+     * @return the application object or null if not known
+     */
 	@Override
 	public PUserApp API_getRegisteredUserAppByName(String name) throws RemoteException {
 		return PrivacyManager.instance.getApp(name).toParcelable();
 	}
 
+    /**
+     * This functions returns an array containing all the sensor names that are known by
+     * GarmentOS. Note GarmentOS does not prohibit to give the same name to different sensors.
+     * To uniquely identify a sensor consider using the ID and not the name.
+     *
+     * @return a String array containing all the sensor names that are known by GarmentOS
+     */
     @Override
     public String[] API_getSensorNames() throws RemoteException {
         return SensorManager.getSensorNames();
     }
 
+    /**
+     * Return a collection with all the registered Sensors by GarmentOS.
+     *
+     * @return a collection containing all sensors known by GarmentOS
+     */
     @Override
     public PSensor[] API_getAllSensors() throws RemoteException {
         java.util.Collection<Sensor> sensors = SensorManager.getAllSensors();
@@ -111,6 +170,11 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         return psensors;
     }
 
+    /**
+     * Return a collection with all the registered Sensors with thge given sensorTypeby GarmentOS.
+     *
+     * @return a collection containing all sensors with the given SensorType known by GarmentOS
+     */
     @Override
     public PSensor[] API_getAllSensorsByType(int sensorType) throws RemoteException {
         java.util.Collection<Sensor> sensors = SensorManager.getAllSensors(SensorType.values()[sensorType]);
@@ -121,18 +185,25 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
         return pSensors;
     }
 
+    /**
+     * Get the sensor that is registered with the given ID. If the ID is not known to GarmentOS
+     * null will be returned by this function.
+     *
+     * @param id the id to search for.
+     * @return the Sensor object for the ID or null if the ID is unknown
+     */
     @Override
     public PSensor API_getSensorById(int id) throws RemoteException {
         return SensorManager.getSensorByID(id).toParcelable();
     }
 
     // =====================================================================
-	// 
-	// Function calls forward to UserApp object  
+	//
+	// Function calls forward to UserApp object
 	//
 	// -------------------------------------------------------------
 	//
-	// Calls to UserApp, oid represents the unique ID of the object 
+	// Calls to UserApp, oid represents the unique ID of the object
 	//
 	@Override
 	public boolean PRIVACY_USERAPP_sensorProhibited(int oid, int id) throws RemoteException {
@@ -214,14 +285,14 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
             userApp.setDefaultSensor(SensorType.values()[sensorType], sensorID);
     }
 
-	
+
 	// =====================================================================
-	// 
-	// Function calls forward to Sensor object  
+	//
+	// Function calls forward to Sensor object
 	//
 	// -------------------------------------------------------------
 	//
-	// Calls to Sensor, sid represents the unique ID of the object 
+	// Calls to Sensor, sid represents the unique ID of the object
 	//
 	@Override
 	public void SENSORS_SENSOR_setEnabled(int sid, boolean isEnabled) throws RemoteException {
