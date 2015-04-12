@@ -14,6 +14,7 @@ import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 import de.unistuttgart.vis.wearable.os.api.CallbackHandler;
 import de.unistuttgart.vis.wearable.os.api.IGarmentAPI;
 import de.unistuttgart.vis.wearable.os.bluetoothservice.GarmentOSBluetoothService;
+import de.unistuttgart.vis.wearable.os.driver.DriverManager;
 import de.unistuttgart.vis.wearable.os.privacy.PrivacyManager;
 import de.unistuttgart.vis.wearable.os.sensors.InternalSensors;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
@@ -129,6 +130,15 @@ public class GarmentOSService extends android.app.Service {
 			public void run() {
 				ActivityRecognitionModule.getInstance();
 			}
+            }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    Utils.sleepUninterrupted(5000);
+                    android.util.Log.d("orDEBUG", "GOS:Service - Reporting Driver num " + DriverManager.getDrivers().length);
+                }
+            }
         }).start();
 		
     }

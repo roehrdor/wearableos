@@ -11,4 +11,5 @@ interface IGarmentDriver {
     float[] executeDriver(in byte[] stream);
     String  getDriverName();
     void    setID(int id);
+    int     getID();
 }
