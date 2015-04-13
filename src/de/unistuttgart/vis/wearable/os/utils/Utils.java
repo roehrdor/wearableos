@@ -7,6 +7,11 @@
  */
 package de.unistuttgart.vis.wearable.os.utils;
 
+import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class provides some basic utilities that can be used everywhere.
  * 
@@ -189,6 +194,35 @@ public class Utils {
      */
     public static long getCurrentLongUnixTimeStamp() {
         return System.currentTimeMillis();
+    }
+
+
+    private static List<Integer> permissionFlags = new ArrayList<Integer>();
+    static {
+        permissionFlags.add(Constants.PERMISSION_HEARTRATE);
+        permissionFlags.add(Constants.PERMISSION_ACCELEROMETER);
+        permissionFlags.add(Constants.PERMISSION_MAGNETIC_FIELD);
+        permissionFlags.add(Constants.PERMISSION_GYROSCOPE);
+        permissionFlags.add(Constants.PERMISSION_LIGHT);
+        permissionFlags.add(Constants.PERMISSION_PRESSURE);
+        permissionFlags.add(Constants.PERMISSION_PROXIMITY);
+        permissionFlags.add(Constants.PERMISSION_GRAVITY);
+        permissionFlags.add(Constants.PERMISSION_ROTATION_VECTOR);
+        permissionFlags.add(Constants.PERMISSION_TEMPERATURE);
+        permissionFlags.add(Constants.PERMISSION_GPS_SENSOR);
+    }
+
+    /**
+     * Get the permission flag based on the given sensor type
+     *
+     * @param sensorType the sensor type to get the permission flag for
+     * @return the permission flag for the given value
+     */
+    public static int permissionFlagFromSensorType(SensorType sensorType) {
+        if(sensorType == null)
+            return Constants.ILLEGAL_VALUE;
+        else
+            return permissionFlags.get(sensorType.ordinal());
     }
 
 	/**
