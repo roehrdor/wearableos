@@ -290,6 +290,10 @@ public class AddSensorActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        this.finish();
+    }
+
+    public void saveNewSensor(View view) {
         if (textView.getText().toString().equalsIgnoreCase("New Sensor") || textView.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
                     Toast.LENGTH_SHORT).show();
@@ -305,10 +309,7 @@ public class AddSensorActivity extends Activity {
             Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
             this.finish();
         }
-    }
 
-    public void goBack(View view) {
-        this.finish();
     }
 
 }
