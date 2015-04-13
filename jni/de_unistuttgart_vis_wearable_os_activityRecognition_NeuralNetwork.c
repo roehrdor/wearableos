@@ -1,14 +1,21 @@
 #include "include/de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork.h"
-#include "include/neural_network.h"
+#include "fann/include/doublefann.h"
+#include <android/log.h>
 
-static void **networks;
-static uint instances = 0;
-static uint num_existent = 0;
-static uint num_elements = 0;
-static uint max_current_instances = 4;
+#define LOG_TAG		"GOS_NN"
+#define LOG(...)	__android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 
 #define ILLEGAL_INSTANCE_ID 0xFFFFFFFF
 
+static struct fann **networks;
+static int num_existent = 0;
+static int max_current_instances = 0x4;
+
+/*
+ * Every instance of the neural netowrk java class has an uniquee instance id to access
+ * the underluying native neural network
+ * @return the instance id of the neural network or ILLEGAL_INSTANCE_ID if not existent
+ */
 inline int get_instance_id(JNIEnv *env, jobject thiz)
 {
 	jclass thiz_class;
@@ -25,30 +32,69 @@ inline int get_instance_id(JNIEnv *env, jobject thiz)
 	return (int)(*env)->GetIntField(env, thiz, fidnumber);
 }
 
-inline void keep_network(neural_net *network)
+/*
+ * Save the network in memory
+ */
+inline int keep_network(JNIEnv *env, jobject thiz, struct fann *pann)
 {
-	//TODO save pointer to neural network in array
-	if(networks == NULL)
+	int i;
+	jclass thiz_class;
+	jfieldID fidnumber;
+
+	/* If we do not have any array at the moment allocate memory and create it */
+	if(networks == NULL) 
 	{
-		max_current_instances = 4;
-		networks = malloc(sizeof(void*) * max_current_instances);
+		max_current_instances = 0x4;
+		networks = malloc(sizeof(struct fann*) * max_current_instances);
 	}
 
-	/* Enough memory available */
-	if(instances >= max_current_instances)
+	/* 
+	 * Check whether we have enough memory other wise reallocate the memory with
+	 * twice as much memory 
+	 */
+	if(num_existent >= max_current_instances)
 	{
-		void **p;
+		struct fann **p;
 		max_current_instances *= 2;
-		p = realloc(network, max_current_instances);
+		p = realloc(networks, max_current_instances);
 		if(p == NULL)
 		{
-			printf("damn\n");
-			return;
+			LOG("Could not reallocate memory for resizing\n");
+			return 0x1;
+		}
+		networks = p;
+
+		for(i = max_current_instances / 2; i != max_current_instances; ++i) 
+		{
+			networks[i] = NULL;
 		}
 	}
-	networks[instances] = network;
-	++instances;
+
+	/* Increase the counter */
 	++num_existent;
+
+	/* Check for the first free array index, this is the instance id */
+	for(i = 0; i != max_current_instances; ++i)	 	
+		if(networks[i] == NULL)
+			break;
+
+	/* Save the network at this position in the array */
+	networks[i] = pann;
+
+	/*  Set the internal instance id */
+	/* Get the instance id from the object */
+	thiz_class = (*env)->GetObjectClass(env, thiz);
+	fidnumber = (*env)->GetFieldID(env, thiz_class, "instance_id", "I");
+	if(fidnumber == NULL)
+	{
+		LOG("Fatal, could not get instance_id %d field!\n", i);
+		return ILLEGAL_INSTANCE_ID;
+	}
+	LOG("Setting ID %d\n", i);
+	(*env)->SetIntField(env, thiz, fidnumber, i);
+
+	/* Success */
+	return 0x0;
 }
 
 /*
@@ -57,18 +103,32 @@ inline void keep_network(neural_net *network)
  * Signature: ([II)I
  */
 JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1new_1neural_1net(JNIEnv *env, jobject thiz, jintArray topology, jint size)
-{	
-	uint *c_topology;
-	uint i;
+{		
+	int *c_topology;
+	unsigned int i;
+	struct fann *ann;
 
-	c_topology = (uint*)(*env)->GetIntArrayElements(env, topology, NULL);
-	if(NULL == c_topology)
+	/* Gain access to the int array elements through JVM */
+	c_topology = (int*)(*env)->GetIntArrayElements(env, topology, NULL);
+
+	/* Check whether we got access to the array elements */
+	if(c_topology == NULL)
 	{
-		printf("Error, could not read topology!\n");
+		/* If not Log and return with error code */
+		LOG("Error, could not read topology!\n");
 		return 0x1;
-	}	
-	keep_network(new_neural_net(c_topology, size));
+	}
+
+	/* Create the neural network */
+	ann = fann_create_standard_array(size, c_topology);
+
+	/* Now keep the neural entwork */
+	keep_network(env, thiz, ann);
+	
+	/* Release the int array elements */
 	(*env)->ReleaseIntArrayElements(env, topology, (jint*)c_topology, 0);
+
+	/* Success */
 	return 0x0;
 }
 
@@ -79,50 +139,16 @@ JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
  */
 JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1new_1neural_1net_1from_1file(JNIEnv *env, jobject thiz, jstring file_name)
 {
-	int instance_id;
-	const char *str;
-	void *instance;
-	neural_net *net;
+	const char *file;
+	struct fann *ann;
 
-	str = (*env)->GetStringUTFChars(env, file_name, NULL);
-	if(str == NULL)
+	file = (*env)->GetStringUTFChars(env, file_name, NULL);
+	if(file == NULL)
 		return 0x1;
 
-
-	instance = net = new_neural_net_load(str);
-	(*env)->ReleaseStringUTFChars(env, file_name, str);		
-	
-	/* File could not be read or has been damaged */
-	if(instance == NULL)
-		return 0x1;
-
-	keep_network(instance);	
-
-	//
-	// Set the number of neurons in the object
-	//
-	jclass thizClass = (*env)->GetObjectClass(env, thiz);
-	
-	//
-	// Set the number of input neurons
-	//
-	jfieldID fidNumberOfInputNeurons = (*env)->GetFieldID(env, thizClass, "numberOfInputNeurons", "I");
-	if(fidNumberOfInputNeurons == NULL)
-		return 0x1;
-	jint numberOfInputNeurons = (*env)->GetIntField(env, thiz, fidNumberOfInputNeurons);
-	numberOfInputNeurons = neural_net_get_input_neurons_number(net);
-	printf("%d\n", numberOfInputNeurons);
-	(*env)->SetIntField(env, thiz, fidNumberOfInputNeurons, numberOfInputNeurons);
-
-	//
-	// Set the number of output neurons
-	//
-	jfieldID fidNumberOfOutputNeurons = (*env)->GetFieldID(env, thizClass, "numberOfOutputNeurons", "I");
-	if(fidNumberOfOutputNeurons == NULL)
-		return 0x1;
-	jint numberOfOutputNeurons = (*env)->GetIntField(env, thiz, fidNumberOfOutputNeurons);
-	numberOfOutputNeurons = neural_net_get_output_neurons_number(net);
-	(*env)->SetIntField(env, thiz, fidNumberOfOutputNeurons, numberOfOutputNeurons);
+	ann = fann_create_from_file(file);
+	(*env)->ReleaseStringUTFChars(env, file_name, file);	
+	keep_network(env, thiz, ann);
 
 	/* Success */
 	return 0x0;
@@ -136,95 +162,66 @@ JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
 JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1delete_1neural_1net(JNIEnv *env, jobject thiz)
 {	
 	int instance_id;
-	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_elements - 1 < instance_id)
+	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_existent - 1 < instance_id)
 		return;
-	
-	/* Now that we got our ID we can delete the neural network */
-	delete_neural_net((neural_net*)networks[instance_id]);
-	--num_existent;
+
+	fann_destroy((struct fann *)networks[instance_id]);
+	networks[instance_id] = NULL;
 	if(num_existent == 0)
 	{
 		free(networks);
 		networks = NULL;
-		num_elements = 0;
-		max_current_instances = 0;
-		instances = 0;
+		max_current_instances = 0x0;
 	}
 }
 
 /*
  * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_feed_forward
- * Signature: ([DI)V
+ * Method:    j_train
+ * Signature: ([DI[DI)V
  */
-JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1feed_1forward(JNIEnv *env, jobject thiz, jdoubleArray input, jint size)
+JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1train(JNIEnv *env, jobject thiz, jdoubleArray input, jint inputSize, jdoubleArray target, jint targetSize)
 {
+	fann_type *finput, *ftarget;
+	struct fann *ann;
 	int instance_id;
-	uint i;
-	double *dinput;		
 
-	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_elements - 1 < instance_id)
-	{
-		printf("Fatal, could not get instance_id\n");
+	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_existent - 1 < instance_id)
 		return;
-	}
-	dinput = (double*)(*env)->GetDoubleArrayElements(env, input, NULL);
-	neural_net_feed_forward((neural_net*)networks[instance_id], dinput, (int)size);
-	(*env)->ReleaseDoubleArrayElements(env, input, (jdouble*)dinput, 0);
+	ann = networks[instance_id];
+
+	ftarget = (fann_type*)(*env)->GetDoubleArrayElements(env, target, NULL);
+	finput = (fann_type*)(*env)->GetDoubleArrayElements(env, input, NULL);
+
+	fann_train(ann, finput, ftarget);
+
+	(*env)->ReleaseDoubleArrayElements(env, target, (jdouble*)ftarget, 0);
+	(*env)->ReleaseDoubleArrayElements(env, target, (jdouble*)finput, 0);
 }
 
 /*
  * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_back_prop
- * Signature: ([DI)V
+ * Method:    j_run
+ * Signature: ([DI[DI)V
  */
-JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1back_1prop(JNIEnv *env, jobject thiz, jdoubleArray target, jint size)
+JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1run(JNIEnv *env, jobject thiz, jdoubleArray input, jint inputSize, jdoubleArray output, jint outputSize)
 {
-	int instance_id;
-	uint i;
-	double *dtarget;
-
-	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_elements - 1 < instance_id)
-		return;
-
-	dtarget = (double*)(*env)->GetDoubleArrayElements(env, target, NULL);
-	neural_net_back_prop((neural_net*)networks[instance_id], dtarget, (int)size);
-	(*env)->ReleaseDoubleArrayElements(env, target, (jdouble*)dtarget, 0);
-
-}
-
-/*
- * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_get_results
- * Signature: ([DI)V
- */
-JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1get_1results(JNIEnv *env, jobject thiz, jdoubleArray res, jint size)
-{
-	int instance_id;
-	uint i;
+	fann_type *finput, *fresult;
 	double *dresult;
-
-	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_elements - 1 < instance_id)
-		return;
-
-	dresult = (double*)(*env)->GetDoubleArrayElements(env, res, NULL);
-	neural_net_get_results((neural_net*)networks[instance_id], dresult, size);
-	(*env)->ReleaseDoubleArrayElements(env, res, (jdouble*)dresult, 0);
-}
-
-/*
- * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_get_recent_average_error
- * Signature: ()D
- */
-JNIEXPORT jdouble JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1get_1recent_1average_1error(JNIEnv *env, jobject thiz)
-{
+	struct fann *ann;
 	int instance_id;
 
-	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_elements - 1 < instance_id)
-		return ILLEGAL_INSTANCE_ID;
+	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_existent - 1 < instance_id)
+		return;
+	ann = networks[instance_id];
 
-	return (jdouble)neural_net_recent_average_error((neural_net*)networks[instance_id]);
+	finput = (fann_type*)(*env)->GetDoubleArrayElements(env, input, NULL);
+	fresult = fann_run(ann, finput);
+	(*env)->ReleaseDoubleArrayElements(env, output, (jdouble*)finput, 0);
+
+	dresult = (double*)(*env)->GetDoubleArrayElements(env, output, NULL);
+	memcpy(fresult, dresult, sizeof(double) * outputSize);
+	(*env)->ReleaseDoubleArrayElements(env, output, (jdouble*)dresult, 0);
 }
 
 /*
@@ -232,22 +229,8 @@ JNIEXPORT jdouble JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecogniti
  * Method:    j_neural_net_save
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1save(JNIEnv *env, jobject thiz, jstring file_name)
+JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1save(JNIEnv *env, jobject thiz, jstring fileName)
 {
-	const char *str;
-	int instance_id;
-	jint return_value;
-
-	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_elements - 1 < instance_id)
-		return ILLEGAL_INSTANCE_ID;
-
-	str = (*env)->GetStringUTFChars(env, file_name, NULL);
-
-	if(str == NULL)
-		return;
-
-	return_value = (jint)neural_net_save((neural_net*)networks[instance_id], str);
-	(*env)->ReleaseStringUTFChars(env, file_name, str);	
-	return return_value;
+	//TODO
+	return 0x0;
 }
-

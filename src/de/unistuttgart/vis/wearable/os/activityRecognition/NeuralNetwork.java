@@ -53,14 +53,9 @@ public class NeuralNetwork {
 	// instance id to address the JNI structure
 	private int instance_id = -1;
 
-	// Also store the number of input and output neurons in the java
-	// class, for early error recognition 
-	private int numberOfInputNeurons;
-	private int numberOfOutputNeurons;
-
 	// Statically load the library
 	static {
-		System.loadLibrary("neuralNetwork");
+        System.loadLibrary("neuralNetwork");
 	}
 	
 	/**
@@ -83,9 +78,6 @@ public class NeuralNetwork {
 		for(int i = topology.length - 1; i >= 0; --i)
 			if(topology[i] < 1)
 				throw new IllegalArgumentException("There must be a neuron in each layer");
-
-		this.numberOfInputNeurons = topology[0];
-		this.numberOfOutputNeurons = topology[topology.length - 1];
 
 		if(this.j_new_neural_net(topology, topology.length) == 0)
 			this.set_index();
@@ -115,9 +107,6 @@ public class NeuralNetwork {
 	 */
 	public synchronized void delete() {
 		this.j_delete_neural_net();
-		--num_existent;
-		if(num_existent == 0 )
-			num_instances = 0;
 	}
 
 	/**
@@ -127,9 +116,7 @@ public class NeuralNetwork {
 	 * @param input the input to feed forward
 	 */
 	public void input(double[] input) {
-		if(input.length != this.numberOfInputNeurons)
-			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network - found " + this.numberOfInputNeurons + " but need " + input.length);
-		this.j_neural_net_feed_forward(input, input.length);
+		throw new RuntimeException("Currently this operation is not supported");
 	}
 
 	/**
@@ -143,13 +130,7 @@ public class NeuralNetwork {
 	 * @param target target result
 	 */
 	public void train(double[] input, double[] target) {
-		if(input.length != this.numberOfInputNeurons)
-			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
-		if(target.length != this.numberOfOutputNeurons)
-			throw new IllegalArgumentException("The number of target neurons must equal the output numbers of the neural network");
-
-		this.j_neural_net_feed_forward(input, input.length);
-		this.j_neural_net_back_prop(target, target.length);
+		this.j_train(input, input.length, target, target.length);
 	}
 
 	/**
@@ -159,10 +140,7 @@ public class NeuralNetwork {
 	 * @param target the target value
 	 */
 	public void backProp(double[] target) {
-		if(target.length != this.numberOfOutputNeurons)
-			throw new IllegalArgumentException("The number of target neurons must equal the output numbers of the neural network");
-
-		this.j_neural_net_back_prop(target, target.length);	
+		throw new RuntimeException("Currently this operation is not supported");
 	}
 
 	/**
@@ -172,10 +150,7 @@ public class NeuralNetwork {
 	 * @param result result output array to store the results in
 	 */
 	public void result(double[] result) {
-		if(result.length != this.numberOfOutputNeurons)
-			throw new IllegalArgumentException("The number of result neurons must equal the output numbers of the neural network");
-
-		this.j_neural_net_get_results(result, result.length);
+		throw new RuntimeException("Currently this operation is not supported");
 	}
 
 	/**
@@ -189,13 +164,7 @@ public class NeuralNetwork {
 	 * @param output the result of the neural network
 	 */
 	public void classifiy(double[] input, double[] output) {
-		if(input.length != this.numberOfInputNeurons)
-			throw new IllegalArgumentException("The number of input neurons must equal the input numbers of the neural network");
-		if(output.length != this.numberOfOutputNeurons)
-			throw new IllegalArgumentException("The number of result neurons must equal the output numbers of the neural network");
-
-		this.j_neural_net_feed_forward(input, input.length);
-		this.j_neural_net_get_results(output, output.length);
+		this.j_run(input, input.length, output, output.length);
 	}
 
 	/**
@@ -204,7 +173,7 @@ public class NeuralNetwork {
 	 * @return the recent error rate
 	 */
 	public double recentError() {
-		return this.j_neural_net_get_recent_average_error();
+		throw new RuntimeException("Currently this operation is not supported");
 	}
 
 	/**
@@ -223,8 +192,8 @@ public class NeuralNetwork {
 	 * Set the current index to identify this obect in the JNI Code
 	 */
 	private synchronized void set_index() {
-		this.instance_id = num_instances++;
-		++num_existent;
+		//this.instance_id = num_instances++;
+		//++num_existent;
 	}
 	
 	/* 
@@ -234,9 +203,7 @@ public class NeuralNetwork {
 	private native int j_new_neural_net(int[] topology, int size);
 	private native int j_new_neural_net_from_file(String file);
 	private native void j_delete_neural_net();
-	private native void j_neural_net_feed_forward(double[] input, int size);
-	private native void j_neural_net_back_prop(double[] target, int size);
-	private native void j_neural_net_get_results(double[] res, int size);
-	private native double j_neural_net_get_recent_average_error();
+	private native void j_train(double[] input, int size, double[] target, int size2);
+	private native void j_run(double[] input, int size, double[] result, int size2);
 	private native int j_neural_net_save(String file);	
 }

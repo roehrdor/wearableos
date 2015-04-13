@@ -33,35 +33,19 @@ JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
 
 /*
  * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_feed_forward
- * Signature: ([DI)V
+ * Method:    j_train
+ * Signature: ([DI[DI)V
  */
-JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1feed_1forward
-  (JNIEnv *, jobject, jdoubleArray, jint);
+JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1train
+  (JNIEnv *, jobject, jdoubleArray, jint, jdoubleArray, jint);
 
 /*
  * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_back_prop
- * Signature: ([DI)V
+ * Method:    j_run
+ * Signature: ([DI[DI)V
  */
-JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1back_1prop
-  (JNIEnv *, jobject, jdoubleArray, jint);
-
-/*
- * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_get_results
- * Signature: ([DI)V
- */
-JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1get_1results
-  (JNIEnv *, jobject, jdoubleArray, jint);
-
-/*
- * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
- * Method:    j_neural_net_get_recent_average_error
- * Signature: ()D
- */
-JNIEXPORT jdouble JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1get_1recent_1average_1error
-  (JNIEnv *, jobject);
+JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1run
+  (JNIEnv *, jobject, jdoubleArray, jint, jdoubleArray, jint);
 
 /*
  * Class:     de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork
