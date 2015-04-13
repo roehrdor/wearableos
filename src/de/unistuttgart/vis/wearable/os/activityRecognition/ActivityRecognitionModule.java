@@ -7,6 +7,9 @@
  */
 package de.unistuttgart.vis.wearable.os.activityRecognition;
 
+import android.os.Looper;
+import android.util.Log;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,11 +22,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import android.os.Looper;
-import android.util.Log;
 import de.unistuttgart.vis.wearable.os.activityRecognition.NeuralNetworkManager.Status;
-import de.unistuttgart.vis.wearable.os.activityRecognition.FeatureSet;
-import de.unistuttgart.vis.wearable.os.activityRecognition.TimeWindow;
 import de.unistuttgart.vis.wearable.os.api.ActivityChangedCallback;
 import de.unistuttgart.vis.wearable.os.api.CallbackFlags;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
@@ -32,7 +31,6 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.service.GarmentOSService;
 import de.unistuttgart.vis.wearable.os.storage.ActivityLoad;
-import de.unistuttgart.vis.wearable.os.storage.ActivityStorage;
 
 /**
  * @author Tobias
@@ -55,10 +53,8 @@ public class ActivityRecognitionModule {
 		instance.neuralNetworkManager = new NeuralNetworkManager(Properties.storageDirectory);
 		instance.loadActivities();
 	}
-	
-	private final double LONG_MAX = 4294967296.0;
-	
-	private List<Activity> activities = new ArrayList<Activity>();
+
+    private List<Activity> activities = new ArrayList<Activity>();
 	private NeuralNetworkManager neuralNetworkManager;	
 	private Activity currentActivity;
 	
@@ -67,12 +63,14 @@ public class ActivityRecognitionModule {
 	private Date endActivity;
 	private boolean training = false;
 	private boolean recognizing = false;
+    private boolean finished = false;
 	
 	private ScheduledExecutorService scheduler;
 	private Future<?> recognitionFuture;
 	private Future<?> trainingFuture;
-	
-	public static synchronized ActivityRecognitionModule getInstance() {
+    private int errorCount;
+
+    public static synchronized ActivityRecognitionModule getInstance() {
 		return instance;
 	}
 	
@@ -183,7 +181,8 @@ public class ActivityRecognitionModule {
 					try {
 						timeWindow = createTimeWindow("unlabeled", begin, end);
 					} catch (ArrayIndexOutOfBoundsException e) {
-						Log.e("har", "ArrayIndexOutOfBoundsException in train: " + e.getLocalizedMessage());
+						Log.e("har", "ArrayIndexOutOfBoundsException in train: " +
+                                e.getLocalizedMessage());
 						return;
 					}
 					double recognizedActivity = 0;
@@ -195,17 +194,20 @@ public class ActivityRecognitionModule {
 						try {
 							recognizedActivity = neuralNetworkManager.recognise(timeWindow);
 						} catch (NullPointerException e) {
-							Log.e("har", "NullPointerException in recognize: " + e.getLocalizedMessage());
+							Log.e("har", "NullPointerException in recognize: " +
+                                    e.getLocalizedMessage());
 							return;
 						} catch (IllegalArgumentException e) {
-							Log.e("har", "IllegalArgumentException in recognize: " + e.getLocalizedMessage());
+							Log.e("har", "IllegalArgumentException in recognize: " +
+                                    e.getLocalizedMessage());
 							return;
 						}
 					}
 					String closestActivity = closestActivity(recognizedActivity);
-					if(!closestActivity.equals(getCurrentActivity())) {
+					if(!closestActivity.equals(getCurrentActivity().getActivityEnum().toString())) {
 						boolean firstActivity = false;
-						if(getCurrentActivity().getActivityEnum().name().equals(ActivityEnum.NOACTIVITY.name())) {
+						if(getCurrentActivity().getActivityEnum().name()
+                                .equals(ActivityEnum.NOACTIVITY.name())) {
 							setBeginActivity(new Date());
 							firstActivity = true;
 						}
@@ -269,7 +271,8 @@ public class ActivityRecognitionModule {
 	 */
 	private String closestActivity(double find) {
 		String closest = neuralNetworkManager.getActivities().get(0);
-		double distance = Math.abs(closest.hashCode() / LONG_MAX - find);
+        double LONG_MAX = 4294967296.0;
+        double distance = Math.abs(closest.hashCode() / LONG_MAX - find);
 		for(String s : neuralNetworkManager.getActivities()) {
 			double tempDistance = Math.abs(s.hashCode() / LONG_MAX - find);
 			if(distance >= tempDistance) {
@@ -308,39 +311,47 @@ public class ActivityRecognitionModule {
 		try {
 			trainingFuture = scheduler.scheduleAtFixedRate(new Runnable() {
 
-				@Override
-				public void run() {
-					if(Looper.myLooper() == null) {
-						Looper.prepare();
-					}
-					Date end = new Date();
-					Date begin = new Date();
-					begin.setTime(end.getTime() - windowLength);
-					TimeWindow timeWindow;
-					try {
-						timeWindow = createTimeWindow(activity, begin, end);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						Log.e("har", "ArrayIndexOutOfBoundsException in train: " + e.getLocalizedMessage());
-						return;
-					}
-                    if(timeWindow.getActivityLabel().equals(
+                @Override
+                public void run() {
+                    if (Looper.myLooper() == null) {
+                        Looper.prepare();
+                    }
+                    if (errorCount >= 8) {
+                        errorCount = 0;
+                        restartTraining(activity, windowLength);
+                        return;
+                    }
+                    Date end = new Date();
+                    Date begin = new Date();
+                    begin.setTime(end.getTime() - windowLength);
+                    TimeWindow timeWindow;
+                    try {
+                        timeWindow = createTimeWindow(activity, begin, end);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        Log.e("har", "ArrayIndexOutOfBoundsException in train: " +
+                                e.getLocalizedMessage());
+                        return;
+                    }
+                    if (timeWindow.getActivityLabel().equals(
                             "dead (sensor disabled)")) {
                         throw new CancellationException("sensor is disabled");
                     }
-					if(!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
-						try {
-							neuralNetworkManager.train(timeWindow);
-						} catch (NullPointerException e) {
-							Log.e("har", "NullPointerException in train: " + e.getLocalizedMessage());
-							return;
-						} catch (IllegalArgumentException e) {
-							Log.e("har", "IllegalArgumentException in train: " + e.getLocalizedMessage());
-							return;
-						}
-					}
-				}
-				
-			}, 1000, windowLength / 4, TimeUnit.MILLISECONDS);
+                    if (!timeWindow.getActivityLabel().substring(0, 4).equals("dead")) {
+                        try {
+                            neuralNetworkManager.train(timeWindow);
+                            errorCount = 0;
+                        } catch (NullPointerException e) {
+                            Log.e("har", "NullPointerException in train: " +
+                                    e.getLocalizedMessage());
+                            errorCount++;
+                        } catch (IllegalArgumentException e) {
+                            Log.e("har", "IllegalArgumentException in train: " +
+                                    e.getLocalizedMessage());
+                        }
+                    }
+                }
+
+            }, 1000, windowLength / 2, TimeUnit.MILLISECONDS);
 			trainingFuture.get();
 		} catch(InterruptedException e) {
 			Log.e("har", "InterruptedException in train: " + e.getLocalizedMessage());
@@ -356,6 +367,17 @@ public class ActivityRecognitionModule {
 			closeNeuralNetwork();
 		}
 	}
+
+    private void restartTraining(String activity, int windowLength) {
+        trainingFuture.cancel(false);
+        training = false;
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        train(activity, windowLength);
+    }
 	
 	/**
 	 * This method trains the neural network from already saved data.
@@ -384,6 +406,7 @@ public class ActivityRecognitionModule {
 							+ e.getLocalizedMessage());
 			return;
 		}
+        finished = false;
 		trainingNumber = 0;
 		training = true;
 		scheduler = Executors.newScheduledThreadPool(4);
@@ -395,16 +418,19 @@ public class ActivityRecognitionModule {
 					if(Looper.myLooper() == null) {
 						Looper.prepare();
 					}
-					boolean finnished = false;
-					while (!finnished) {
+                    if(errorCount >= 8) {
+                        errorCount = 0;
+                        return;
+                    }
+					while (!finished) {
 						Date timeWindowBegin = new Date();
-						timeWindowBegin.setTime(begin.getTime() + (windowLength / 4)
+						timeWindowBegin.setTime(begin.getTime() + (windowLength / 2)
 								* trainingNumber);
 						Date timeWindowEnd = new Date();
 						timeWindowEnd.setTime(timeWindowBegin.getTime()
 								+ windowLength);
 						if (timeWindowEnd.getTime() >= end.getTime()) {
-							finnished = true;
+							finished = true;
 							training = false;
 							closeNeuralNetwork();
 							return;
@@ -419,12 +445,21 @@ public class ActivityRecognitionModule {
 								.equals("dead")) {
 							try {
 								neuralNetworkManager.train(timeWindow);
-							} catch (NullPointerException e) {
-							} catch (IllegalArgumentException e) {
-							}
+                                errorCount = 0;
+                            } catch (NullPointerException e) {
+                                Log.e("har", "NullPointerException in train: " +
+                                        e.getLocalizedMessage());
+                                errorCount++;
+                                return;
+                            } catch (IllegalArgumentException e) {
+                                Log.e("har", "IllegalArgumentException in train: " +
+                                        e.getLocalizedMessage());
+                                return;
+                            }
 						}
 						incTrainingNumber();
 					}
+                    finished = false;
 				}
 				
 			});
@@ -443,18 +478,16 @@ public class ActivityRecognitionModule {
 			closeNeuralNetwork();
 		}
 	}
-	
-	/**
-	 * TODO delete
-	 */
+
 	private synchronized void incTrainingNumber() {
 		trainingNumber++;
 	}
-	
+
 	/**
 	 * Stops the currently running training.
 	 */
 	public void stopTraining() {
+        finished = true;
 		trainingFuture.cancel(false);
 		training = false;
 	}
@@ -574,7 +607,8 @@ public class ActivityRecognitionModule {
 		try {
 			return neuralNetworkManager.create(inputNeurons);
 		} catch (IllegalArgumentException e) {
-			Log.e("har", "IllegalArgumentException in createNeuralNetwork: " + e.getLocalizedMessage());
+			Log.e("har", "IllegalArgumentException in createNeuralNetwork: " +
+                    e.getLocalizedMessage());
 			return false;
 		}
 

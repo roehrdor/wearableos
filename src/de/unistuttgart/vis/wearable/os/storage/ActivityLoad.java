@@ -19,10 +19,9 @@ public class ActivityLoad implements Runnable {
 	
 	private long threadID = 0;
 	
-	private java.io.File file = null;
-	private java.io.RandomAccessFile raf = null;
-	
-	private static final java.util.Set<Long> activeWorkers = new java.util.HashSet<Long>();
+	java.io.File file = null;
+
+    private static final java.util.Set<Long> activeWorkers = new java.util.HashSet<Long>();
 
 	public ActivityLoad(java.util.List<Activity> activities) {
 		this.activities = activities;
@@ -62,7 +61,7 @@ public class ActivityLoad implements Runnable {
 	 *            the id of the worker
 	 * @return false if the job is still running, true otherwise
 	 */
-	public static boolean jobFinsihed(long id) {
+	public static boolean jobFinished(long id) {
 		synchronized (activeWorkers) {		
 			return !activeWorkers.contains(id);
 		}
@@ -74,9 +73,7 @@ public class ActivityLoad implements Runnable {
     public void run() {
         try {
             int currentFileLength;
-            int numberOfDataSetsInFile;
-            int dataDimension;
-            int numberOfReadingIterations = 0;
+            int numberOfReadingIterations;
             boolean skip = false;
 
             //
@@ -91,21 +88,19 @@ public class ActivityLoad implements Runnable {
             //
             // Otherwise open the file as RandomAccessFile
             //
-            raf = new java.io.RandomAccessFile(file, "rw");
+            java.io.RandomAccessFile raf = new java.io.RandomAccessFile(file, "rw");
 
             //
             // Based on the file size compute the number of entries in the file
             //
             currentFileLength = (int)file.length();
-            raf.seek(8);
-            dataDimension = raf.readInt();
-            numberOfDataSetsInFile = (currentFileLength - 12) / ((dataDimension + 1) * 4);
-            numberOfReadingIterations = numberOfDataSetsInFile;
+            raf.seek(0);
+            numberOfReadingIterations = currentFileLength / 12;
 
             //
             // If not data fields are available, skip
             //
-            if(numberOfDataSetsInFile < 1 || currentFileLength <= 12)
+            if(currentFileLength <= 12)
                 skip = true;
 
             if(!skip) {
@@ -118,6 +113,7 @@ public class ActivityLoad implements Runnable {
                 while (--numberOfReadingIterations >= 0) {
                 	if (first) {
 						dateBegin = new java.util.Date(raf.readLong());
+                        first = false;
 					}
 					ActivityEnum activityEnum = ActivityEnum.values()[raf.readInt()];
                 	int i = 0;
@@ -127,10 +123,11 @@ public class ActivityLoad implements Runnable {
                 		}
                 		i++;
                 	}
-                	java.util.Date dateEnd = new java.util.Date(raf.readLong());
-                	activities.get(i).addPeriod(dateBegin, dateEnd);
-                	dateBegin = dateEnd;
-                	first = false;
+                    if(numberOfReadingIterations != 0) {
+                        java.util.Date dateEnd = new java.util.Date(raf.readLong());
+                        activities.get(i).addPeriod(dateBegin, dateEnd);
+                        dateBegin = dateEnd;
+                    }
                 }
             }
             //
