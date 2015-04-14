@@ -11,15 +11,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.api.*;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 public class MainActivity extends Activity {
