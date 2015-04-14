@@ -1,6 +1,8 @@
 package de.unistuttgart.vis.wearable.os.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.internalapi.PSensor;
 import de.unistuttgart.vis.wearable.os.internalapi.PUserApp;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * Created by Lucas on 01.03.2015.
@@ -34,9 +37,7 @@ public class AppDetailActivity extends Activity {
         app = getIntent().getParcelableExtra("PUserApp");
         sensorTypes = APIFunctions.getAvailableSensorTypes();
         ListView listView = (ListView) findViewById(R.id.listView_app_detail);
-        ArrayAdapter adapter = new AppListAdapter();
-        listView.setAdapter(adapter);
-
+        listViewOptions(listView);
     }
 
     private class AppListAdapter extends ArrayAdapter<SensorType> {
@@ -93,5 +94,58 @@ public class AppDetailActivity extends Activity {
 
             }
         });
+    }
+
+
+
+    public void listViewOptions(ListView listView) {
+        @SuppressWarnings("rawtypes")
+        ArrayAdapter adapter = new AppListAdapter();
+        listView.setAdapter(adapter);
+
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                showDialogDelete(position, view);
+                return true;
+            }
+        });
+
+
+    }
+
+    public void showDialogDelete(final int position, final View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AppDetailActivity.this);
+
+        if(view.isEnabled()) {
+            builder.setMessage("Wollen sie diesen Sensor verbieten?");
+        }else{
+            builder.setMessage("Wollen sie diesen Sensor erlauben?");
+        }
+
+        builder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(view.isEnabled()) {
+                    app.denySensorType(Utils.permissionFlagFromSensorType(sensorTypes[position]));
+                    view.setEnabled(false);
+                }else{
+                    app.allowSensorType(Utils.permissionFlagFromSensorType(sensorTypes[position]));
+                    view.setEnabled(true);
+                }
+                onCreate(null);
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
     }
 }
