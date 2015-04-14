@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">WearableOS SettingsApp</string>
+    <string name="app_name">GarmentOS SettingsApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_sensor_add">AddSensorActivity</string>
     <string name="btn_dropbox">Dropbox</string>
