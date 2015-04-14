@@ -11,19 +11,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.api.*;
-import de.unistuttgart.vis.wearable.os.driver.DriverManager;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
-import de.unistuttgart.vis.wearable.os.sensors.SensorData;
-import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
-
-import java.sql.Driver;
 
 public class MainActivity extends Activity {
     private static Context context;
@@ -107,21 +98,5 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    Utils.sleepUninterrupted(2000);
-                    for(IGarmentDriver iGarmentDriver : DriverManager.getDrivers()) {
-                        try {
-                            Log.d("orDEBUG", "" + iGarmentDriver.getDriverName());
-                        } catch (RemoteException e) {
-                            Log.d("orDEBUG", "DRIVER ERROR");
-                        }
-                    }
-                }
-            }
-        }).start();
     }
 }
