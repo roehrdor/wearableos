@@ -1,10 +1,5 @@
 package de.unistuttgart.vis.wearable.os.cloud.oneDrive;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -25,6 +20,12 @@ import de.unistuttgart.vis.wearable.os.utils.Constants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -53,77 +54,79 @@ public class OneDrive extends Activity {
     public void onBackPressed() {
         // Case when activity is started and no directory was selected
         if(internetAvailable()){
-        if(parentDirectory == null||(parentDirectory.optString(Miscellaneous.PARENT_ID).equals(parentDirectory.optString(Miscellaneous.ID)))||parentDirectory.isNull(Miscellaneous.PARENT_ID)){
-            super.onBackPressed();
-        }
-        // Case where elements of ListView where selected
-        else {
-            progressDialog = new ProgressDialog(getMainContext());
-            progressDialog.setCancelable(false);
-            progressDialog.setMessage("Loading parent directory...");
-            if(directoryList.size()>0){
-                directoryList.remove(directoryList.size()-1);
-                if(directoryList.size()==0){
+            if(parentDirectory == null||(parentDirectory.optString(Miscellaneous.PARENT_ID).equals(parentDirectory.optString(Miscellaneous.ID)))||parentDirectory.isNull(Miscellaneous.PARENT_ID)||client==null){
+                finish();
+            }
+            // Case where elements of ListView where selected
+            else {
+                progressDialog = new ProgressDialog(getMainContext());
+                progressDialog.setCancelable(false);
+                progressDialog.setMessage("Loading parent directory...");
+                if(directoryList.size()>0){
+                    directoryList.remove(directoryList.size()-1);
+                    if(directoryList.size()==0){
 
+                        futurePath = "/";
+
+                    }
+                    else{
+                        String pathString ="";
+                        for(String currentDirectory:directoryList){
+                            pathString+="/"+currentDirectory;
+                        }
+                        futurePath = pathString;
+
+                    }
+                }
+                else{
                     futurePath = "/";
 
                 }
-                else{
-                    String pathString ="";
-                    for(String currentDirectory:directoryList){
-                        pathString+="/"+currentDirectory;
-                    }
-                    futurePath = pathString;
-
-                }
-            }
-            // Case where the root is displayed and previously an item was clicked and then the back-button was pressed
-            else{
-                futurePath = "/";
-
-            }
-            progressDialog.show();
-            getConnectClient().getAsync(parentDirectory.optString(Miscellaneous.PARENT_ID), new LiveOperationListener() {
-                JSONObject grandParentJsonObject = null;
-                @Override
-                public void onComplete(LiveOperation operation) {
+                progressDialog.show();
+                getConnectClient().getAsync(parentDirectory.optString(Miscellaneous.PARENT_ID), new LiveOperationListener() {
+                    JSONObject grandParentJsonObject = null;
+                    @Override
+                    public void onComplete(LiveOperation operation) {
 
                         grandParentJsonObject = operation.getResult();
                         parentDirectory = grandParentJsonObject;
                         getArchiveList(parentDirectory);
 
-                }
+                    }
 
-                @Override
-                public void onError(LiveOperationException exception, LiveOperation operation) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getMainContext(),"Couldn't load parent directory list due to connectivity issues",Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onError(LiveOperationException exception, LiveOperation operation) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getMainContext(),"Couldn't load parent directory list due to connectivity issues",Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
 
+            }
         }
-    }
-    else{
-        Toast.makeText(getMainContext(),"Please enable WiFi or mobile data",Toast.LENGTH_SHORT).show();}
+        else{
+            Toast.makeText(getMainContext(),"Please enable WiFi or mobile data",Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(internetAvailable()){
-        context = OneDrive.this;
-        directoryList = new ArrayList<String>();
-        this.auth = new LiveAuthClient(this, Miscellaneous.CLIENT_ID);
-        setContentView(getIntent().getBooleanExtra("isExport",false)?R.layout.activity_cloud_export:R.layout.activity_cloud_import);
-        oneDriveFolderListView = (ListView)findViewById(R.id.listViewFileChooser);
-        currentDirectoryTextView = (TextView)findViewById(R.id.textView_current_directory);
-        if(!getIntent().getBooleanExtra("isExport",false)) {
+            context = OneDrive.this;
+            directoryList = new ArrayList<String>();
+            this.auth = new LiveAuthClient(this, Miscellaneous.CLIENT_ID);
+            setContentView(getIntent().getBooleanExtra("isExport",false)?R.layout.activity_cloud_export:R.layout.activity_cloud_import);
+            oneDriveFolderListView = (ListView)findViewById(R.id.listViewFileChooser);
+            currentDirectoryTextView = (TextView)findViewById(R.id.textView_current_directory);
+            if(!getIntent().getBooleanExtra("isExport",false)) {
 
-            isExport = false;
-        }
-        key =getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
-        jsonComparator = new JSONComparator();
-        childrenList = new ArrayList<JSONObject>();
+                isExport = false;
+            }
+            key =getIntent().getBooleanExtra("encrypted",false)?getIntent().getStringExtra("key"):"";
+            jsonComparator = new JSONComparator();
+            childrenList = new ArrayList<JSONObject>();
 
             adapter = new OneDriveAdapter(getMainContext(), childrenList);
             oneDriveFolderListView.setAdapter(adapter);
@@ -135,7 +138,7 @@ public class OneDrive extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                   JSONObject curJSONObject = (JSONObject) oneDriveFolderListView.getItemAtPosition(position);
+                    JSONObject curJSONObject = (JSONObject) oneDriveFolderListView.getItemAtPosition(position);
 
                     if (isExport) {
 
@@ -147,7 +150,7 @@ public class OneDrive extends Activity {
                             directoryList.add(curJSONObject.optString(Miscellaneous.NAME));
                             String pathString ="";
                             for(String currentDirectory:directoryList){
-                                    pathString +="/"+currentDirectory;}
+                                pathString +="/"+currentDirectory;}
                             futurePath = pathString;
 
                             parentDirectory = curJSONObject;
@@ -182,60 +185,60 @@ public class OneDrive extends Activity {
     }
 
     private void getArchiveList(final JSONObject currentParentDirectory) {
-            getConnectClient().getAsync(currentParentDirectory==null?"me/skydrive/files":
-                    currentParentDirectory.optString(Miscellaneous.ID)+"/files", new LiveOperationListener() {
-                @Override
-                public void onComplete(LiveOperation operation) {
-                    if(currentParentDirectory == null){
-                        getConnectClient().getAsync("me/skydrive", new LiveOperationListener() {
-                            @Override
-                            public void onComplete(LiveOperation operation) {
-                                parentDirectory = operation.getResult();
-
-                            }
-
-                            @Override
-                            public void onError(LiveOperationException exception, LiveOperation operation) {
-
-                            }
-                        });
-                        currentDirectoryTextView.setText("/");
-                    }
-                    else{
-                        currentDirectoryTextView.setText(futurePath);
-                    }
-                    childrenList.clear();
-                    JSONObject currentJsonObject;
-                    JSONArray fileListArray = operation.getResult().optJSONArray(Miscellaneous.DATA);
-                    for (int i = 0; i < fileListArray.length(); i++) {
-                        try {
-                            currentJsonObject = fileListArray.getJSONObject(i);
-                            if (currentJsonObject.optString(Miscellaneous.TYPE).equals("folder")) {
-                                childrenList.add(currentJsonObject);
-                            } else if (currentJsonObject.optString(Miscellaneous.TYPE).equals("file")
-                                    && currentJsonObject.optString(Miscellaneous.NAME).endsWith(".zip")) {
-                                childrenList.add(currentJsonObject);
-                            }
-
-
-                        } catch (JSONException e) {
+        getConnectClient().getAsync(currentParentDirectory==null?"me/skydrive/files":
+                currentParentDirectory.optString(Miscellaneous.ID)+"/files", new LiveOperationListener() {
+            @Override
+            public void onComplete(LiveOperation operation) {
+                if(currentParentDirectory == null){
+                    getConnectClient().getAsync("me/skydrive", new LiveOperationListener() {
+                        @Override
+                        public void onComplete(LiveOperation operation) {
+                            parentDirectory = operation.getResult();
 
                         }
-                    }
 
-                    Collections.sort(childrenList,jsonComparator);
-                    adapter.notifyDataSetChanged();
-                    if(progressDialog!=null){
-                        progressDialog.dismiss();}
-                    }
+                        @Override
+                        public void onError(LiveOperationException exception, LiveOperation operation) {
 
-                @Override
-                public void onError(LiveOperationException exception, LiveOperation operation) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getMainContext(),"Couldn't load parent directory list due to connectivity issues",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    currentDirectoryTextView.setText("/");
                 }
-            });
-        }
+                else{
+                    currentDirectoryTextView.setText(futurePath);
+                }
+                childrenList.clear();
+                JSONObject currentJsonObject;
+                JSONArray fileListArray = operation.getResult().optJSONArray(Miscellaneous.DATA);
+                for (int i = 0; i < fileListArray.length(); i++) {
+                    try {
+                        currentJsonObject = fileListArray.getJSONObject(i);
+                        if (currentJsonObject.optString(Miscellaneous.TYPE).equals("folder")) {
+                            childrenList.add(currentJsonObject);
+                        } else if (currentJsonObject.optString(Miscellaneous.TYPE).equals("file")
+                                && currentJsonObject.optString(Miscellaneous.NAME).endsWith(".zip")) {
+                            childrenList.add(currentJsonObject);
+                        }
+
+
+                    } catch (JSONException e) {
+
+                    }
+                }
+
+                Collections.sort(childrenList,jsonComparator);
+                adapter.notifyDataSetChanged();
+                if(progressDialog!=null){
+                    progressDialog.dismiss();}
+            }
+
+            @Override
+            public void onError(LiveOperationException exception, LiveOperation operation) {
+                progressDialog.dismiss();
+                Toast.makeText(getMainContext(),"Couldn't load parent directory list due to connectivity issues",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void startFileImport(JSONObject curJSONObject) {
         new OneDriveAsyncDownloadTask().execute(curJSONObject);
@@ -246,16 +249,21 @@ public class OneDrive extends Activity {
     protected void onStart() {
         super.onStart();
 
-            if (internetAvailable()) {
-                if(getConnectClient()==null) {
+        if (internetAvailable()) {
+            if(getConnectClient()==null) {
                 auth.login(this, Arrays.asList(Miscellaneous.SCOPES),
                         new LiveAuthListener() {
                             @Override
                             public void onAuthError(LiveAuthException exception, Object userState) {
-
-                                Toast.makeText(getApplicationContext(), exception.getError(),
-                                        Toast.LENGTH_SHORT).show();
-                                client = null;
+                                if(exception.getError().toString().length()==0){
+                                    client = null;
+                                    finish();
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(), "Couldn't log in to One Drive, Cause: "+exception.getError(),
+                                            Toast.LENGTH_SHORT).show();
+                                    client = null;
+                                    finish();}
 
                             }
 
@@ -282,16 +290,16 @@ public class OneDrive extends Activity {
                         });
             }
             else{
-                    if (getConnectClient() != null
-                            && !getConnectClient().getSession().isExpired()) {
-                        getArchiveList(parentDirectory);
-                    }
+                if (getConnectClient() != null
+                        && !getConnectClient().getSession().isExpired()) {
+                    getArchiveList(parentDirectory);
+                }
             }
         }
         else{
-                Toast.makeText(getMainContext(),"No internet available, activate WiFi oder mobile data",Toast.LENGTH_SHORT).show();
-                onBackPressed();
-            }
+            Toast.makeText(getMainContext(),"No internet available, activate WiFi oder mobile data",Toast.LENGTH_SHORT).show();
+            onBackPressed();
+        }
     }
 
 //    @Override
@@ -337,28 +345,28 @@ public class OneDrive extends Activity {
      */
     public void upload(View view) {
 
-            if (internetAvailable()) {
+        if (internetAvailable()) {
 
-                if (getConnectClient() != null
-                        && !getConnectClient().getSession().isExpired()) {
+            if (getConnectClient() != null
+                    && !getConnectClient().getSession().isExpired()) {
 
-                    new OneDriveAsyncUploadTask(getKey()).execute(parentDirectory);
+                new OneDriveAsyncUploadTask(getKey()).execute(parentDirectory);
 
             } else {
                 Toast.makeText(
                         getApplicationContext(),
                         "No internet connection available, please activate wifi \nor mobile data",
                         Toast.LENGTH_SHORT).show();
-                    super.onBackPressed();
-                }
-            }
-        else{
-                Toast.makeText(
-                        getApplicationContext(),
-                        "No internet connection available, please activate wifi \nor mobile data",
-                        Toast.LENGTH_SHORT).show();
                 super.onBackPressed();
             }
+        }
+        else{
+            Toast.makeText(
+                    getApplicationContext(),
+                    "No internet connection available, please activate wifi \nor mobile data",
+                    Toast.LENGTH_SHORT).show();
+            super.onBackPressed();
+        }
     }
 
     public static String getKey(){
