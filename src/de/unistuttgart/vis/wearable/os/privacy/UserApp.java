@@ -13,7 +13,9 @@ import de.unistuttgart.vis.wearable.os.sensors.SensorManager;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
-/**
+import java.util.Collection;
+
+ /**
  * This class represents a Application that makes use of our Garment OS Service.
  * This class saves the package name of the application and the permissions the
  * user has given to this application.
@@ -75,6 +77,16 @@ public class UserApp implements java.io.Serializable  {
 	 */
 	public int getDefaultSensor(SensorType sensorType) {
         Integer ret;
+
+        //
+        // If no default sensor is set, set the first sensor for the type
+        //
+        if(defaultSensors.get(sensorType) == null) {
+            Collection<Sensor> sensors = SensorManager.getAllSensors(sensorType);
+            if(sensors.size() != 0)
+                defaultSensors.put(sensorType, ((Sensor)sensors.toArray()[0]).getSensorID());
+        }
+
 		return (ret = defaultSensors.get(sensorType)) == null ? Constants.ILLEGAL_VALUE : ret;
 	}
 
