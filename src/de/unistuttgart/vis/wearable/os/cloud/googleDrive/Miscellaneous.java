@@ -5,6 +5,10 @@ import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 
+/**
+ * Helper class for needed Constants for Google Drive, including Integer constants to
+ * determine successful log-ins and a method to get the latest directory
+ */
 public class Miscellaneous {
     static final int SIGN_IN_REQUEST_CODE_1 = 0;
     static final int SIGN_IN_REQUEST_CODE_2 = 1;

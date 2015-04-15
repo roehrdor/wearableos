@@ -136,13 +136,14 @@ public class OneDrive extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                    JSONObject curJSONObject = (JSONObject) oneDriveFolderListView.getItemAtPosition(position);
-                    progressDialog = new ProgressDialog(getMainContext());
-                    progressDialog.setMessage("Loading directory list of "+curJSONObject.optString(Miscellaneous.NAME)+"...");
-                    progressDialog.setCancelable(false);
-                    progressDialog.show();
+
                     if (isExport) {
 
                         if (curJSONObject.optString(Miscellaneous.TYPE).equals("folder")) {
+                            progressDialog = new ProgressDialog(getMainContext());
+                            progressDialog.setMessage("Loading directory list of "+curJSONObject.optString(Miscellaneous.NAME)+"...");
+                            progressDialog.setCancelable(false);
+                            progressDialog.show();
                             directoryList.add(curJSONObject.optString(Miscellaneous.NAME));
                             String pathString ="";
                             for(String currentDirectory:directoryList){
@@ -154,6 +155,10 @@ public class OneDrive extends Activity {
                         }
                     } else {
                         if (curJSONObject.optString(Miscellaneous.TYPE).equals("folder")) {
+                            progressDialog = new ProgressDialog(getMainContext());
+                            progressDialog.setMessage("Loading directory list of "+curJSONObject.optString(Miscellaneous.NAME)+"...");
+                            progressDialog.setCancelable(false);
+                            progressDialog.show();
                             directoryList.add(curJSONObject.optString(Miscellaneous.NAME));
                             String pathString ="";
                             for(String currentDirectory:directoryList){

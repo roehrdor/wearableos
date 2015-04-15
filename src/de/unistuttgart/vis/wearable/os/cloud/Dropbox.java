@@ -97,6 +97,7 @@ public class Dropbox extends Activity {
                                         Toast.makeText(context,
                                                 "File-Upload cancelled",
                                                 Toast.LENGTH_SHORT).show();
+                                        tmp.delete();
                                         finish();
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -104,6 +105,7 @@ public class Dropbox extends Activity {
                                         Toast.makeText(context,
                                                 "File-Upload cancelled",
                                                 Toast.LENGTH_SHORT).show();
+                                        tmp.delete();
                                         finish();
                                     }
                                 }

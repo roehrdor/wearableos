@@ -3,7 +3,10 @@ package de.unistuttgart.vis.wearable.os.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -18,6 +21,9 @@ import de.unistuttgart.vis.wearable.os.cloud.FileAdapter;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 
+/**
+ * Activity to export or import archives of sensor data and properties that are encrypted or unencrypted
+ */
 public class ImportExportArchiveActivity extends Activity {
 
     private File currentDir;
@@ -56,14 +62,14 @@ public class ImportExportArchiveActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 ArrayList<File> currentList = new ArrayList<File>();
-                    if(!((File)list.getItemAtPosition(position)).isFile()){
-                        currentList = fill(((File) list.getItemAtPosition(position)));
-                        folders.clear();
-                        folders.addAll(currentList);
-                        adapter.notifyDataSetChanged();}
+                if(!((File)list.getItemAtPosition(position)).isFile()){
+                    currentList = fill(((File) list.getItemAtPosition(position)));
+                    folders.clear();
+                    folders.addAll(currentList);
+                    adapter.notifyDataSetChanged();}
                 else{
                     startFileImport((File)list.getItemAtPosition(position));
-                    }
+                }
             }
         });
 
@@ -71,85 +77,85 @@ public class ImportExportArchiveActivity extends Activity {
 
     private void startFileImport(final File archiveFile) {
 
-            if(Archiver.notEncryptedGOSFile(archiveFile)){
-                int value = APIFunctions.unpackArchiveFile(archiveFile);
-                switch (value) {
-                    case Constants.UNPACK_NO_ERROR:
-                        Toast.makeText(getBaseContext(),
-                                "File import finished",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                        break;
-                    case Constants.UNPACK_INVALID_FILE:
-                        Toast.makeText(getBaseContext(),
-                                "Invalid File",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                        break;
-                    case Constants.UNPACK_EXTRACTING_FAILED:
-                        Toast.makeText(getBaseContext(),
-                                "Extracting failed",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                        break;
-                    case Constants.UNPACK_WRONG_KEY:
-                        Toast.makeText(getBaseContext(),
-                                "Wrong Password",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                        break;
+        if(Archiver.notEncryptedGOSFile(archiveFile)){
+            int value = APIFunctions.unpackArchiveFile(archiveFile);
+            switch (value) {
+                case Constants.UNPACK_NO_ERROR:
+                    Toast.makeText(getBaseContext(),
+                            "File import finished",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    break;
+                case Constants.UNPACK_INVALID_FILE:
+                    Toast.makeText(getBaseContext(),
+                            "Invalid File",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    break;
+                case Constants.UNPACK_EXTRACTING_FAILED:
+                    Toast.makeText(getBaseContext(),
+                            "Extracting failed",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    break;
+                case Constants.UNPACK_WRONG_KEY:
+                    Toast.makeText(getBaseContext(),
+                            "Wrong Password",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    break;
 
+            }
+        }
+        else {
+            AlertDialog.Builder alert = new AlertDialog.Builder(ImportExportArchiveActivity.this);
+
+            alert.setTitle("Please enter password:");
+            final EditText input = new EditText(ImportExportArchiveActivity.this);
+            alert.setView(input);
+
+            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    key = input.getText().toString();
+                    int value = Archiver.unpackEncryptedFile(key, archiveFile);
+                    switch (value) {
+                        case Constants.UNPACK_NO_ERROR:
+                            Toast.makeText(getBaseContext(),
+                                    "File import finished",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+                        case Constants.UNPACK_INVALID_FILE:
+                            Toast.makeText(getBaseContext(),
+                                    "Invalid File",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+                        case Constants.UNPACK_EXTRACTING_FAILED:
+                            Toast.makeText(getBaseContext(),
+                                    "Extracting failed",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+                        case Constants.UNPACK_WRONG_KEY:
+                            Toast.makeText(getBaseContext(),
+                                    "Wrong Password",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            break;
+
+                    }
                 }
-            }
-            else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(ImportExportArchiveActivity.this);
+            });
 
-                alert.setTitle("Please enter password:");
-                final EditText input = new EditText(ImportExportArchiveActivity.this);
-                alert.setView(input);
-
-                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        key = input.getText().toString();
-                        int value = Archiver.unpackEncryptedFile(key, archiveFile);
-                        switch (value) {
-                            case Constants.UNPACK_NO_ERROR:
-                                Toast.makeText(getBaseContext(),
-                                        "File import finished",
-                                        Toast.LENGTH_SHORT).show();
-                                finish();
-                                break;
-                            case Constants.UNPACK_INVALID_FILE:
-                                Toast.makeText(getBaseContext(),
-                                        "Invalid File",
-                                        Toast.LENGTH_SHORT).show();
-                                finish();
-                                break;
-                            case Constants.UNPACK_EXTRACTING_FAILED:
-                                Toast.makeText(getBaseContext(),
-                                        "Extracting failed",
-                                        Toast.LENGTH_SHORT).show();
-                                finish();
-                                break;
-                            case Constants.UNPACK_WRONG_KEY:
-                                Toast.makeText(getBaseContext(),
-                                        "Wrong Password",
-                                        Toast.LENGTH_SHORT).show();
-                                finish();
-                                break;
-
-                        }
-                    }
-                });
-
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        finish();
-                    }
-                });
-                alert.setCancelable(false);
-                alert.show();
-            }
+            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    finish();
+                }
+            });
+            alert.setCancelable(false);
+            alert.show();
+        }
     }
 
     @Override
@@ -161,7 +167,7 @@ public class ImportExportArchiveActivity extends Activity {
             adapter.notifyDataSetChanged();
         }
         else{
-        super.onBackPressed();}
+            super.onBackPressed();}
     }
 
     /**
@@ -176,7 +182,7 @@ public class ImportExportArchiveActivity extends Activity {
         if(f.canRead()){
             if(isExport&&f.canWrite()){
                 btnSave.setText("Upload SensorData");
-            btnSave.setEnabled(true);
+                btnSave.setEnabled(true);
             }
             else{
                 if (isExport) {
@@ -199,16 +205,72 @@ public class ImportExportArchiveActivity extends Activity {
 
     public void upload(View view) {
 
-            File tmp = new File(currentDir.getAbsolutePath() + File.separator + "gos_sensors.zip");
-            if (getIntent().getBooleanExtra("encrypted", false)) {
-                Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"), tmp);
-            } else {
-                Archiver.createArchiveFile(tmp);
-            }
-            Toast.makeText(getBaseContext(), "Export finished",
-                    Toast.LENGTH_SHORT).show();
+        final File tmp = new File(currentDir.getAbsolutePath() + File.separator + "gos_sensors.zip");
+        if(spaceAvailable(currentDir)){
+            if(tmp.exists()){
+                AlertDialog.Builder alert = new AlertDialog.Builder(ImportExportArchiveActivity.this);
+                alert.setTitle("Overwrite existing archive?");
+
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        if (getIntent().getBooleanExtra("encrypted", false)) {
+                            Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"), tmp);
+                        } else {
+                            Archiver.createArchiveFile(tmp);
+                        }
+                        Toast.makeText(getBaseContext(), "Export finished",
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Toast.makeText(getBaseContext(),"Export cancelled",Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+                alert.setCancelable(false);
+                alert.show();
+            }else {
+                if (getIntent().getBooleanExtra("encrypted", false)) {
+                    Archiver.createEncryptedArchiveFile(getIntent().getStringExtra("key"), tmp);
+                } else {
+                    Archiver.createArchiveFile(tmp);
+                }
+                Toast.makeText(getBaseContext(), "Export finished",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+
+            }}
+        else{
+            Toast.makeText(getBaseContext(),"Not enough space available, aborting export",Toast.LENGTH_SHORT).show();
             finish();
-
-
+        }
     }
+
+    /**
+     *
+     * @param path The target directory for the archive
+     * @return the possibility to save the sensor archive in the desired directory
+     */
+    public boolean spaceAvailable(File path){
+        long requiredSpace = 0;
+        for(int i=0; i<getApplicationContext().getFilesDir().getAbsoluteFile().listFiles().length;i++){
+            requiredSpace+=getApplicationContext().getFilesDir().getAbsoluteFile().listFiles()[i].length();
+        }
+        StatFs internalStorageStat = new StatFs(path.getAbsolutePath());
+        long targetDirectorySize;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            targetDirectorySize = internalStorageStat.getAvailableBlocksLong()*internalStorageStat.getBlockSizeLong();
+        } else {
+
+            targetDirectorySize = (long)internalStorageStat.getAvailableBlocks()*(long)internalStorageStat.getBlockSize();
+        }
+
+        return targetDirectorySize>requiredSpace;
+    }
+
 }
