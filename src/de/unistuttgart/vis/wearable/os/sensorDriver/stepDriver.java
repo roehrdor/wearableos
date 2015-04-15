@@ -27,7 +27,6 @@ public class stepDriver implements SensorDriver {
             dataFloat[j] = Float.parseFloat(parts[j]);
 
         }
-
         return dataFloat;
     }
 }

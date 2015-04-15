@@ -49,7 +49,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txt3"
         android:layout_alignRight="@+id/txt3"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:textOff="off"
+        android:textOn="on"/>
 
 
 </RelativeLayout>
