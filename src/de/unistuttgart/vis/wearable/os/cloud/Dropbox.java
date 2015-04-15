@@ -57,6 +57,7 @@ public class Dropbox extends Activity {
     private boolean abort = false;
     private ProgressDialog progressDialog;
     int startCount = 0;
+    private boolean buttonEnabled = false;
 
 
     private DropboxAPI<AndroidAuthSession> mDBApi;
@@ -428,6 +429,8 @@ public class Dropbox extends Activity {
         if (getIntent().getBooleanExtra("isExport",false)){
             setContentView(R.layout.activity_cloud_export);
             button = (Button) findViewById(R.id.btn_upload);
+            button.setVisibility(View.INVISIBLE);
+
         } else {
             setContentView(R.layout.activity_cloud_import);
         }
@@ -539,6 +542,7 @@ public class Dropbox extends Activity {
                         }
                         if (getIntent().getBooleanExtra("isExport", false)) {
                             button.setVisibility(View.VISIBLE);
+                            buttonEnabled =true;
                         }
 
                     }
@@ -555,18 +559,20 @@ public class Dropbox extends Activity {
     protected void onResume() {
        startCount++;
        super.onResume();
+        if (buttonEnabled){
+            button.setVisibility(View.VISIBLE);
+        }
         pathView = (TextView) findViewById(R.id.textView_current_directory);
         if (mDBApi.getSession().authenticationSuccessful()) {
             try {
                 // complete the authentication
                 mDBApi.getSession().finishAuthentication();
-                if (getIntent().getBooleanExtra("isExport",false)) {
-                    button.setVisibility(View.INVISIBLE);
-                }
+
                 if(list==null) {
                     pathView.setText("Current Folder: /");
                     setFileList("/");
                 }
+
             } catch (IllegalStateException e) {
             }
 
