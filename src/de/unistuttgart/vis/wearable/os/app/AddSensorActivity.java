@@ -298,15 +298,20 @@ public class AddSensorActivity extends Activity {
             Toast.makeText(getBaseContext(), "Please change your Sensor Name!",
                     Toast.LENGTH_SHORT).show();
         }  else {
-            de.unistuttgart.vis.wearable.os.internalapi.PSensor saveSensor = APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
+            if (btMac != null) {
+                de.unistuttgart.vis.wearable.os.internalapi.PSensor saveSensor = APIFunctions.addNewSensor((int) (powerOption * SAMPLE_RATE_FAKTOR), powerOption * SAVE_PERIOD_FAKTOR, smoothness, textView.getText().toString(), sensorTypes[spinner.getSelectedItemPosition()], btMac, measurementSystems[spinner2.getSelectedItemPosition()], MeasurementUnits.NONE, MeasurementSystems.LUX, MeasurementUnits.NONE);
+                Log.d("BluetoothComService", "Service started");
+                //startService(startBT);
+                Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getBaseContext(), "Sensor could not be saved", Toast.LENGTH_LONG).show();
+            }
             //Intent startBT = new Intent(this, GarmentOSBluetoothService.class);
             //startBT.putExtra("btDevice", btMac);
             //startBT.putExtra("btId", saveSensor.getID());
             //startBT.putExtra("btDriver", sensorDriver);
 
-            Log.d("BluetoothComService", "Service started");
-            //startService(startBT);
-            Toast.makeText(getBaseContext(), "Sensor saved and BluetoothService started", Toast.LENGTH_LONG).show();
+
             this.finish();
         }
 

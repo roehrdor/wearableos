@@ -5,6 +5,8 @@ package de.unistuttgart.vis.wearable.os.app;
  */
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -20,6 +22,8 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Set;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
@@ -188,6 +192,7 @@ public class SensorDetailActivity extends Activity {
             }
 
         });
+
 
         measurementSystems = sensorType.getMeasurementSystems();
         spinner2 = (Spinner) findViewById(R.id.sensorDetail_spinner_MeasurmentSystem);

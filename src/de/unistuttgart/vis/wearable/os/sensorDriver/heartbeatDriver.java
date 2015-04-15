@@ -20,7 +20,6 @@ public class heartbeatDriver implements SensorDriver{
         float[] dataFloat = new float[1];
             Log.i("test", parts[0]);
             dataFloat[0] = Float.parseFloat(parts[0]);
-
         return dataFloat;
     }
 }

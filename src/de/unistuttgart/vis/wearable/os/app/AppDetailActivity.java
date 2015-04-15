@@ -3,7 +3,10 @@ package de.unistuttgart.vis.wearable.os.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
@@ -28,7 +32,6 @@ public class AppDetailActivity extends Activity {
     private Spinner spinner;
     private PSensor[] pSensors;
     private PUserApp app;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,10 @@ public class AppDetailActivity extends Activity {
             //Wählt den aktuell in PUserApp gespeicherten Sensor im Spinner aus
             int i = 0;
             if(app.getDefaultSensor(sensorTypes[position]) != null) {
+                    if (!app.sensorTypeGranted(Utils.permissionFlagFromSensorType(sensorTypes[position]))) {
+                        itemView.setBackgroundColor(Color.parseColor("#86959f"));
+                    }
+
                 for(PSensor pSensor : pSensors) {
                     if(pSensor.equals(app.getDefaultSensor(sensorTypes[position]))) {
                         spinner.setSelection(i);
@@ -69,6 +76,8 @@ public class AppDetailActivity extends Activity {
                     i++;
                 }
             }
+
+
             imageView.setImageResource(sensorTypes[position].getIconID());
             textView.setText(sensorTypes[position].toString());
 
@@ -118,28 +127,32 @@ public class AppDetailActivity extends Activity {
     public void showDialogDelete(final int position, final View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(AppDetailActivity.this);
 
-        if(view.isEnabled()) {
-            builder.setMessage("Wollen sie diesen Sensor verbieten?");
+        if(app.sensorTypeGranted(Utils.permissionFlagFromSensorType(sensorTypes[position]))) {
+            builder.setMessage("Would you like to disable this sensor?");
         }else{
-            builder.setMessage("Wollen sie diesen Sensor erlauben?");
+            builder.setMessage("Would you like to enable this sensor?");
         }
 
-        builder.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(view.isEnabled()) {
+
+                ImageView imageView = (ImageView) view.findViewById(R.id.imageView_app_list_detail);
+                if(app.sensorTypeGranted(Utils.permissionFlagFromSensorType(sensorTypes[position]))) {
                     app.denySensorType(Utils.permissionFlagFromSensorType(sensorTypes[position]));
-                    view.setEnabled(false);
+                    view.setBackgroundColor(Color.parseColor("#86959f"));
+                    Toast.makeText(getBaseContext(), "Sensor access denied", Toast.LENGTH_LONG).show();
                 }else{
                     app.allowSensorType(Utils.permissionFlagFromSensorType(sensorTypes[position]));
-                    view.setEnabled(true);
+                    view.setBackgroundColor(Color.parseColor("#c0d6e4"));
+                    Toast.makeText(getBaseContext(), "Sensor access granted", Toast.LENGTH_LONG).show();
                 }
-                onCreate(null);
                 dialog.dismiss();
+
             }
         });
 
-        builder.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

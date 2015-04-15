@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import de.unistuttgart.vis.wearable.os.R;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
@@ -119,22 +120,23 @@ public class SensorsActivity extends Activity {
     public void showDialogDelete(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(SensorsActivity.this);
 
-        builder.setMessage("Wollen sie diesen Sensor löschen?");
+        builder.setMessage("Would you like to delete this sensor?");
 
-        builder.setPositiveButton("Nein", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
 
-        builder.setNegativeButton("Ja", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 APIFunctions.removeSensor(sensors[position].getID());
                 onCreate(null);
                 dialog.dismiss();
                 onResume();
+                Toast.makeText(getBaseContext(), "Sensor was deleted", Toast.LENGTH_LONG).show();
             }
         });
 

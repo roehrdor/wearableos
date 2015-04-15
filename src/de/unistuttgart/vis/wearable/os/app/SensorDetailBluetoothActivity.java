@@ -57,6 +57,7 @@ public class SensorDetailBluetoothActivity extends Activity {
     private String sensorDriver;
     private BluetoothDevice btDevice;
     private String btMac;
+    private BluetoothAdapter myBluetoothAdapter;
 
 
     @Override
@@ -196,6 +197,7 @@ public class SensorDetailBluetoothActivity extends Activity {
 
         });
 
+
         measurementSystems = sensorType.getMeasurementSystems();
         spinner2 = (Spinner) findViewById(R.id.sensorDetail_spinner_MeasurmentSystem);
         ArrayAdapter adapter3 = new ArrayAdapter(this,
@@ -261,6 +263,28 @@ public class SensorDetailBluetoothActivity extends Activity {
 
         });
     }
+
+    public void refreshBluetoothSpinner(View view) {
+        loadBTDevices();
+    }
+
+    private void loadBTDevices() {
+        spinner3 = (Spinner) findViewById(R.id.sensorAdd_spinner_Bluetooth);
+        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (!myBluetoothAdapter.isEnabled()) {
+            Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOnIntent, 1);
+        }
+
+        Set<BluetoothDevice> pairedDevices = myBluetoothAdapter.getBondedDevices();
+        ArrayAdapter<BluetoothDevice> BTArrayAdapter = new ArrayAdapter<BluetoothDevice>(this, android.R.layout.simple_spinner_item);
+        for (BluetoothDevice device : pairedDevices) {
+            BTArrayAdapter.add(device);
+        }
+        spinner3.setAdapter(BTArrayAdapter);
+    }
+
 
     public int getPosition(SensorType[] sensorTypes, SensorType sensorType) {
         int i = 0;
