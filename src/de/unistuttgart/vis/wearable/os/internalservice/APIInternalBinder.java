@@ -273,8 +273,9 @@ public class APIInternalBinder extends IGarmentInternalAPI.Stub {
     public PSensor PRIVACY_USERAPP_getDefaultSensorO(int oid, int sensorType) throws RemoteException {
         UserApp userApp = PrivacyManager.instance.getApp(oid);
         int sensorID;
-        if(userApp != null && (sensorID = userApp.getDefaultSensor(SensorType.values()[sensorType])) != 0)
-            return SensorManager.getSensorByID(sensorID).toParcelable();
+        Sensor sensor = null;
+        if(userApp != null && (sensorID = userApp.getDefaultSensor(SensorType.values()[sensorType])) != 0 && (sensor = SensorManager.getSensorByID(sensorID)) != null)
+            return sensor.toParcelable();
         return null;
     }
 
