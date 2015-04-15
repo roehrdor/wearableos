@@ -10,7 +10,9 @@ package de.unistuttgart.vis.wearable.os.utils;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class provides some basic utilities that can be used everywhere.
@@ -196,20 +198,22 @@ public class Utils {
         return System.currentTimeMillis();
     }
 
-
-    private static List<Integer> permissionFlags = new ArrayList<Integer>();
+    private static Map<Integer, Integer> permissionFlags = new HashMap<Integer, Integer>();
     static {
-        permissionFlags.add(Constants.PERMISSION_HEARTRATE);
-        permissionFlags.add(Constants.PERMISSION_ACCELEROMETER);
-        permissionFlags.add(Constants.PERMISSION_MAGNETIC_FIELD);
-        permissionFlags.add(Constants.PERMISSION_GYROSCOPE);
-        permissionFlags.add(Constants.PERMISSION_LIGHT);
-        permissionFlags.add(Constants.PERMISSION_PRESSURE);
-        permissionFlags.add(Constants.PERMISSION_PROXIMITY);
-        permissionFlags.add(Constants.PERMISSION_GRAVITY);
-        permissionFlags.add(Constants.PERMISSION_ROTATION_VECTOR);
-        permissionFlags.add(Constants.PERMISSION_TEMPERATURE);
-        permissionFlags.add(Constants.PERMISSION_GPS_SENSOR);
+        permissionFlags.put(SensorType.HEARTRATE.ordinal(), Constants.PERMISSION_HEARTRATE);
+        permissionFlags.put(SensorType.ACCELEROMETER.ordinal(), Constants.PERMISSION_ACCELEROMETER);
+        permissionFlags.put(SensorType.MAGNETIC_FIELD.ordinal(), Constants.PERMISSION_MAGNETIC_FIELD);
+        permissionFlags.put(SensorType.GYROSCOPE.ordinal(), Constants.PERMISSION_GYROSCOPE);
+        permissionFlags.put(SensorType.LIGHT.ordinal(), Constants.PERMISSION_LIGHT);
+        permissionFlags.put(SensorType.PRESSURE.ordinal(), Constants.PERMISSION_PRESSURE);
+        permissionFlags.put(SensorType.PROXIMITY.ordinal(), Constants.PERMISSION_PROXIMITY);
+        permissionFlags.put(SensorType.GRAVITY.ordinal(), Constants.PERMISSION_GRAVITY);
+        permissionFlags.put(SensorType.ROTATION_VECTOR.ordinal(), Constants.PERMISSION_ROTATION_VECTOR);
+        permissionFlags.put(SensorType.TEMPERATURE.ordinal(), Constants.PERMISSION_TEMPERATURE);
+        permissionFlags.put(SensorType.GPS_SENSOR.ordinal(), Constants.PERMISSION_GPS_SENSOR);
+        for(SensorType s : SensorType.values())
+            if(permissionFlags.containsKey(s.ordinal()))
+                android.util.Log.e("orDEBUG", "Missing " + s.name());
     }
 
     /**
