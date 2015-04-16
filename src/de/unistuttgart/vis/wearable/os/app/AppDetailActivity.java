@@ -67,6 +67,8 @@ public class AppDetailActivity extends Activity {
             if(app.getDefaultSensor(sensorTypes[position]) != null) {
                     if (!app.sensorTypeGranted(Utils.permissionFlagFromSensorType(sensorTypes[position]))) {
                         itemView.setBackgroundColor(Color.parseColor("#86959f"));
+                    }else{
+                        itemView.setBackgroundColor(Color.parseColor("#c0d6e4"));
                     }
 
                 for(PSensor pSensor : pSensors) {
