@@ -1,4 +1,4 @@
-package de.unistuttgart.vis.wearable.os.cloud;
+package de.unistuttgart.vis.wearable.os.cloud.dropBox;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,7 +11,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.dropbox.client2.DropboxAPI;
@@ -21,6 +20,7 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
 import de.unistuttgart.vis.wearable.os.R;
+import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.properties.Properties;
 import de.unistuttgart.vis.wearable.os.utils.Constants;

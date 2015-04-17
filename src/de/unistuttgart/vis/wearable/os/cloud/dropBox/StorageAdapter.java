@@ -1,4 +1,4 @@
-package de.unistuttgart.vis.wearable.os.cloud;
+package de.unistuttgart.vis.wearable.os.cloud.dropBox;
 
 import android.app.Activity;
 import android.view.LayoutInflater;

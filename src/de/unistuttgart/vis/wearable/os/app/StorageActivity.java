@@ -15,7 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import de.unistuttgart.vis.wearable.os.R;
-import de.unistuttgart.vis.wearable.os.cloud.Dropbox;
+import de.unistuttgart.vis.wearable.os.cloud.dropBox.Dropbox;
 import de.unistuttgart.vis.wearable.os.cloud.googleDrive.GoogleDrive;
 import de.unistuttgart.vis.wearable.os.cloud.oneDrive.OneDrive;
 
