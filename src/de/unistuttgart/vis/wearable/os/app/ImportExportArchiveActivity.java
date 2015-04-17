@@ -3,10 +3,7 @@ package de.unistuttgart.vis.wearable.os.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StatFs;
 import android.view.View;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
@@ -18,6 +15,7 @@ import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.cloud.FileAdapter;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
+import de.unistuttgart.vis.wearable.os.utils.Utils;
 
 /**
  * Activity to export or import archives of sensor data and properties that are encrypted or unencrypted
@@ -74,7 +72,7 @@ public class ImportExportArchiveActivity extends Activity {
     }
 
     private void startFileImport(final File archiveFile) {
-        if(archiveFile.length()<freeInternalSpace()){
+        if(archiveFile.length()< Utils.availableInternalSpace()){
             if(Archiver.notEncryptedGOSFile(archiveFile)){
                 int value = APIFunctions.unpackArchiveFile(archiveFile);
                 switch (value) {
@@ -208,7 +206,7 @@ public class ImportExportArchiveActivity extends Activity {
     public void upload(View view) {
 
         final File tmp = new File(currentDir.getAbsolutePath() + File.separator + "gos_sensors.zip");
-        if(exportSpaceAvailable(currentDir)){
+        if(Utils.availableExternalSpace(currentDir, getApplicationContext())){
             if(tmp.exists()){
                 AlertDialog.Builder alert = new AlertDialog.Builder(ImportExportArchiveActivity.this);
                 alert.setTitle("Overwrite existing archive?");
@@ -252,44 +250,4 @@ public class ImportExportArchiveActivity extends Activity {
         }
     }
 
-    /**
-     *
-     * @param path The target directory for the archive
-     * @return the possibility to save the sensor archive in the desired directory
-     */
-    public boolean exportSpaceAvailable(File path){
-        long requiredSpace = 0;
-        for(int i=0; i<getApplicationContext().getFilesDir().getAbsoluteFile().listFiles().length;i++){
-            requiredSpace+=getApplicationContext().getFilesDir().getAbsoluteFile().listFiles()[i].length();
-        }
-        StatFs internalStorageStat = new StatFs(path.getAbsolutePath());
-        long targetDirectorySize;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            targetDirectorySize = internalStorageStat.getAvailableBlocksLong()*internalStorageStat.getBlockSizeLong();
-        } else {
-
-            targetDirectorySize = (long)internalStorageStat.getAvailableBlocks()*(long)internalStorageStat.getBlockSize();
-        }
-
-        return targetDirectorySize>requiredSpace;
-    }
-    /**
-     *
-     * @return the internal space necessary for the archive import
-     */
-    public long freeInternalSpace(){
-
-        StatFs internalStorageStat = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
-        long targetDirectorySize;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            targetDirectorySize = internalStorageStat.getAvailableBlocksLong()*internalStorageStat.getBlockSizeLong();
-        } else {
-
-            targetDirectorySize = (long)internalStorageStat.getAvailableBlocks()*(long)internalStorageStat.getBlockSize();
-        }
-
-        return targetDirectorySize;
-    }
 }
