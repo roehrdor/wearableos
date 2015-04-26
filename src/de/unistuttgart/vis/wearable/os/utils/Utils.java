@@ -271,7 +271,7 @@ public class Utils {
      * @param context The context of the activity that calls this method
      * @return the possibility to save the sensor archive in the desired directory
      */
-    public static boolean availableExternalSpace(File path, Context context){
+    public static boolean enoughExternalSpaceAvailable(File path, Context context){
         long requiredSpace = 0;
         for(int i=0; i<context.getFilesDir().getAbsoluteFile().listFiles().length;i++){
             requiredSpace+=context.getFilesDir().getAbsoluteFile().listFiles()[i].length();
@@ -291,7 +291,7 @@ public class Utils {
      * Checks the free space that is available at the internal storage
      * @return the internal space available for the archive import in byte size
      */
-    public static long availableInternalSpace(){
+    public static long getAvailableInternalSpace(){
         long targetDirectorySize;
         StatFs internalStorageStat = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
 

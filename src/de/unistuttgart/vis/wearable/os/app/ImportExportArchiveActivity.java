@@ -71,8 +71,12 @@ public class ImportExportArchiveActivity extends Activity {
 
     }
 
+    /**
+     * Triggers the import process of the selected local archive file
+     * @param archiveFile The archive file selected for import
+     */
     private void startFileImport(final File archiveFile) {
-        if(archiveFile.length()< Utils.availableInternalSpace()){
+        if(archiveFile.length()< Utils.getAvailableInternalSpace()){
             if(Archiver.notEncryptedGOSFile(archiveFile)){
                 int value = APIFunctions.unpackArchiveFile(archiveFile);
                 switch (value) {
@@ -203,10 +207,14 @@ public class ImportExportArchiveActivity extends Activity {
         return dir;
     }
 
+    /**
+     * Triggers the upload process to the current directory
+     *
+     */
     public void upload(View view) {
 
         final File tmp = new File(currentDir.getAbsolutePath() + File.separator + "gos_sensors.zip");
-        if(Utils.availableExternalSpace(currentDir, getApplicationContext())){
+        if(Utils.enoughExternalSpaceAvailable(currentDir, getApplicationContext())){
             if(tmp.exists()){
                 AlertDialog.Builder alert = new AlertDialog.Builder(ImportExportArchiveActivity.this);
                 alert.setTitle("Overwrite existing archive?");
