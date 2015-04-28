@@ -10,7 +10,6 @@ import android.content.IntentSender;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.*;
-import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.google.android.gms.common.ConnectionResult;
@@ -27,11 +26,9 @@ import de.unistuttgart.vis.wearable.os.cloud.Archiver;
 import de.unistuttgart.vis.wearable.os.internalapi.APIFunctions;
 import de.unistuttgart.vis.wearable.os.utils.Constants;
 import de.unistuttgart.vis.wearable.os.utils.Utils;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IllegalFormatCodePointException;
 
 /**
  * Activity to provide functionality to upload or download an archive file to or
@@ -645,11 +642,17 @@ public class GoogleDrive extends Activity implements
         private File file = null;
         private char mode = '_';
         private final ProgressDialog progressDialog;
+        private final ProgressDialog waitForCancelDialog;
         BufferedInputStream fileInputStream = null;
         BufferedOutputStream fileOutputStream = null;
 
-        public AsyncDriveFileUploadTask(char mode, String password) {
+        public AsyncDriveFileUploadTask(char mode, final String password) {
             this.mode = mode;
+            waitForCancelDialog = new ProgressDialog(GoogleDrive.getMainContext());
+            waitForCancelDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            waitForCancelDialog.setMessage("Cancelling the upload...");
+            waitForCancelDialog.setCancelable(false);
+
             // create Progress Dialog to display the progress of upload
             progressDialog = new ProgressDialog(
                     GoogleDrive.getMainContext());
@@ -669,7 +672,7 @@ public class GoogleDrive extends Activity implements
                                 public void run() {
 
                                     setCancelStatus(true);
-
+                                    waitForCancelDialog.show();
 
                                 }
                             };
@@ -689,13 +692,18 @@ public class GoogleDrive extends Activity implements
             if(progressDialog!=null&&progressDialog.isShowing()){
                 progressDialog.dismiss();
             }
+            if(waitForCancelDialog!=null&&waitForCancelDialog.isShowing()){
+                waitForCancelDialog.dismiss();
+            }
             super.onPostExecute(result);
             file.delete();
-
-            finish();
-
-
-
+            fileListBuffer.release();
+            if(result!=null&&result){
+                publishProgress("Upload successful");
+            }
+            if(!result){
+                finish();
+            }
 
 
         }
@@ -709,152 +717,174 @@ public class GoogleDrive extends Activity implements
 
         @Override
         protected Boolean doInBackground(DriveContents... params) {
-            if(!Utils.enoughExternalSpaceAvailable(Environment.getExternalStorageDirectory(),getMainContext())){
-                Toast.makeText(getMainContext(),"Couldn't create temporary archive file for import, not enough space available",Toast.LENGTH_SHORT).show();
-                finish();
-            }
             file = new File(getApplicationContext().getFilesDir().getAbsolutePath()+File.separator+Miscellaneous.getCloudArchiveName()+".zip");
 
-            if(key.equals("")){
-                if(file.exists()){
-                    file.delete();
+            if(Utils.enoughExternalSpaceAvailable(Environment.getExternalStorageDirectory(),getMainContext())){
+                file.delete();
+
+                if(key.equals("")){
+                    Archiver.createArchiveFile(file);}
+                else{
+                    Archiver.unpackEncryptedFile(key,file);
                 }
 
-                Archiver.createArchiveFile(file);
-            }
-            else{
-                if(file.exists()){
-                    file.delete();
-                }
-
-                Archiver.createEncryptedArchiveFile(key,file);
-            }
-            try {
+                int streamStatus = 0;
+                long currentBytes = 0;
                 int bufferSize = 1024;
                 byte[] buffer = new byte[bufferSize];
                 DriveContents driveFileContents = params[0];
-                fileInputStream = new BufferedInputStream(
-                        new FileInputStream(file));
-                double totalBytes = file.length();
-                double currentBytes = 0.0f;
-                // Overwrite file.
-                // TODO actually use a buffer to prevent overheating the device
+                long totalBytes = file.length();
                 fileOutputStream = new BufferedOutputStream(
                         driveFileContents.getOutputStream());
 
-                int fileByte = 0;
-
-                try {
-                    while (fileByte != -1) {
-
-                        // TODO use available() to block only for a reasonable amount of time
-
-                        fileByte = fileInputStream.read();
-
-                        if (fileByte != -1) {
-                            if (!getCancelStatus()) {
-
-                                currentBytes++;
-
-                                progressDialog
-                                        .setProgress((int) (100 * (currentBytes / totalBytes)));
-
-                                fileOutputStream.write(fileByte);
-
-                            } else {
-
-                                try {
-                                    fileInputStream.close();
-                                    fileOutputStream.flush();
-                                    fileOutputStream.close();
-                                    driveFileContents.discard(GoogleDrive.getGoogleApiClient());
-                                    if(progressDialog.isShowing()){
-                                        progressDialog.setMessage("Cancelling upload...");
-                                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);}
-
-
-                                    fileListBuffer.release();
-                                    fileByte = -1;
-                                    setCancelStatus(true);
-
-                                } catch (IOException e) {
-
-
-
-                                    fileListBuffer.release();
-                                    fileByte = -1;
-                                    setCancelStatus(true);
-
-                                }
-                            }
-                        }
-
-
-                    }
-                } catch (IOException e) {
-
-                    fileListBuffer.release();
-
-
-                } finally {
+                try{
+                    fileInputStream = new BufferedInputStream(
+                            new FileInputStream(file));
+                } catch (FileNotFoundException e) {
+                    publishProgress("Couldn't create temporary file");
                     try {
-                        fileInputStream.close();
-                        fileOutputStream.flush();
                         fileOutputStream.close();
-
-                    } catch (IOException e) {
-
-                        publishProgress("Upload cancelled");
-
-
+                        return false;
+                    } catch (IOException e1) {
+                        return false;
                     }
                 }
-                if (!getCancelStatus()) {
 
+                while(streamStatus!=-1){
+                    try {
 
-                    MetadataChangeSet fileUploadChangeSet = new MetadataChangeSet.Builder()
-                            .setMimeType(Miscellaneous.getZipMimeType())
-                            .setTitle(Miscellaneous.getCloudArchiveName()+".zip").build();
-                    if (mode == 'u') {
-                        if(getGoogleApiClient()==null){
-                            Toast.makeText(getMainContext(),"An error occurred, aborting download",Toast.LENGTH_SHORT).show();
+                        streamStatus = fileInputStream.read(buffer, 0, bufferSize);
+
+                        // Handle errors occurring when from the inputStream
+                    } catch (IOException e) {
+                        publishProgress("Couldn't read temporary archive file");
+                        try {
+                            fileInputStream.close();
+
+                        } catch (IOException e1) {
+                            try{
+                                fileOutputStream.close();
+                            } catch (IOException e2) {
+                                driveFileContents.discard(getGoogleApiClient());
+                                return false;
+                            }
+                            driveFileContents.discard(getGoogleApiClient());
+                            return false;
+                        }
+                        try{
+                            fileOutputStream.close();
+                        } catch (IOException e2) {
+                            driveFileContents.discard(getGoogleApiClient());
+                            return false;
+                        }
+                        driveFileContents.discard(getGoogleApiClient());
+                        return false;
+
+                    }
+                    // Upload is in progress and the user has not cancelled it
+                    if(streamStatus!=-1 && !getCancelStatus()){
+
+                        currentBytes+=streamStatus;
+
+                        progressDialog.setProgress((int)(100.0f * ((float)currentBytes / (float)totalBytes)));
+
+                        try {
+                            fileOutputStream.write(buffer, 0, streamStatus);
+
+                            // Handle errors occurring when writing to the outputStream
+                        } catch (IOException e) {
+                            publishProgress("Couldn't write temporary archive file");
+                            try {
+                                fileInputStream.close();
+
+                            } catch (IOException e1) {
+                                try{
+                                    fileOutputStream.close();
+                                } catch (IOException e2) {
+                                    driveFileContents.discard(getGoogleApiClient());
+                                    return false;
+                                }
+                                driveFileContents.discard(getGoogleApiClient());
+                                return false;
+                            }
+                            try{
+                                fileOutputStream.close();
+                            } catch (IOException e2) {
+                                driveFileContents.discard(getGoogleApiClient());
+                                return false;
+                            }
+                            driveFileContents.discard(getGoogleApiClient());
+                            return false;
+                        }
+
+                    }
+                    // Upload is in progress and the user has cancelled it
+                    else if(streamStatus!=-1 && getCancelStatus()){
+                        publishProgress("File-upload cancelled");
+                        try {
+                            fileInputStream.close();
+
+                        } catch (IOException e1) {
+                            try{
+                                fileOutputStream.close();
+                            } catch (IOException e2) {
+                                driveFileContents.discard(getGoogleApiClient());
+                                return false;
+                            }
+                            driveFileContents.discard(getGoogleApiClient());
+                            return false;
+                        }
+                        try{
+                            fileOutputStream.close();
+                        } catch (IOException e2) {
+                            driveFileContents.discard(getGoogleApiClient());
+                            return false;
+                        }
+                        driveFileContents.discard(getGoogleApiClient());
+                        return false;
+                    }
+
+                    // The inputStream has reached its end
+                    else if(streamStatus==-1 && currentBytes == totalBytes){
+
+                        try{
+                            fileOutputStream.flush();
+                        } catch (IOException e) {
 
                         }
-                        Drive.DriveApi
-                                .getFolder(
-                                        GoogleDrive
-                                                .getGoogleApiClient(),
-                                        currentDirectoryId)
-                                .createFile(
-                                        GoogleDrive
-                                                .getGoogleApiClient(),
-                                        fileUploadChangeSet, driveFileContents)
-                                .setResultCallback(
-                                        afterFileCreationCallback);
-                    } else {
-                        driveFileContents.commit(GoogleDrive.getGoogleApiClient(), fileUploadChangeSet).setResultCallback(
-                                afterFileOverWriteCallback);
+                        MetadataChangeSet fileUploadChangeSet = new MetadataChangeSet.Builder()
+                                .setMimeType(Miscellaneous.getZipMimeType())
+                                .setTitle(Miscellaneous.getCloudArchiveName()+".zip").build();
+                        if (mode == 'u') {
+                            if(getGoogleApiClient()==null){
+                                Toast.makeText(getMainContext(),"An error occurred, aborting download",Toast.LENGTH_SHORT).show();
 
+                            }
+                            Drive.DriveApi
+                                    .getFolder(
+                                            GoogleDrive
+                                                    .getGoogleApiClient(),
+                                            currentDirectoryId)
+                                    .createFile(
+                                            GoogleDrive
+                                                    .getGoogleApiClient(),
+                                            fileUploadChangeSet, driveFileContents)
+                                    .setResultCallback(
+                                            afterFileCreationCallback);
+                            return true;
+                        } else {
+                            driveFileContents.commit(GoogleDrive.getGoogleApiClient(), fileUploadChangeSet).setResultCallback(
+                                    afterFileOverWriteCallback);
+                            return true;
+                        }
 
                     }
-
-                } else {
-
-                    try{driveFileContents.discard(GoogleDrive.getGoogleApiClient());}
-                    catch (IllegalStateException e){
-
-                    }
-                    publishProgress("Upload cancelled");
-
-                    fileListBuffer.release();
-
-
                 }
-            } catch (IOException e) {
+            }
+            else{
+                publishProgress("Couldn't create temporary archive file for export, not enough space available");
 
-                fileListBuffer.release();
-
-
+                return false;
             }
 
             return null;
@@ -886,7 +916,6 @@ public class GoogleDrive extends Activity implements
                                 public void run() {
 
                                     setCancelStatus(true);
-
 
                                 }
                             };
@@ -929,19 +958,19 @@ public class GoogleDrive extends Activity implements
                     while (streamStatus != -1) {
                         streamStatus = contentInputStream.read(buffer, 0, bufferSize);
                         if (streamStatus != -1 && !getCancelStatus()) {
-                            Log.d("gosDEBUG","Schreibe in Puffer...");
+
                             fileOutputStream.write(buffer, 0, streamStatus);
                             currentBytes+=streamStatus;
-                            progressDialog.setProgress((int) ((currentBytes / totalBytes) * 100));
+                            progressDialog.setProgress((int) (((float)currentBytes / (float)totalBytes) * 100));
 
-                        } else if (streamStatus != -1 && getCancelStatus()) {
+                        } else if (streamStatus == -1 && !getCancelStatus()) {
                             try{
                                 if(progressDialog.isShowing()){
                                     progressDialog.dismiss();}
                                 contentInputStream.close();
                                 fileOutputStream.close();
                                 existingFileContents.discard(getGoogleApiClient());
-                                return false;}
+                                return true;}
                             catch (IOException e){
                                 return false;
                             }
@@ -949,29 +978,25 @@ public class GoogleDrive extends Activity implements
 
 
                         }
+                        else {
+                            try{
+                                contentInputStream.close();
+                                fileOutputStream.close();
+                                existingFileContents.discard(getGoogleApiClient());
+                            }
+                            catch (IOException e){
+                                return false;
+                            }
+                        }
+
                     }
                 } catch (IOException e) {
 
                     publishProgress("Couldn't access file...");
-                    return false;
+                    return true;
 
-                } finally {
-                    try {
-                        fileOutputStream.flush();
-                        fileOutputStream.close();
-                        contentInputStream.close();
-                        publishProgress("Successfully downloaded file");
-
-
-                        return true;
-
-                    } catch (IOException e) {
-
-                        publishProgress("Download failed...");
-                        return false;
-
-                    }
                 }
+
 
             }
             catch (Exception e) {
@@ -980,7 +1005,7 @@ public class GoogleDrive extends Activity implements
                 e.printStackTrace();
                 return false;
             }
-
+            return false;
         }
 
         @Override
