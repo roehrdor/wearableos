@@ -688,8 +688,12 @@ public class OneDrive extends Activity {
                 if(file.exists()){
                     file.delete();
                 }
+                if(password.equals("")){
+                    Archiver.createArchiveFile(file);
+                }else{
+                    Archiver.createEncryptedArchiveFile(password,file);
+                }
 
-                Archiver.createEncryptedArchiveFile(password,file);
             }
 
             OneDrive.getConnectClient().uploadAsync(

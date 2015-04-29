@@ -725,7 +725,7 @@ public class GoogleDrive extends Activity implements
                 if(key.equals("")){
                     Archiver.createArchiveFile(file);}
                 else{
-                    Archiver.unpackEncryptedFile(key,file);
+                    Archiver.createEncryptedArchiveFile(key,file);
                 }
 
                 int streamStatus = 0;
