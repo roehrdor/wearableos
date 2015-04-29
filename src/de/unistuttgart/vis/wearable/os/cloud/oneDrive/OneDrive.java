@@ -10,6 +10,8 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.microsoft.live.*;
@@ -49,6 +51,7 @@ public class OneDrive extends Activity {
     private ProgressDialog progressDialog = null;
     private String futurePath = "";
     private static boolean cancelRequest = false;
+
 
     private static synchronized void setCancelRequest(boolean newStatus){
         cancelRequest = newStatus;
@@ -312,7 +315,8 @@ public class OneDrive extends Activity {
 
 //    @Override
 //    protected void onStop() {
-//        // suboptimal solution to handle standby
+//        // suboptimal soluti
+// on to handle standby
 //        if (client != null) {
 //            client = null;
 //        }
@@ -383,13 +387,18 @@ public class OneDrive extends Activity {
     private class OneDriveAsyncDownloadTask extends AsyncTask<JSONObject, String, Long> {
 
         private final ProgressDialog progressDialog;
-
+        private final ProgressDialog waitForCancelDialog;
         private JSONObject downloadJsonObject = null;
         File downloadDestination = null;
+
 
         public OneDriveAsyncDownloadTask() {
 
             // create Progress Dialog to display the progress of upload
+            waitForCancelDialog = new ProgressDialog(OneDrive.getMainContext());
+            waitForCancelDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+            waitForCancelDialog.setCancelable(false);
             progressDialog = new ProgressDialog(getMainContext());
             progressDialog.setMax(100);
             progressDialog.setMessage("Downloading " + Miscellaneous.getCloudArchiveName());
@@ -400,15 +409,17 @@ public class OneDrive extends Activity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            runOnUiThread(new Runnable() {
-                                @Override
+                            final Handler handler = new Handler();
+
+                            final Runnable cancel = new Runnable() {
                                 public void run() {
-                                    setCancelRequest(true);
+
+                                    setCancelStatus(true);
+                                    waitForCancelDialog.setMessage("Cancelling the upload...");
+                                    waitForCancelDialog.show();
                                 }
-                            });
-
-
-
+                            };
+                            handler.post(cancel);
 
                         }
                     });
@@ -419,7 +430,6 @@ public class OneDrive extends Activity {
         @Override
         protected void onPostExecute(Long aLong) {
             super.onPostExecute(aLong);
-
         }
 
         @Override
@@ -442,7 +452,8 @@ public class OneDrive extends Activity {
             try {
                 downloadDestination.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                publishProgress("Couldn't create temporary archive file");
+                finish();
             }
             // The download of the archive file to the created
             // directory is initiated
@@ -458,16 +469,17 @@ public class OneDrive extends Activity {
                                     .setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
 
                             if (getCancelRequest()) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        setCancelRequest(true);
-                                    }
-                                });
 
-                                publishProgress("Download cancelled");
-                                progressDialog.dismiss();
+                                if(progressDialog!=null&&progressDialog.isShowing()){
+                                    progressDialog.dismiss();}
+
                                 operation.cancel();
+                                setCancelRequest(false);
+                                if(waitForCancelDialog.isShowing()){
+                                    waitForCancelDialog.dismiss();
+                                }
+                                downloadDestination.delete();
+                                publishProgress("Download cancelled");
                                 finish();
                             }
                         }
@@ -475,16 +487,22 @@ public class OneDrive extends Activity {
                         @Override
                         public void onDownloadFailed(LiveOperationException exception,
                                                      LiveDownloadOperation operation) {
-                            publishProgress("Download cancelled");
                             operation.cancel();
-                            progressDialog.dismiss();
+                            downloadDestination.delete();
+                            publishProgress("Download cancelled");
+                            if(progressDialog!=null&&progressDialog.isShowing()){
+                                progressDialog.dismiss();}
+                            if(waitForCancelDialog!=null&&waitForCancelDialog.isShowing()){
+                                waitForCancelDialog.dismiss();
+                            }
+                            setCancelRequest(false);
                             finish();
 
                         }
 
                         @Override
                         public void onDownloadCompleted(LiveDownloadOperation operation) {
-                            publishProgress("Successfully downloaded archive");
+
                             if (!Archiver.notEncryptedGOSFile(downloadDestination)) {
 
                                 AlertDialog.Builder alert = new AlertDialog.Builder(OneDrive.this);
@@ -494,35 +512,46 @@ public class OneDrive extends Activity {
 
                                 alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
+
+
                                         String key = input.getText().toString();
                                         int value = Archiver.unpackEncryptedFile(key, downloadDestination);
                                         switch (value) {
                                             case Constants.UNPACK_NO_ERROR:
+                                                progressDialog.dismiss();
                                                 Toast.makeText(context,
                                                         "File import finished",
                                                         Toast.LENGTH_SHORT).show();
-                                                finish();
+                                                downloadDestination.delete();
                                                 break;
+
                                             case Constants.UNPACK_INVALID_FILE:
+                                                progressDialog.dismiss();
                                                 Toast.makeText(context,
                                                         "Invalid File",
                                                         Toast.LENGTH_SHORT).show();
-                                                finish();
+                                                downloadDestination.delete();
                                                 break;
+
                                             case Constants.UNPACK_EXTRACTING_FAILED:
+                                                progressDialog.dismiss();
                                                 Toast.makeText(context,
                                                         "Extracting failed",
                                                         Toast.LENGTH_SHORT).show();
-                                                finish();
-                                                break;
+                                                downloadDestination.delete();
+                                               break;
+
                                             case Constants.UNPACK_WRONG_KEY:
+                                                progressDialog.dismiss();
                                                 Toast.makeText(context,
                                                         "Wrong Password",
                                                         Toast.LENGTH_SHORT).show();
-                                                finish();
+                                                downloadDestination.delete();
                                                 break;
 
+
                                         }
+                                        finish();
                                     }
                                 });
 
@@ -536,38 +565,46 @@ public class OneDrive extends Activity {
                                 alert.setCancelable(false);
                                 alert.show();
                             } else {
+
                                 int value = APIFunctions.unpackArchiveFile(downloadDestination);
 
                                 switch (value) {
                                     case Constants.UNPACK_NO_ERROR:
+                                       progressDialog.dismiss();
                                         Toast.makeText(context,
                                                 "File import finished",
                                                 Toast.LENGTH_SHORT).show();
-                                        finish();
+                                        downloadDestination.delete();
                                         break;
+
                                     case Constants.UNPACK_INVALID_FILE:
+                                        progressDialog.dismiss();
                                         Toast.makeText(context,
                                                 "Invalid File",
                                                 Toast.LENGTH_SHORT).show();
-                                        finish();
-                                        break;
+                                        downloadDestination.delete();
+                                       break;
+
                                     case Constants.UNPACK_EXTRACTING_FAILED:
+                                        progressDialog.dismiss();
                                         Toast.makeText(context,
                                                 "Extracting failed",
                                                 Toast.LENGTH_SHORT).show();
-                                        finish();
+                                        downloadDestination.delete();
                                         break;
+
                                     case Constants.UNPACK_WRONG_KEY:
+                                        progressDialog.dismiss();
                                         Toast.makeText(context,
                                                 "Wrong Password",
                                                 Toast.LENGTH_SHORT).show();
-                                        finish();
+                                        downloadDestination.delete();
                                         break;
+
 
                                 }
                             }
-                            downloadDestination.delete();
-                            progressDialog.dismiss();
+                          finish();
                         }
 
                     });
@@ -580,10 +617,17 @@ public class OneDrive extends Activity {
         private String password;
         private final ProgressDialog progressDialog;
         private JSONObject uploadJsonObject = null;
+        private final ProgressDialog waitForCancelDialog;
 
         public OneDriveAsyncUploadTask(String password) {
             this.password = password;
             // create Progress Dialog to display the progress of upload
+
+            waitForCancelDialog = new ProgressDialog(OneDrive.getMainContext());
+            waitForCancelDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            waitForCancelDialog.setMessage("Cancelling the upload...");
+            waitForCancelDialog.setCancelable(false);
+
             progressDialog = new ProgressDialog(OneDrive.getMainContext());
             progressDialog.setMax(100);
             progressDialog.setMessage("Uploading " +Miscellaneous.getCloudArchiveName());
@@ -594,26 +638,25 @@ public class OneDrive extends Activity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                          runOnUiThread(new Runnable() {
-                              @Override
-                              public void run() {
-                                  setCancelRequest(true);
-                              }
-                          });
+                            final Handler handler = new Handler();
+
+                            final Runnable cancel = new Runnable() {
+                                public void run() {
+
+                                    setCancelStatus(true);
+                                    waitForCancelDialog.show();
+                                }
+                            };
+                            handler.post(cancel);
+
                         }
                     });
             progressDialog.show();
-
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            file.delete();
-            getArchiveList(parentDirectory);
-
-
-
         }
 
         @Override
@@ -636,7 +679,8 @@ public class OneDrive extends Activity {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    publishProgress("Couldn't create temporary archive file");
+                    finish();
                 }
                 Archiver.createArchiveFile(file);
             }
@@ -654,19 +698,20 @@ public class OneDrive extends Activity {
 
                         @Override
                         public void onUploadProgress(int totalBytes, int bytesRemaining, LiveOperation arg2) {
+
                             if (getCancelRequest()) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        setCancelRequest(true);
-                                    }
-                                });
 
-                                publishProgress("Upload cancelled");
+                                if(progressDialog!=null&&progressDialog.isShowing()){
+                                    progressDialog.dismiss();}
+
                                 arg2.cancel();
+                                setCancelRequest(false);
+                                if(waitForCancelDialog.isShowing()){
+                                    waitForCancelDialog.dismiss();
+                                }
                                 file.delete();
+                                publishProgress("Upload cancelled");
                                 finish();
-
                             }
                             progressDialog
                                     .setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
@@ -678,7 +723,12 @@ public class OneDrive extends Activity {
                             arg1.cancel();
                             file.delete();
                             publishProgress("Upload cancelled");
-                            progressDialog.dismiss();
+                            if(progressDialog!=null&&progressDialog.isShowing()){
+                                progressDialog.dismiss();}
+                            if(waitForCancelDialog!=null&&waitForCancelDialog.isShowing()){
+                                waitForCancelDialog.dismiss();
+                            }
+                            setCancelRequest(false);
                             finish();
 
                         }
@@ -687,8 +737,12 @@ public class OneDrive extends Activity {
                         public void onUploadCompleted(LiveOperation arg0) {
                             file.delete();
                             publishProgress("Successfully uploaded sensor archive");
-                            progressDialog.dismiss();
-
+                            if(progressDialog!=null&&progressDialog.isShowing()){
+                                progressDialog.dismiss();}
+                            if(waitForCancelDialog!=null&&waitForCancelDialog.isShowing()){
+                                waitForCancelDialog.dismiss();
+                            }
+                            finish();
                         }
 
                     }, null);
@@ -696,7 +750,12 @@ public class OneDrive extends Activity {
 
         }
     }
-
+    private static synchronized boolean getCancelStatus(){
+        return cancelRequest;
+    }
+    private static synchronized void setCancelStatus(boolean newStatus){
+        cancelRequest = newStatus;
+    }
 
 
 }
