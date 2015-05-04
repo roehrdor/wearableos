@@ -76,9 +76,21 @@ public class HARActivityTraining extends Activity {
 				switch (checkedId) {
 				case R.id.har_train_radio0:
 					live = true;
+                    // disable date and time, not necessary for live training
+                    startDateBtn.setEnabled(false);
+                    startTimeBtn.setEnabled(false);
+                    endDateBtn.setEnabled(false);
+                    endTimeBtn.setEnabled(false);
+
 					break;
 				case R.id.har_train_radio1:
 					live = false;
+                    // enable date and time, necessary for training with the database
+                    startDateBtn.setEnabled(true);
+                    startTimeBtn.setEnabled(true);
+                    endDateBtn.setEnabled(true);
+                    endTimeBtn.setEnabled(true);
+
 					break;
 				}
 			}
@@ -324,6 +336,12 @@ public class HARActivityTraining extends Activity {
 			}
 
 		});
+
+        // disable date and time, not necessary for live training
+        endTimeBtn.setEnabled(false);
+        endDateBtn.setEnabled(false);
+        startTimeBtn.setEnabled(false);
+        startDateBtn.setEnabled(false);
 
 		// activity
 		ArrayAdapter<String> adapter;
