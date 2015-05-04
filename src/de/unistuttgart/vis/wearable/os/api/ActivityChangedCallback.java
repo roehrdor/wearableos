@@ -11,6 +11,10 @@ import android.os.Parcel;
 import de.unistuttgart.vis.wearable.os.activityRecognition.ActivityEnum;
 
 /**
+ * This Callback object is returned when the Activity of the User has changed
+ * and the app has registered itself for being called back once this event
+ * happens
+ *
  * @author roehrdor
  */
 public class ActivityChangedCallback extends BaseCallbackObject {

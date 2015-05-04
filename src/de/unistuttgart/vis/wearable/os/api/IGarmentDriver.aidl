@@ -7,6 +7,9 @@
  */
 package de.unistuttgart.vis.wearable.os.api;
 
+/**
+ * This interface defines the methods every driver has to provide
+ */
 interface IGarmentDriver {
     float[] executeDriver(in byte[] stream);
     String  getDriverName();

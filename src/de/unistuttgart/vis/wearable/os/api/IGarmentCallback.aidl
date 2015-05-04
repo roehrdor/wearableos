@@ -9,6 +9,9 @@ package de.unistuttgart.vis.wearable.os.api;
 
 import de.unistuttgart.vis.wearable.os.api.BaseCallbackObject;
 
+/**
+ * This Interface defines the method available for callback objects
+ */
 interface IGarmentCallback {
 	void callback(in BaseCallbackObject value);
 }

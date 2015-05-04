@@ -12,6 +12,9 @@ import de.unistuttgart.vis.wearable.os.api.PSensor;
 import de.unistuttgart.vis.wearable.os.api.PSensorData;
 import de.unistuttgart.vis.wearable.os.api.IGarmentDriver;
 
+/**
+ * This interface defines all the available methods for the IPC
+ */
 interface IGarmentAPI {
 	long currentTime();
 
