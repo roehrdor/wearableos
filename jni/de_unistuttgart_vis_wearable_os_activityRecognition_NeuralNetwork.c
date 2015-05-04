@@ -26,7 +26,7 @@ inline int get_instance_id(JNIEnv *env, jobject thiz)
 	fidnumber = (*env)->GetFieldID(env, thiz_class, "instance_id", "I");
 	if(fidnumber == NULL)
 	{
-		printf("Fatal, could not read instance_id!\n");
+		LOG("Fatal, could not read instance_id!\n");
 		return ILLEGAL_INSTANCE_ID;
 	}
 	return (int)(*env)->GetIntField(env, thiz, fidnumber);
@@ -46,6 +46,8 @@ inline int keep_network(JNIEnv *env, jobject thiz, struct fann *pann)
 	{
 		max_current_instances = 0x4;
 		networks = malloc(sizeof(struct fann*) * max_current_instances);
+		for(i = 0; i != max_current_instances; ++i)
+		    networks[i] = NULL;
 	}
 
 	/* 
@@ -90,7 +92,6 @@ inline int keep_network(JNIEnv *env, jobject thiz, struct fann *pann)
 		LOG("Fatal, could not get instance_id %d field!\n", i);
 		return ILLEGAL_INSTANCE_ID;
 	}
-	LOG("Setting ID %d\n", i);
 	(*env)->SetIntField(env, thiz, fidnumber, i);
 
 	/* Success */
@@ -121,6 +122,9 @@ JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
 
 	/* Create the neural network */
 	ann = fann_create_standard_array(size, c_topology);
+
+	fann_set_activation_function_hidden(ann, FANN_SIGMOID_SYMMETRIC);
+    fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
 
 	/* Now keep the neural entwork */
 	keep_network(env, thiz, ann);
@@ -183,20 +187,25 @@ JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
 JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1train(JNIEnv *env, jobject thiz, jdoubleArray input, jint inputSize, jdoubleArray target, jint targetSize)
 {
 	fann_type *finput, *ftarget;
+	double *dinput;
 	struct fann *ann;
 	int instance_id;
+	int i;
 
 	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_existent - 1 < instance_id)
-		return;
+	{
+	    LOG("W %d\n", instance_id);
+	    return;
+	}
+
 	ann = networks[instance_id];
 
-	ftarget = (fann_type*)(*env)->GetDoubleArrayElements(env, target, NULL);
-	finput = (fann_type*)(*env)->GetDoubleArrayElements(env, input, NULL);
+	finput = (double*)(*env)->GetDoubleArrayElements(env, input, NULL);
+	ftarget = (double*)(*env)->GetDoubleArrayElements(env, target, NULL);
 
 	fann_train(ann, finput, ftarget);
-
-	(*env)->ReleaseDoubleArrayElements(env, target, (jdouble*)ftarget, 0);
-	(*env)->ReleaseDoubleArrayElements(env, target, (jdouble*)finput, 0);
+    (*env)->ReleaseDoubleArrayElements(env, input, (jdouble*)finput, 0);
+    (*env)->ReleaseDoubleArrayElements(env, target, (jdouble*)ftarget, 0);
 }
 
 /*
@@ -210,17 +219,33 @@ JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
 	double *dresult;
 	struct fann *ann;
 	int instance_id;
+	int i;
 
 	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_existent - 1 < instance_id)
 		return;
 	ann = networks[instance_id];
 
 	finput = (fann_type*)(*env)->GetDoubleArrayElements(env, input, NULL);
-	fresult = fann_run(ann, finput);
-	(*env)->ReleaseDoubleArrayElements(env, output, (jdouble*)finput, 0);
+	dresult = (*env)->GetDoubleArrayElements(env, output, NULL);
+	fresult = (double*)fann_run(ann, finput);
+	memcpy(dresult, fresult, sizeof(double) * outputSize);
 
-	dresult = (double*)(*env)->GetDoubleArrayElements(env, output, NULL);
-	memcpy(fresult, dresult, sizeof(double) * outputSize);
+#ifdef _NN_DEBUG_
+	LOG("-- START OF RUN--");
+    LOG("Input data");
+    for(i = 0; i != inputSize; ++i)
+    {
+        LOG("\t%f", finput[i]);
+    }
+    LOG("Result data");
+    for(i = 0; i != outputSize; ++i)
+    {
+        LOG("\t%f", fresult[i]);
+    }
+    LOG("-- END OF RUN--");
+#endif
+
+	(*env)->ReleaseDoubleArrayElements(env, input, (jdouble*)finput, 0);
 	(*env)->ReleaseDoubleArrayElements(env, output, (jdouble*)dresult, 0);
 }
 
@@ -231,6 +256,20 @@ JNIEXPORT void JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_
  */
 JNIEXPORT jint JNICALL Java_de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork_j_1neural_1net_1save(JNIEnv *env, jobject thiz, jstring fileName)
 {
-	//TODO
+	struct fann *ann;
+	const char *file;
+	int instance_id;
+
+	if((instance_id = get_instance_id(env, thiz)) == ILLEGAL_INSTANCE_ID || num_existent - 1 < instance_id)
+    		return;
+    	ann = networks[instance_id];
+
+    file = (*env)->GetStringUTFChars(env, fileName, NULL);
+    if(file == NULL)
+        return 0x1;
+
+	fann_save(ann, file);
+	(*env)->ReleaseStringUTFChars(env, fileName, file);
+
 	return 0x0;
 }

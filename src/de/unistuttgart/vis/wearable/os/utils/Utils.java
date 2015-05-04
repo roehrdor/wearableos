@@ -7,8 +7,13 @@
  */
 package de.unistuttgart.vis.wearable.os.utils;
 
+import android.content.Context;
+import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
 import de.unistuttgart.vis.wearable.os.sensors.SensorType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,12 +21,12 @@ import java.util.Map;
 
 /**
  * This class provides some basic utilities that can be used everywhere.
- * 
+ *
  * @author roehrdor
  */
 public class Utils {
-	private Utils() {
-	}
+    private Utils() {
+    }
 
     /**
      * Sleep for the given amount of time without getting interrupted.
@@ -135,16 +140,16 @@ public class Utils {
         return (b[3]) | ((b[2] & 0xFF) << 0x8) | ((b[1] & 0xFF) << 0x10) | ((b[0] & 0xFF) << 0x18);
     }
 
-	/**
-	 * Create the unix time stamp from the given {@link java.util.Date} object
-	 * 
-	 * @param date
-	 *            the date object
-	 * @return the unix time stamp for the date object
-	 */
-	public static int dateToUnix(java.util.Date date) {
-		return (int) (date.getTime() / 1000L);
-	}
+    /**
+     * Create the unix time stamp from the given {@link java.util.Date} object
+     *
+     * @param date
+     *            the date object
+     * @return the unix time stamp for the date object
+     */
+    public static int dateToUnix(java.util.Date date) {
+        return (int) (date.getTime() / 1000L);
+    }
 
     /**
      * Create the long unix time stamp from the given {@link java.util.Date} object
@@ -157,16 +162,16 @@ public class Utils {
         return date.getTime();
     }
 
-	/**
-	 * Create a new {@link java.util.Date} object from the given unix time stamp
-	 * 
-	 * @param unixTime
-	 *            the unix time stamp to create a date object for
-	 * @return the date object for the time stamp
-	 */
-	public static java.util.Date unixToDate(int unixTime) {
-		return new java.util.Date(1000L * unixTime);
-	}
+    /**
+     * Create a new {@link java.util.Date} object from the given unix time stamp
+     *
+     * @param unixTime
+     *            the unix time stamp to create a date object for
+     * @return the date object for the time stamp
+     */
+    public static java.util.Date unixToDate(int unixTime) {
+        return new java.util.Date(1000L * unixTime);
+    }
 
     /**
      * Create a new {@link java.util.Date} object from the given long unix time stamp
@@ -179,14 +184,14 @@ public class Utils {
         return new java.util.Date(unixTime);
     }
 
-	/**
-	 * Return the current unix time stamp as integer value.
-	 * 
-	 * @return the current unix time stamp
-	 */
-	public static int getCurrentUnixTimeStamp() {
-		return (int) (System.currentTimeMillis() / 1000L);
-	}
+    /**
+     * Return the current unix time stamp as integer value.
+     *
+     * @return the current unix time stamp
+     */
+    public static int getCurrentUnixTimeStamp() {
+        return (int) (System.currentTimeMillis() / 1000L);
+    }
 
     /**
      * Get the current unix date with milli seconds. This functions returns the value of the call to the
@@ -229,34 +234,72 @@ public class Utils {
             return permissionFlags.get(sensorType.ordinal());
     }
 
-	/**
-	 * This function can be used to create an explicit intent from the given
-	 * implicit one. Android API 21 needs an explicit Intent to start a service
-	 * from
-	 *
-	 * @param context
-	 *            the context of the application
-	 * @param implicitIntent
-	 *            the implicit created Intent
-	 * @return the corresponding explicit content for the given implicit one
-	 */
-	public static android.content.Intent explicitFromImplicit(
-			android.content.Context context,
-			android.content.Intent implicitIntent) {
-		android.content.pm.PackageManager pm = context.getPackageManager();
-		java.util.List<android.content.pm.ResolveInfo> resolveInfo = pm
-				.queryIntentServices(implicitIntent, 0);
-		if (resolveInfo == null || resolveInfo.size() != 1) {
-			return null;
-		}
-		android.content.pm.ResolveInfo serviceInfo = resolveInfo.get(0);
-		String packageName = serviceInfo.serviceInfo.packageName;
-		String className = serviceInfo.serviceInfo.name;
-		android.content.ComponentName component = new android.content.ComponentName(
-				packageName, className);
-		android.content.Intent explicitIntent = new android.content.Intent(
-				implicitIntent);
-		explicitIntent.setComponent(component);
-		return explicitIntent;
-	}
+    /**
+     * This function can be used to create an explicit intent from the given
+     * implicit one. Android API 21 needs an explicit Intent to start a service
+     * from
+     *
+     * @param context
+     *            the context of the application
+     * @param implicitIntent
+     *            the implicit created Intent
+     * @return the corresponding explicit content for the given implicit one
+     */
+    public static android.content.Intent explicitFromImplicit(
+            android.content.Context context,
+            android.content.Intent implicitIntent) {
+        android.content.pm.PackageManager pm = context.getPackageManager();
+        java.util.List<android.content.pm.ResolveInfo> resolveInfo = pm
+                .queryIntentServices(implicitIntent, 0);
+        if (resolveInfo == null || resolveInfo.size() != 1) {
+            return null;
+        }
+        android.content.pm.ResolveInfo serviceInfo = resolveInfo.get(0);
+        String packageName = serviceInfo.serviceInfo.packageName;
+        String className = serviceInfo.serviceInfo.name;
+        android.content.ComponentName component = new android.content.ComponentName(
+                packageName, className);
+        android.content.Intent explicitIntent = new android.content.Intent(
+                implicitIntent);
+        explicitIntent.setComponent(component);
+        return explicitIntent;
+    }
+
+    /**
+     * Checks for free space at the specified directory to give feedback whether an export to that path is possible
+     * @param path The target directory for the archive
+     * @param context The context of the activity that calls this method
+     * @return the possibility to save the sensor archive in the desired directory
+     */
+    public static boolean enoughExternalSpaceAvailable(File path, Context context){
+        long requiredSpace = 0;
+        for(int i=0; i<context.getFilesDir().getAbsoluteFile().listFiles().length;i++){
+            requiredSpace+=context.getFilesDir().getAbsoluteFile().listFiles()[i].length();
+        }
+        StatFs internalStorageStat = new StatFs(path.getAbsolutePath());
+        long targetDirectorySize;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            targetDirectorySize = internalStorageStat.getAvailableBlocksLong()*internalStorageStat.getBlockSizeLong();
+        } else {
+            targetDirectorySize = (long)internalStorageStat.getAvailableBlocks()*(long)internalStorageStat.getBlockSize();
+        }
+        return targetDirectorySize>requiredSpace;
+    }
+
+    /**
+     * Checks the free space that is available at the internal storage
+     * @return the internal space available for the archive import in byte size
+     */
+    public static long getAvailableInternalSpace(){
+        long targetDirectorySize;
+        StatFs internalStorageStat = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            targetDirectorySize = internalStorageStat.getAvailableBlocksLong()*internalStorageStat.getBlockSizeLong();
+        } else {
+            targetDirectorySize = (long)internalStorageStat.getAvailableBlocks()*(long)internalStorageStat.getBlockSize();
+        }
+        return targetDirectorySize;
+    }
 }

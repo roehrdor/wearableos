@@ -55,6 +55,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE            :=  neuralNetwork
 LOCAL_SRC_FILES         := 	de_unistuttgart_vis_wearable_os_activityRecognition_NeuralNetwork.c
 LOCAL_LDLIBS            += -lm -llog -landroid
-LOCAL_STATIC_LIBRARIES  += float-fann double-fann fixed-fann fann
+LOCAL_STATIC_LIBRARIES  += double-fann float-fann fixed-fann fann
 LOCAL_CFLAGS            += -I$(LOCAL_PATH)/fann/include
 include $(BUILD_SHARED_LIBRARY)

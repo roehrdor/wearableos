@@ -38,9 +38,8 @@ import java.lang.IllegalArgumentException;
  *		Instances that are no longer needed or will never be used again must
  *		be explicitly deleted by the user.</p>
  * 
- * @author Oliver Roehrdanz
+ * @author roehrdor
  * @version 1.0
- * (c) 2014 - roehrdor.com
  * </body>
  * </html>
  */

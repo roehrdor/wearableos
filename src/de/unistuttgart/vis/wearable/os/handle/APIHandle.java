@@ -46,6 +46,8 @@ public class APIHandle extends android.app.Application {
      * @return the app package id
      */
     public static String getAppPackageID() {return appPackageID;}
+
+    private static Runnable startupProc = null;
 	
 	
 	// =========================================================
@@ -65,7 +67,10 @@ public class APIHandle extends android.app.Application {
                 garmentAPIHandle.registerApp(appPackageID);
             } catch(RemoteException e) {
             }
-		}
+
+            if(startupProc != null)
+                startupProc.run();
+        }
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
@@ -110,6 +115,14 @@ public class APIHandle extends android.app.Application {
 	public static IGarmentAPI getGarmentAPIHandle() {
 		return garmentAPIHandle;
 	}
+
+    /**
+     * Register a runnable that is started upon connection
+     * @param runnable the runnable to be run
+     */
+    public static void registerStartupProc(Runnable runnable) {
+        startupProc = runnable;
+    }
 	
 	/**
 	 * Get the internal garment API Handle to make internal API function calls

@@ -48,7 +48,14 @@ public class OneDrive extends Activity {
     private TextView currentDirectoryTextView = null;
     private ProgressDialog progressDialog = null;
     private String futurePath = "";
+    private static boolean cancelRequest = false;
 
+    private static synchronized void setCancelRequest(boolean newStatus){
+        cancelRequest = newStatus;
+    }
+    private static synchronized boolean getCancelRequest(){
+        return cancelRequest;
+    }
 
     @Override
     public void onBackPressed() {
@@ -243,6 +250,7 @@ public class OneDrive extends Activity {
     private void startFileImport(JSONObject curJSONObject) {
         new OneDriveAsyncDownloadTask().execute(curJSONObject);
 
+
     }
 
     @Override
@@ -375,7 +383,7 @@ public class OneDrive extends Activity {
     private class OneDriveAsyncDownloadTask extends AsyncTask<JSONObject, String, Long> {
 
         private final ProgressDialog progressDialog;
-        private boolean cancelRequest = false;
+
         private JSONObject downloadJsonObject = null;
         File downloadDestination = null;
 
@@ -392,18 +400,16 @@ public class OneDrive extends Activity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            class AsyncUploadCancelTask extends AsyncTask<Void, Long, Boolean> {
-
+                            runOnUiThread(new Runnable() {
                                 @Override
-                                protected Boolean doInBackground(Void... params) {
-                                    cancelRequest = true;
-
-                                    return false;
+                                public void run() {
+                                    setCancelRequest(true);
                                 }
+                            });
 
-                            }
 
-                            new AsyncUploadCancelTask().execute(null, null);
+
+
                         }
                     });
             progressDialog.show();
@@ -450,10 +456,19 @@ public class OneDrive extends Activity {
 
                             progressDialog
                                     .setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
-                            if (cancelRequest) {
+
+                            if (getCancelRequest()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setCancelRequest(true);
+                                    }
+                                });
+
                                 publishProgress("Download cancelled");
                                 progressDialog.dismiss();
                                 operation.cancel();
+                                finish();
                             }
                         }
 
@@ -461,7 +476,9 @@ public class OneDrive extends Activity {
                         public void onDownloadFailed(LiveOperationException exception,
                                                      LiveDownloadOperation operation) {
                             publishProgress("Download cancelled");
+                            operation.cancel();
                             progressDialog.dismiss();
+                            finish();
 
                         }
 
@@ -478,7 +495,7 @@ public class OneDrive extends Activity {
                                 alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         String key = input.getText().toString();
-                                        int value =Archiver.unpackEncryptedFile(key, downloadDestination);
+                                        int value = Archiver.unpackEncryptedFile(key, downloadDestination);
                                         switch (value) {
                                             case Constants.UNPACK_NO_ERROR:
                                                 Toast.makeText(context,
@@ -562,7 +579,6 @@ public class OneDrive extends Activity {
         File file = null;
         private String password;
         private final ProgressDialog progressDialog;
-        private boolean cancelRequest = false;
         private JSONObject uploadJsonObject = null;
 
         public OneDriveAsyncUploadTask(String password) {
@@ -578,18 +594,12 @@ public class OneDrive extends Activity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            class AsyncUploadCancelTask extends AsyncTask<Void, Long, Boolean> {
-
-                                @Override
-                                protected Boolean doInBackground(Void... params) {
-                                    cancelRequest = true;
-
-                                    return false;
-                                }
-
-                            }
-
-                            new AsyncUploadCancelTask().execute(null, null, null);
+                          runOnUiThread(new Runnable() {
+                              @Override
+                              public void run() {
+                                  setCancelRequest(true);
+                              }
+                          });
                         }
                     });
             progressDialog.show();
@@ -644,20 +654,32 @@ public class OneDrive extends Activity {
 
                         @Override
                         public void onUploadProgress(int totalBytes, int bytesRemaining, LiveOperation arg2) {
-                            progressDialog
-                                    .setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
-                            if (cancelRequest) {
+                            if (getCancelRequest()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setCancelRequest(true);
+                                    }
+                                });
+
                                 publishProgress("Upload cancelled");
                                 arg2.cancel();
+                                file.delete();
+                                finish();
 
                             }
+                            progressDialog
+                                    .setProgress((int) (((float) (totalBytes - bytesRemaining) / (float) (totalBytes)) * 100));
+
                         }
 
                         @Override
                         public void onUploadFailed(LiveOperationException arg0, LiveOperation arg1) {
+                            arg1.cancel();
                             file.delete();
                             publishProgress("Upload cancelled");
                             progressDialog.dismiss();
+                            finish();
 
                         }
 
@@ -674,4 +696,7 @@ public class OneDrive extends Activity {
 
         }
     }
+
+
+
 }

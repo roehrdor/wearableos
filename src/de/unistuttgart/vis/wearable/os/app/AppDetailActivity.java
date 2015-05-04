@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -60,20 +62,14 @@ public class AppDetailActivity extends Activity {
             pSensors = APIFunctions.getAllSensors(sensorTypes[position]);
             fillSpinner(sensorTypes[position]);
 
-
-            //
-            // Patch - roehrdor
-            // Choose the default sensor and display it accordingly, also set the background color
-            // according to whether access to the given sensor type is granted for the selected
-            // application or not
-            //
+            //Wählt den aktuell in PUserApp gespeicherten Sensor im Spinner aus
             int i = 0;
             if(app.getDefaultSensor(sensorTypes[position]) != null) {
-                if (!app.sensorTypeGranted(Utils.permissionFlagFromSensorType(sensorTypes[position]))) {
+                    if (!app.sensorTypeGranted(Utils.permissionFlagFromSensorType(sensorTypes[position]))) {
                         itemView.setBackgroundColor(Color.parseColor("#86959f"));
-                } else {
-                    itemView.setBackgroundColor(Color.parseColor("#c0d6e4"));
-                }
+                    }else{
+                        itemView.setBackgroundColor(Color.parseColor("#c0d6e4"));
+                    }
 
                 for(PSensor pSensor : pSensors) {
                     if(pSensor.equals(app.getDefaultSensor(sensorTypes[position]))) {
@@ -83,9 +79,9 @@ public class AppDetailActivity extends Activity {
                 }
             }
 
+
             imageView.setImageResource(sensorTypes[position].getIconID());
             textView.setText(sensorTypes[position].toString());
-
 
             return itemView;
         }
@@ -95,6 +91,7 @@ public class AppDetailActivity extends Activity {
         ArrayAdapter adapter = new ArrayAdapter(AppDetailActivity.this, android.R.layout.simple_spinner_item, pSensors);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
@@ -110,10 +107,13 @@ public class AppDetailActivity extends Activity {
         });
     }
 
+
+
     public void listViewOptions(ListView listView) {
         @SuppressWarnings("rawtypes")
         ArrayAdapter adapter = new AppListAdapter();
         listView.setAdapter(adapter);
+
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -122,6 +122,8 @@ public class AppDetailActivity extends Activity {
                 return true;
             }
         });
+
+
     }
 
     public void showDialogDelete(final int position, final View view) {
@@ -161,5 +163,4 @@ public class AppDetailActivity extends Activity {
 
         builder.show();
     }
-
 }
