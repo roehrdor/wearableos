@@ -81,7 +81,7 @@
     <string name="button_har_manage">Manage Neural Network</string>
     <string name="title_train_settings">Training settings</string>
     <string name="radioButton_train_live">Live</string>
-    <string name="radioButton_train_DB">Database (coming soon)</string>
+    <string name="radioButton_train_DB">Database</string>
     <string name="textView_train_start_date">Start:</string>
     <string name="textView_train_end_date">End:</string>
     <string name="textView_train_activity">Activity:</string>

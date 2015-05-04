@@ -725,7 +725,7 @@ public class GoogleDrive extends Activity implements
                 if(key.equals("")){
                     Archiver.createArchiveFile(file);}
                 else{
-                    Archiver.unpackEncryptedFile(key,file);
+                    Archiver.createEncryptedArchiveFile(key,file);
                 }
 
                 int streamStatus = 0;
@@ -1162,9 +1162,7 @@ public class GoogleDrive extends Activity implements
             if (!arg0.isSuccess()) {
                 Toast.makeText(GoogleDrive.getMainContext(),
                         "Upload failed", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(GoogleDrive.getMainContext(),
-                        "Upload successful", Toast.LENGTH_SHORT).show();
+
             }
             Drive.DriveApi
                     .requestSync(GoogleDrive.getGoogleApiClient())
