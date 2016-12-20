@@ -1,7 +1,7 @@
 ## Building GarmentOS 
 ### From command line
 #### 1. Cloning git repository
-1. Clone the pearl-elk git repository ( git@gitlab.roehrdor.com:roehrdor/pearl-elk.git )
+1. Clone the pearl-elk git repository ( git@github.com:roehrdor/wearableos.git )
 
 #### 2. Building Dependencies
 ##### 1. Building LiveSDK
